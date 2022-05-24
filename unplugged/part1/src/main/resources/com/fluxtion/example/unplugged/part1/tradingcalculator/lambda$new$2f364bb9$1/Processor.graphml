@@ -245,47 +245,56 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="peekEventStream_25">
+        <node id="pushEventStream_24">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="peekEventStream_25:&#10;PeekEventStream"/>
+                    <jGraph:label text="pushEventStream_24:&#10;PushEventStream"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="templateMessage_24">
+        <node id="mtm_Sink">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="templateMessage_24:&#10;TemplateMessage"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;mtm_Sink:&#10;SinkPublisher"/>
+                    <jGraph:Style properties="EVENTHANDLER"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="mapRef2RefEventStream_25">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="mapRef2RefEventStream_25:&#10;MapRef2RefEventStream"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="mapRef2RefEventStream_26">
+        <node id="mapRef2RefEventStream_27">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="mapRef2RefEventStream_26:&#10;MapRef2RefEventStream"/>
+                    <jGraph:label text="mapRef2RefEventStream_27:&#10;MapRef2RefEventStream"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="mapRef2RefEventStream_28">
+        <node id="defaultValueFromSupplier_26">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="mapRef2RefEventStream_28:&#10;MapRef2RefEventStream"/>
+                    <jGraph:label text="defaultValueFromSupplier_26:&#10;DefaultValueFromSupplier"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="defaultValueFromSupplier_27">
+        <node id="filterEventStream_28">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="defaultValueFromSupplier_27:&#10;DefaultValueFromSupplier"/>
+                    <jGraph:label text="filterEventStream_28:&#10;FilterEventStream"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
@@ -299,56 +308,38 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="filterEventStream_30">
+        <node id="pushEventStream_30">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="filterEventStream_30:&#10;FilterEventStream"/>
+                    <jGraph:label text="pushEventStream_30:&#10;PushEventStream"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="peekEventStream_32">
+        <node id="positions_Sink">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="peekEventStream_32:&#10;PeekEventStream"/>
-                    <jGraph:Style properties="NODE"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
-        <node id="templateMessage_31">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="templateMessage_31:&#10;TemplateMessage"/>
-                    <jGraph:Style properties="NODE"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
-        <node id="callbackImpl_33">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;callbackImpl_33:&#10;CallbackImpl"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;positions_Sink:&#10;SinkPublisher"/>
                     <jGraph:Style properties="EVENTHANDLER"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="callbackImpl_34">
+        <node id="callbackImpl_31">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;callbackImpl_34:&#10;CallbackImpl"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;callbackImpl_31:&#10;CallbackImpl"/>
                     <jGraph:Style properties="EVENTHANDLER"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="clock">
+        <node id="callbackImpl_32">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;clock:&#10;Clock"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;callbackImpl_32:&#10;CallbackImpl"/>
                     <jGraph:Style properties="EVENTHANDLER"/>
                 </jGraph:ShapeNode>
             </data>
@@ -380,20 +371,29 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
+        <node id="SinkRegistration">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;SinkRegistration"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="SinkDeregister">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;SinkDeregister"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
         <node id="CallbackEvent">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
                     <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;CallbackEvent"/>
-                    <jGraph:Style properties="EVENT"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
-        <node id="ClockStrategyEvent">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;ClockStrategyEvent"/>
                     <jGraph:Style properties="EVENT"/>
                 </jGraph:ShapeNode>
             </data>
@@ -568,107 +568,112 @@
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="35" source="mapRef2RefEventStream_21" target="peekEventStream_25">
+        <edge id="35" source="pushEventStream_24" target="mtm_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="36" source="templateMessage_24" target="peekEventStream_25">
+        <edge id="36" source="mapRef2RefEventStream_21" target="pushEventStream_24">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="37" source="mapRef2RefEventStream_2" target="mapRef2RefEventStream_26">
+        <edge id="37" source="mapRef2RefEventStream_2" target="mapRef2RefEventStream_25">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="38" source="defaultValueFromSupplier_27" target="mapRef2RefEventStream_28">
+        <edge id="38" source="defaultValueFromSupplier_26" target="mapRef2RefEventStream_27">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="39" source="mapRef2RefEventStream_26" target="mapRef2RefEventStream_28">
+        <edge id="39" source="mapRef2RefEventStream_25" target="mapRef2RefEventStream_27">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="40" source="filterEventStream_29" target="mapRef2RefEventStream_28">
+        <edge id="40" source="filterEventStream_28" target="mapRef2RefEventStream_27">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="41" source="handlerString" target="filterEventStream_29">
+        <edge id="41" source="handlerString" target="filterEventStream_28">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="42" source="string_22" target="filterEventStream_29">
+        <edge id="42" source="string_22" target="filterEventStream_28">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="43" source="mapRef2RefEventStream_28" target="filterEventStream_30">
+        <edge id="43" source="mapRef2RefEventStream_27" target="filterEventStream_29">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="44" source="filterEventStream_30" target="peekEventStream_32">
+        <edge id="44" source="pushEventStream_30" target="positions_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="45" source="templateMessage_31" target="peekEventStream_32">
+        <edge id="45" source="filterEventStream_29" target="pushEventStream_30">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="46" source="callbackImpl_33" target="flatMapEventStream_0">
+        <edge id="46" source="callbackImpl_31" target="flatMapEventStream_0">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="47" source="callbackImpl_34" target="flatMapEventStream_5">
+        <edge id="47" source="callbackImpl_32" target="flatMapEventStream_5">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="48" source="clock" target="templateMessage_24">
+        <edge id="48" source="Trade" target="handlerTrade">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="49" source="clock" target="templateMessage_31">
+        <edge id="49" source="String" target="handlerString">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="50" source="Trade" target="handlerTrade">
+        <edge id="50" source="PairPrice" target="handlerPairPrice">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="51" source="String" target="handlerString">
+        <edge id="51" source="SinkRegistration" target="mtm_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="52" source="PairPrice" target="handlerPairPrice">
+        <edge id="52" source="SinkDeregister" target="mtm_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="53" source="CallbackEvent" target="callbackImpl_33">
+        <edge id="53" source="SinkRegistration" target="positions_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="54" source="CallbackEvent" target="callbackImpl_34">
+        <edge id="54" source="SinkDeregister" target="positions_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="55" source="ClockStrategyEvent" target="clock">
+        <edge id="55" source="CallbackEvent" target="callbackImpl_31">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="56" source="CallbackEvent" target="callbackImpl_32">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>

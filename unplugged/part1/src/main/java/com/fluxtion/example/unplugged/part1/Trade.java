@@ -9,13 +9,13 @@ import java.util.List;
 public class Trade {
     public static Trade bought(String instrumentId, double dealtAmount, double contraAmount) {
         return new Trade(
-                new AssetAmountTraded(instrumentId.substring(0,3), dealtAmount),
+                new AssetAmountTraded(instrumentId.substring(0, 3), dealtAmount),
                 new AssetAmountTraded(instrumentId.substring(3), -1.0 * contraAmount));
     }
 
     public static Trade sold(String instrumentId, double dealtAmount, double contraAmount) {
         return new Trade(
-                new AssetAmountTraded(instrumentId.substring(0,3), -1.0 * dealtAmount),
+                new AssetAmountTraded(instrumentId.substring(0, 3), -1.0 * dealtAmount),
                 new AssetAmountTraded(instrumentId.substring(3), contraAmount));
     }
 

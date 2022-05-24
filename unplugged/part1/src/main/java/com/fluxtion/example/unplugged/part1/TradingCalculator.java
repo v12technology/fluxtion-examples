@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static com.fluxtion.compiler.builder.stream.EventFlow.subscribe;
 
@@ -36,6 +37,14 @@ public class TradingCalculator {
     public void reset() {
         streamProcessor.onEvent("reset");
         streamProcessor.onEvent("publish");
+    }
+
+    public void markToMarketListener(Consumer<Map<String, Double>> listener) {
+        streamProcessor.addSink("mtm", listener);
+    }
+
+    public void positionsListener(Consumer<Map<String, Double>> listener) {
+        streamProcessor.addSink("positions", listener);
     }
 
     public TradingCalculator() {
@@ -63,14 +72,14 @@ public class TradingCalculator {
                     .map(GroupBy::map)
                     .defaultValue(Collections::emptyMap)
                     .updateTrigger(subscribe(String.class).filter("publish"::equalsIgnoreCase))
-                    .console("MtM:{}");
+                    .sink("mtm");
 
             //Positions
             assetPosition.map(GroupBy::map)
                     .defaultValue(Collections::emptyMap)
                     .updateTrigger(subscribe(String.class).filter("publish"::equalsIgnoreCase))
                     .filter(Objects::nonNull)
-                    .console("positionMap:{}");
+                    .sink("positions");
         });
         streamProcessor.init();
     }
