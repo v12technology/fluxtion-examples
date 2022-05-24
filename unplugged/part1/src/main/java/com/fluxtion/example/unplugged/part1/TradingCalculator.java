@@ -85,9 +85,6 @@ public class TradingCalculator {
     }
 
     public static KeyValue<String, Double> markToMarket(KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
-        if (assetPosition == null || assetPriceMap == null) {
-            return null;
-        }
         Double price = assetPriceMap.getOrDefault(assetPosition.getKey(), Double.NaN);
         return new KeyValue<>(assetPosition.getKey(), price * assetPosition.getValue());
     }
