@@ -3,6 +3,7 @@ package com.fluxtion.example.unplugged.part1;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.stream.EventStreamBuilder;
 import com.fluxtion.example.unplugged.part1.Trade.AssetPrice;
+import com.fluxtion.example.unplugged.part1.Trade.TradeLeg;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.stream.aggregate.functions.AggregateDoubleSum;
 import com.fluxtion.runtime.stream.groupby.GroupBy;
@@ -51,12 +52,12 @@ public class TradingCalculator {
         streamProcessor = Fluxtion.interpret(c -> {
             EventStreamBuilder<GroupByStreamed<String, Double>> assetPosition = subscribe(Trade.class)
                     .flatMap(Trade::tradeLegs)
-                    .groupBy(Trade.AssetAmountTraded::getId, Trade.AssetAmountTraded::getAmount, AggregateDoubleSum::new)
+                    .groupBy(TradeLeg::getId, TradeLeg::getAmount, Aggregates.doubleSum())
                     .resetTrigger(subscribe(String.class).filter("reset"::equalsIgnoreCase));
 
             EventStreamBuilder<GroupByStreamed<String, Double>> assetPriceMap = subscribe(PairPrice.class)
                     .flatMap(new ConvertToBasePrice("USD")::toCrossRate)
-                    .groupBy(Trade.AssetPrice::getId, Trade.AssetPrice::getPrice, AggregateDoubleSum::new)
+                    .groupBy(Trade.AssetPrice::getId, Trade.AssetPrice::getPrice, Aggregates.doubleIdentity())
                     .resetTrigger(subscribe(String.class).filter("reset"::equalsIgnoreCase));
 
             EventStreamBuilder<KeyValue<String, Double>> posDrivenMtmStream = assetPosition.map(GroupByStreamed::keyValue)

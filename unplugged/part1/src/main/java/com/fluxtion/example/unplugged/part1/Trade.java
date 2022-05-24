@@ -7,22 +7,22 @@ import java.util.List;
 
 @Value
 public class Trade {
+    TradeLeg dealt;
+    TradeLeg contra;
     public static Trade bought(String instrumentId, double dealtAmount, double contraAmount) {
         return new Trade(
-                new AssetAmountTraded(instrumentId.substring(0, 3), dealtAmount),
-                new AssetAmountTraded(instrumentId.substring(3), -1.0 * contraAmount));
+                new TradeLeg(instrumentId.substring(0, 3), dealtAmount),
+                new TradeLeg(instrumentId.substring(3), -1.0 * contraAmount));
     }
 
     public static Trade sold(String instrumentId, double dealtAmount, double contraAmount) {
         return new Trade(
-                new AssetAmountTraded(instrumentId.substring(0, 3), -1.0 * dealtAmount),
-                new AssetAmountTraded(instrumentId.substring(3), contraAmount));
+                new TradeLeg(instrumentId.substring(0, 3), -1.0 * dealtAmount),
+                new TradeLeg(instrumentId.substring(3), contraAmount));
     }
 
-    AssetAmountTraded dealt;
-    AssetAmountTraded contra;
 
-    public List<AssetAmountTraded> tradeLegs() {
+    public List<TradeLeg> tradeLegs() {
         return Arrays.asList(dealt, contra);
     }
 
@@ -33,7 +33,7 @@ public class Trade {
     }
 
     @Value
-    public static class AssetAmountTraded {
+    public static class TradeLeg {
         String id;
         double amount;
     }
