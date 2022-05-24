@@ -18,5 +18,10 @@ public class Main {
         //reset
         System.out.println("\nresetting:");
         tradingCalculator.reset();
+
+        //more trades
+        System.out.println("\nsending trades and rates:");
+        tradingCalculator.processTrade(Trade.bought("EURUSD", 250d, 130d));
+        tradingCalculator.priceUpdate(new PairPrice("EURUSD", 1.5));
     }
 }
