@@ -4,8 +4,8 @@ public class Main {
     public static void main(String[] args) {
         TradingCalculator tradingCalculator = new TradingCalculator();
         //add listener
-        tradingCalculator.markToMarketListener(m -> System.out.println("received MTM:" + m));
-        tradingCalculator.positionsListener(m -> System.out.println("received positions:" + m));
+        tradingCalculator.markToMarketListener(m -> System.out.println("Asset mark to market\t:" + m));
+        tradingCalculator.positionsListener(m -> System.out.println("Asset positions\t\t\t:" + m));
         //send trades and rates
         tradingCalculator.processTrade(Trade.bought("EURUSD", 250d, 130d));
         tradingCalculator.priceUpdate(new PairPrice("EURUSD", 1.5));
