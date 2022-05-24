@@ -1,6 +1,7 @@
 package com.fluxtion.example.unplugged.part1;
 
 import com.fluxtion.compiler.Fluxtion;
+import com.fluxtion.compiler.SEPConfig;
 import com.fluxtion.compiler.builder.stream.EventStreamBuilder;
 import com.fluxtion.example.unplugged.part1.Trade.AssetPrice;
 import com.fluxtion.example.unplugged.part1.Trade.TradeLeg;
@@ -50,42 +51,44 @@ public class TradingCalculator {
     }
 
     public TradingCalculator() {
-        streamProcessor = Fluxtion.compile(c -> {
-            EventStreamBuilder<Object> resetTrigger = subscribeToSignal("reset");
-            EventStreamBuilder<Object> publishTrigger = subscribeToSignal("publish");
-
-            EventStreamBuilder<GroupByStreamed<String, Double>> assetPosition = subscribe(Trade.class)
-                    .flatMap(Trade::tradeLegs)
-                    .groupBy(TradeLeg::getId, TradeLeg::getAmount, Aggregates.doubleSum())
-                    .resetTrigger(resetTrigger);
-
-            EventStreamBuilder<GroupByStreamed<String, Double>> assetPriceMap = subscribe(PairPrice.class)
-                    .flatMap(new ConvertToBasePrice("USD")::toCrossRate)
-                    .groupBy(Trade.AssetPrice::getId, Trade.AssetPrice::getPrice, Aggregates.doubleIdentity())
-                    .resetTrigger(resetTrigger);
-
-            EventStreamBuilder<KeyValue<String, Double>> posDrivenMtmStream = assetPosition.map(GroupByStreamed::keyValue)
-                    .map(TradingCalculator::markToMarket, assetPriceMap.map(GroupBy::map));
-
-            EventStreamBuilder<KeyValue<String, Double>> priceDrivenMtMStream = assetPriceMap.map(GroupByStreamed::keyValue)
-                    .map(TradingCalculator::markToMarket, assetPosition.map(GroupBy::map)).updateTrigger(assetPriceMap);
-
-            //Mark to market to sink as a map
-            posDrivenMtmStream.merge(priceDrivenMtMStream)
-                    .groupBy(KeyValue::getKey, KeyValue::getValueAsDouble, Aggregates.identity())
-                    .resetTrigger(resetTrigger)
-                    .map(GroupBy::map)
-                    .defaultValue(Collections::emptyMap)
-                    .updateTrigger(publishTrigger)
-                    .sink("mtm");
-
-            //Positions to sink as a map
-            assetPosition.map(GroupBy::map)
-                    .defaultValue(Collections::emptyMap)
-                    .updateTrigger(publishTrigger)
-                    .sink("positions");
-        });
+        streamProcessor = Fluxtion.compile(this::buildProcessor);
         streamProcessor.init();
+    }
+
+    private void buildProcessor(SEPConfig config){
+        EventStreamBuilder<Object> resetTrigger = subscribeToSignal("reset");
+        EventStreamBuilder<Object> publishTrigger = subscribeToSignal("publish");
+
+        EventStreamBuilder<GroupByStreamed<String, Double>> assetPosition = subscribe(Trade.class)
+                .flatMap(Trade::tradeLegs)
+                .groupBy(TradeLeg::getId, TradeLeg::getAmount, Aggregates.doubleSum())
+                .resetTrigger(resetTrigger);
+
+        EventStreamBuilder<GroupByStreamed<String, Double>> assetPriceMap = subscribe(PairPrice.class)
+                .flatMap(new ConvertToBasePrice("USD")::toCrossRate)
+                .groupBy(Trade.AssetPrice::getId, Trade.AssetPrice::getPrice, Aggregates.doubleIdentity())
+                .resetTrigger(resetTrigger);
+
+        EventStreamBuilder<KeyValue<String, Double>> posDrivenMtmStream = assetPosition.map(GroupByStreamed::keyValue)
+                .map(TradingCalculator::markToMarket, assetPriceMap.map(GroupBy::map));
+
+        EventStreamBuilder<KeyValue<String, Double>> priceDrivenMtMStream = assetPriceMap.map(GroupByStreamed::keyValue)
+                .map(TradingCalculator::markToMarket, assetPosition.map(GroupBy::map)).updateTrigger(assetPriceMap);
+
+        //Mark to market to sink as a map
+        posDrivenMtmStream.merge(priceDrivenMtMStream)
+                .groupBy(KeyValue::getKey, KeyValue::getValueAsDouble, Aggregates.identity())
+                .resetTrigger(resetTrigger)
+                .map(GroupBy::map)
+                .defaultValue(Collections::emptyMap)
+                .updateTrigger(publishTrigger)
+                .sink("mtm");
+
+        //Positions to sink as a map
+        assetPosition.map(GroupBy::map)
+                .defaultValue(Collections::emptyMap)
+                .updateTrigger(publishTrigger)
+                .sink("positions");
     }
 
     public static KeyValue<String, Double> markToMarket(KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
