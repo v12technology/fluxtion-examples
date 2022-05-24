@@ -335,20 +335,20 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="SinkDeregister">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;SinkDeregister"/>
-                    <jGraph:Style properties="EVENT"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
         <node id="SinkRegistration">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
                     <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;SinkRegistration"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="SinkDeregister">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;SinkDeregister"/>
                     <jGraph:Style properties="EVENT"/>
                 </jGraph:ShapeNode>
             </data>
@@ -582,22 +582,22 @@
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="45" source="SinkDeregister" target="mtm_Sink">
+        <edge id="45" source="SinkRegistration" target="mtm_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="46" source="SinkRegistration" target="mtm_Sink">
+        <edge id="46" source="SinkDeregister" target="mtm_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="47" source="SinkDeregister" target="positions_Sink">
+        <edge id="47" source="SinkRegistration" target="positions_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="48" source="SinkRegistration" target="positions_Sink">
+        <edge id="48" source="SinkDeregister" target="positions_Sink">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>

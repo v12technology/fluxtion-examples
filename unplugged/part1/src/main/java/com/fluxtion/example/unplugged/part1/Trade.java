@@ -1,14 +1,9 @@
 package com.fluxtion.example.unplugged.part1;
 
-import lombok.Value;
-
 import java.util.Arrays;
 import java.util.List;
 
-@Value
-public class Trade {
-    TradeLeg dealt;
-    TradeLeg contra;
+public record Trade(TradeLeg dealt, TradeLeg contra) {
     public static Trade bought(String instrumentId, double dealtAmount, double contraAmount) {
         return new Trade(
                 new TradeLeg(instrumentId.substring(0, 3), dealtAmount),
@@ -26,15 +21,9 @@ public class Trade {
         return Arrays.asList(dealt, contra);
     }
 
-    @Value
-    public static class AssetPrice {
-        String id;
-        double price;
+    public record AssetPrice(String id, double price) {
     }
 
-    @Value
-    public static class TradeLeg {
-        String id;
-        double amount;
+    public record TradeLeg(String id, double amount) {
     }
 }

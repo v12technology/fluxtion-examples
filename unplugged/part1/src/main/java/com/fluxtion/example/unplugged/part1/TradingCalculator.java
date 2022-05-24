@@ -2,7 +2,6 @@ package com.fluxtion.example.unplugged.part1;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.SEPConfig;
-import com.fluxtion.compiler.builder.stream.EventStreamBuilder;
 import com.fluxtion.example.unplugged.part1.Trade.AssetPrice;
 import com.fluxtion.example.unplugged.part1.Trade.TradeLeg;
 import com.fluxtion.runtime.EventProcessor;
@@ -27,6 +26,19 @@ public class TradingCalculator {
 
     private final EventProcessor streamProcessor;
 
+    public TradingCalculator() {
+        streamProcessor = Fluxtion.compile(this::buildProcessor);
+        streamProcessor.init();
+    }
+
+    public static KeyValue<String, Double> markToMarket(KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
+        if (assetPosition == null) {
+            return null;
+        }
+        Double price = assetPriceMap.getOrDefault(assetPosition.getKey(), Double.NaN);
+        return new KeyValue<>(assetPosition.getKey(), price * assetPosition.getValue());
+    }
+
     public void processTrade(Trade trade) {
         streamProcessor.onEvent(trade);
         streamProcessor.publishSignal("publish");
@@ -50,29 +62,24 @@ public class TradingCalculator {
         streamProcessor.addSink("positions", listener);
     }
 
-    public TradingCalculator() {
-        streamProcessor = Fluxtion.compile(this::buildProcessor);
-        streamProcessor.init();
-    }
+    private void buildProcessor(SEPConfig config) {
+        var resetTrigger = subscribeToSignal("reset");
+        var publishTrigger = subscribeToSignal("publish");
 
-    private void buildProcessor(SEPConfig config){
-        EventStreamBuilder<Object> resetTrigger = subscribeToSignal("reset");
-        EventStreamBuilder<Object> publishTrigger = subscribeToSignal("publish");
-
-        EventStreamBuilder<GroupByStreamed<String, Double>> assetPosition = subscribe(Trade.class)
+        var assetPosition = subscribe(Trade.class)
                 .flatMap(Trade::tradeLegs)
-                .groupBy(TradeLeg::getId, TradeLeg::getAmount, Aggregates.doubleSum())
+                .groupBy(TradeLeg::id, TradeLeg::amount, Aggregates.doubleSum())
                 .resetTrigger(resetTrigger);
 
-        EventStreamBuilder<GroupByStreamed<String, Double>> assetPriceMap = subscribe(PairPrice.class)
+        var assetPriceMap = subscribe(PairPrice.class)
                 .flatMap(new ConvertToBasePrice("USD")::toCrossRate)
-                .groupBy(Trade.AssetPrice::getId, Trade.AssetPrice::getPrice, Aggregates.doubleIdentity())
+                .groupBy(Trade.AssetPrice::id, Trade.AssetPrice::price, Aggregates.identity())
                 .resetTrigger(resetTrigger);
 
-        EventStreamBuilder<KeyValue<String, Double>> posDrivenMtmStream = assetPosition.map(GroupByStreamed::keyValue)
+        var posDrivenMtmStream = assetPosition.map(GroupByStreamed::keyValue)
                 .map(TradingCalculator::markToMarket, assetPriceMap.map(GroupBy::map));
 
-        EventStreamBuilder<KeyValue<String, Double>> priceDrivenMtMStream = assetPriceMap.map(GroupByStreamed::keyValue)
+        var priceDrivenMtMStream = assetPriceMap.map(GroupByStreamed::keyValue)
                 .map(TradingCalculator::markToMarket, assetPosition.map(GroupBy::map)).updateTrigger(assetPriceMap);
 
         //Mark to market to sink as a map
@@ -89,14 +96,6 @@ public class TradingCalculator {
                 .defaultValue(Collections::emptyMap)
                 .updateTrigger(publishTrigger)
                 .sink("positions");
-    }
-
-    public static KeyValue<String, Double> markToMarket(KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
-        if (assetPosition == null) {
-            return null;
-        }
-        Double price = assetPriceMap.getOrDefault(assetPosition.getKey(), Double.NaN);
-        return new KeyValue<>(assetPosition.getKey(), price * assetPosition.getValue());
     }
 
     @EqualsAndHashCode
@@ -117,10 +116,10 @@ public class TradingCalculator {
             if (!hasPublished) {
                 list.add(new AssetPrice(baseCurrency, 1.0));
             }
-            if (pairPrice.getId().startsWith(baseCurrency)) {
-                list.add(new AssetPrice(pairPrice.getId().substring(3), 1.0 / pairPrice.getPrice()));
-            } else if (pairPrice.getId().contains(baseCurrency)) {
-                list.add(new AssetPrice(pairPrice.getId().substring(0, 3), pairPrice.getPrice()));
+            if (pairPrice.id().startsWith(baseCurrency)) {
+                list.add(new AssetPrice(pairPrice.id().substring(3), 1.0 / pairPrice.price()));
+            } else if (pairPrice.id().contains(baseCurrency)) {
+                list.add(new AssetPrice(pairPrice.id().substring(0, 3), pairPrice.price()));
             }
             hasPublished = true;
             return list;
