@@ -4,28 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.fluxtion.example</groupId>
+    <parent>
+        <relativePath>../parentpom/pom.xml</relativePath>
+        <groupId>com.fluxtion.example</groupId>
+        <artifactId>unplugged.parentpom</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>unplugged.part1</artifactId>
     <name>unplugged :: part1</name>
-    <version>1.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.fluxtion</groupId>
-            <artifactId>compiler</artifactId>
-            <version>5.0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
 </project>

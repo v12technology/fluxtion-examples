@@ -18,19 +18,26 @@ along with this program.  If not, see
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.fluxtion.example</groupId>
-    <artifactId>example.master</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>unplugged.parentpom</artifactId>
+    <name>unplugged :: parent pom</name>
     <packaging>pom</packaging>
-    <name>fluxtion :: example</name>
-
-    <modules>
-        <module>unplugged/parentpom</module>
-        <module>unplugged/part1</module>
-    </modules>
+    <version>1.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <fluxtion.version>5.0.7</fluxtion.version>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.fluxtion</groupId>
+            <artifactId>compiler</artifactId>
+            <version>5.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
