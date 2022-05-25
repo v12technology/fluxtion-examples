@@ -27,7 +27,7 @@ public class TradingCalculator {
     private final EventProcessor streamProcessor;
 
     public TradingCalculator() {
-        streamProcessor = Fluxtion.compile(this::buildProcessor);
+        streamProcessor = Fluxtion.interpret(this::buildProcessor);
         streamProcessor.init();
     }
 
