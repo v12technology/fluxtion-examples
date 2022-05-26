@@ -11,6 +11,7 @@ import com.fluxtion.runtime.stream.groupby.GroupBy;
 import com.fluxtion.runtime.stream.groupby.GroupBy.KeyValue;
 import com.fluxtion.runtime.stream.groupby.GroupByStreamed;
 import com.fluxtion.runtime.stream.helpers.Aggregates;
+import com.fluxtion.runtime.stream.helpers.Predicates;
 import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 
 import static com.fluxtion.compiler.builder.stream.EventFlow.subscribe;
 import static com.fluxtion.compiler.builder.stream.EventFlow.subscribeToSignal;
@@ -31,12 +33,27 @@ public class TradingCalculator {
         streamProcessor.init();
     }
 
-    public static KeyValue<String, Double> markToMarket(KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
-        if (assetPosition == null) {
+    public static KeyValue<String, Double> markToMarketPrice(KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
+        if (assetPosition == null || assetPriceMap == null) {
+            return null;
+        }
+        Double price = assetPriceMap.get(assetPosition.getKey());
+        if(price == null){
+            return null;
+        }
+        return new KeyValue<>(assetPosition.getKey(), price * assetPosition.getValue());
+    }
+
+    public static KeyValue<String, Double> markToMarketPosition(KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
+        if (assetPosition == null || assetPriceMap == null) {
             return null;
         }
         Double price = assetPriceMap.getOrDefault(assetPosition.getKey(), Double.NaN);
         return new KeyValue<>(assetPosition.getKey(), price * assetPosition.getValue());
+    }
+
+    public static double totalProfit(Map<String, Double> m) {
+        return m.values().stream().mapToDouble(Double::doubleValue).sum();
     }
 
     public void processTrade(Trade trade) {
@@ -62,6 +79,10 @@ public class TradingCalculator {
         streamProcessor.addSink("positions", listener);
     }
 
+    public void profitListener(DoubleConsumer listener){
+        streamProcessor.addSink("profit", listener);
+    }
+
     private void buildProcessor(SEPConfig config) {
         var resetTrigger = subscribeToSignal("reset");
         var publishTrigger = subscribeToSignal("publish");
@@ -77,25 +98,35 @@ public class TradingCalculator {
                 .resetTrigger(resetTrigger);
 
         var posDrivenMtmStream = assetPosition.map(GroupByStreamed::keyValue)
-                .map(TradingCalculator::markToMarket, assetPriceMap.map(GroupBy::map));
+                .map(TradingCalculator::markToMarketPosition, assetPriceMap.map(GroupBy::map));
 
         var priceDrivenMtMStream = assetPriceMap.map(GroupByStreamed::keyValue)
-                .map(TradingCalculator::markToMarket, assetPosition.map(GroupBy::map)).updateTrigger(assetPriceMap);
+                .map(TradingCalculator::markToMarketPrice, assetPosition.map(GroupBy::map)).updateTrigger(assetPriceMap);
 
         //Mark to market to sink as a map
-        posDrivenMtmStream.merge(priceDrivenMtMStream)
+        var mtm = posDrivenMtmStream.merge(priceDrivenMtMStream)
                 .groupBy(KeyValue::getKey, KeyValue::getValueAsDouble, Aggregates.identity())
                 .resetTrigger(resetTrigger)
                 .map(GroupBy::map)
                 .defaultValue(Collections::emptyMap)
                 .updateTrigger(publishTrigger)
+//                .filter(Predicates.hasChangedFilter())
                 .sink("mtm");
 
         //Positions to sink as a map
         assetPosition.map(GroupBy::map)
                 .defaultValue(Collections::emptyMap)
                 .updateTrigger(publishTrigger)
+                .filter(Predicates.hasChangedFilter())
                 .sink("positions");
+
+        //sum of mtm is profit
+        mtm.mapToDouble(TradingCalculator::totalProfit)
+                .defaultValue(Double.NaN)
+                .resetTrigger(resetTrigger)
+                .updateTrigger(publishTrigger)
+//                .filter(Predicates.HAS_CHANGED_DOUBLE_FILTER)
+                .sink("profit");
     }
 
     @EqualsAndHashCode
