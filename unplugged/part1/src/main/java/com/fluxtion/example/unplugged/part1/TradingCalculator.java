@@ -51,6 +51,17 @@ public class TradingCalculator {
         streamProcessor.publishSignal("publish");
     }
 
+    public void processTrades(Trade trade, Trade... trades) {
+        System.out.println("\nTrade batch - start\n\trcvd trade -> " + trade);
+        streamProcessor.onEvent(trade);
+        for (Trade batchTrade: trades) {
+            System.out.println("\trcvd trade -> " + batchTrade);
+            streamProcessor.onEvent(batchTrade);
+        }
+        System.out.println("Trade batch - complete");
+        streamProcessor.publishSignal("publish");
+    }
+
     public void priceUpdate(PairPrice price) {
         System.out.println("\nrcvd price -> " + price);
         streamProcessor.onEvent(price);
@@ -94,10 +105,12 @@ public class TradingCalculator {
                 .resetTrigger(resetTrigger);
 
         var posDrivenMtmStream = assetPosition.map(GroupByStreamed::keyValue)
-                .map(TradingCalculator::markToMarketPosition, assetPriceMap.map(GroupBy::map)).updateTrigger(assetPosition);
+                .map(TradingCalculator::markToMarketPosition, assetPriceMap.map(GroupBy::map))
+                .updateTrigger(assetPosition);
 
         var priceDrivenMtMStream = assetPriceMap.map(GroupByStreamed::keyValue)
-                .map(TradingCalculator::markToMarketPrice, assetPosition.map(GroupBy::map)).updateTrigger(assetPriceMap);
+                .map(TradingCalculator::markToMarketPrice, assetPosition.map(GroupBy::map))
+                .updateTrigger(assetPriceMap);
 
         //Mark to market to sink as a map
         var mtm = posDrivenMtmStream.merge(priceDrivenMtMStream)
@@ -121,14 +134,16 @@ public class TradingCalculator {
     }
 
     //Helper functions used during event processing
-    public static KeyValue<String, Double> markToMarketPrice(KeyValue<String, Double> assetPrice, Map<String, Double> assetPositionMap) {
+    public static KeyValue<String, Double> markToMarketPrice(
+            KeyValue<String, Double> assetPrice, Map<String, Double> assetPositionMap) {
         if (assetPrice == null || assetPositionMap.get(assetPrice.getKey()) == null) {
             return null;
         }
         return new KeyValue<>(assetPrice.getKey(), assetPositionMap.get(assetPrice.getKey()) * assetPrice.getValue());
     }
 
-    public static KeyValue<String, Double> markToMarketPosition(KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
+    public static KeyValue<String, Double> markToMarketPosition(
+            KeyValue<String, Double> assetPosition, Map<String, Double> assetPriceMap) {
         if (assetPosition == null) {
             return null;
         }
@@ -138,7 +153,9 @@ public class TradingCalculator {
         if(assetPriceMap == null){
             return new KeyValue<>(assetPosition.getKey(), Double.NaN);
         }
-        return new KeyValue<>(assetPosition.getKey(), assetPriceMap.getOrDefault(assetPosition.getKey(), Double.NaN) * assetPosition.getValue());
+        return new KeyValue<>(
+                assetPosition.getKey(),
+                assetPriceMap.getOrDefault(assetPosition.getKey(), Double.NaN) * assetPosition.getValue());
     }
 
     public static double totalProfit(Map<String, Double> m) {
@@ -151,5 +168,4 @@ public class TradingCalculator {
         }
         return (new AssetPrice(pairPrice.id().substring(0, 3), pairPrice.price()));
     }
-
 }
