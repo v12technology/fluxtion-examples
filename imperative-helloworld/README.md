@@ -19,3 +19,15 @@ indicates if the event should be propagated. In this case the event is only prop
 ### Node diagram of event processor
 
 ![](docs/Processor.png)
+
+### Generated event processor source
+
+Fluxtion will generate the event processor source file ahead of time if invoked with:
+
+```java
+EventProcessor eventProcessor = Fluxtion.compile(cfg -> {
+    //your construction code here
+});
+```
+
+See the [source for this example](src/main/java/com/fluxtion/example/generated/Processor.java) 
