@@ -26,6 +26,7 @@ along with this program.  If not, see
     <modules>
         <module>unplugged/parentpom</module>
         <module>unplugged/part1</module>
+        <module>imperative-helloworld</module>
     </modules>
 
     <properties>
