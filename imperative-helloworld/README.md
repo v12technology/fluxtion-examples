@@ -16,4 +16,4 @@ In this case the event is only propagated if the sum > 100.
 
 ### Node diagram of event processor
 
-![](docs\Processor.png)
+![](docs/Processor.png)
