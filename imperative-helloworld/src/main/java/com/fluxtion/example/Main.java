@@ -41,7 +41,7 @@ public class Main {
         private double value;
 
         /**
-         * The {@link OnEventHandler} annotation marks this method as the start of an execution path when a {@link Data1}
+         * The {@link OnEventHandler} annotation marks this method as the start of an execution path with a {@link Data1}.
          * Invoked when the {@link com.fluxtion.runtime.EventProcessor} receives a {@link Data1} event.
          *
          * @param data1 the input event
@@ -62,7 +62,7 @@ public class Main {
         private double value;
 
         /**
-         * The {@link OnEventHandler} annotation marks this method as the start of an execution path when a {@link Data2}
+         * The {@link OnEventHandler} annotation marks this method as the start of an execution path with a {@link Data2}.
          * Invoked when the {@link com.fluxtion.runtime.EventProcessor} receives a {@link Data2} event.
          *
          * @param data2 the input event
