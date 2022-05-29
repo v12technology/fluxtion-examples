@@ -16,4 +16,4 @@ In this case the event is only propagated if the sum > 100.
 
 ### Node diagram of event processor
 
-![](C:\Users\gregp\IdeaProjects\fluxtion-examples\imperative-helloworld\src\main\resources\com\fluxtion\example\main\lambda$main$b62863e1$1\Processor.png)
+![](docs\Processor.png)
