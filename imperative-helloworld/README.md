@@ -4,7 +4,8 @@
 creates a processing graph imperatively, extracts double values from events, calculates the sum and prints a
 message to console if the sum is greater than a 100.
 
-The graph is constructed imperatively and the root node is passed to the Fluxtion compiler. The compiler reflects the
+The graph is constructed [imperatively](src/main/java/com/fluxtion/example/Main.java#L20), 
+the root node, SumLogger, is passed to the Fluxtion compiler. The compiler reflects the
 object graph and generates an EventProcessor that invokes the node methods in the correct topological order in response
 to an incoming event. App classes use annotations to mark methods that will be events handlers in the final 
 event processor.
