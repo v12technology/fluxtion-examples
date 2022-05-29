@@ -10,10 +10,10 @@ object graph and generates an EventProcessor that invokes the node methods in th
 to an incoming event. App classes use annotations to mark methods that will be events handlers in the final 
 event processor.
 
-- @OnEventHandler annotation to declare the entry point of an execution path. 
+- @OnEventHandler annotation declares the entry point of an execution path, triggered by an external event. 
 - @OnTrigger annotated methods indicate call back methods to be invoked if a parent propagates a change. 
-- The return flag from the @OnTrigger method indicates if the event should be propagated. 
-In this case the event is only propagated if the sum > 100.
+- The return flag from the DataAddition [@OnTrigger](src/main/java/com/fluxtion/example/Main.java#L93) method, calculate, 
+indicates if the event should be propagated. In this case the event is only propagated if the sum > 100.
 
 ### Node diagram of event processor
 
