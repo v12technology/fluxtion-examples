@@ -1,4 +1,4 @@
-package com.fluxtion.example;
+package com.fluxtion.example.imperative.helloworld;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.EventProcessor;
