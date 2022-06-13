@@ -1,15 +1,19 @@
 package com.fluxtion.example;
 
 import com.fluxtion.compiler.Fluxtion;
+import com.fluxtion.compiler.SEPConfig;
+import com.fluxtion.compiler.builder.stream.EventFlow;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnTrigger;
+
+import java.util.function.Consumer;
 
 
 /**
  * creates a processing graph imperatively, extracts double values from events, calculates the sum and prints a
  * message to console if the sum is greater than a 100.
- *
+ * <p>
  * Uses @{@link OnEventHandler} annotation to declare the entry point of an execution path
  * {@link OnTrigger} annotated methods indicate call back methods to be invoked if a parent propagates a change.
  * The return flag from the {@link OnTrigger} method indicates if the event should be propagated. In this case
@@ -17,18 +21,35 @@ import com.fluxtion.runtime.annotations.OnTrigger;
  */
 public class Main {
     public static void main(String[] args) {
-        EventProcessor eventProcessor = Fluxtion.interpret(cfg -> {
-            SumLogger sumLogger = new SumLogger(
-                    new DataAddition(
-                            new Data1handler(), new Data2handler()));
-            //need to add one root node so fluxtion can calculate the execution graph for the event processor
-            cfg.addNode(sumLogger);
-        });
-        eventProcessor.init();
-        eventProcessor.onEvent(new Data1(34.4));
-        eventProcessor.onEvent(new Data2(52.1));
-        eventProcessor.onEvent(new Data1(105));
-        eventProcessor.onEvent(new Data1(12.4));
+
+//
+//        EventProcessor eventProcessor = Fluxtion.interpret(cfg -> {
+//            SumLogger sumLogger = new SumLogger(
+//                    new DataAddition(
+//                            new Data1handler(), new Data2handler()));
+//            //need to add one root node so fluxtion can calculate the execution graph for the event processor
+//            cfg.addNode(sumLogger);
+//        });
+//        eventProcessor.init();
+//        eventProcessor.onEvent(new Data1(34.4));
+//        eventProcessor.onEvent(new Data2(52.1));
+//        eventProcessor.onEvent(new Data1(105));
+//        eventProcessor.onEvent(new Data1(12.4));
+
+
+        EventProcessor processor = Fluxtion.interpret(cfg -> EventFlow.subscribeToIntSignal("myIntSignal")
+                .mapToObj(d -> "intValue:" + d)
+                .sink("mySink")
+        );
+        processor.init();
+        processor.addSink("mySink", (Consumer<String>) System.out::println);
+        processor.publishSignal("myIntSignal", 10);
+
+
+    }
+
+    private static void buildProcessingLogic(SEPConfig cfg) {
+        EventFlow.subscribe(String.class);
     }
 
     public record Data1(double value) {
