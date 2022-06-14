@@ -1,7 +1,7 @@
 package com.fluxtion.example;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.SEPConfig;
+import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.builder.stream.EventFlow;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.annotations.OnEventHandler;
@@ -48,7 +48,7 @@ public class Main {
 
     }
 
-    private static void buildProcessingLogic(SEPConfig cfg) {
+    private static void buildProcessingLogic(EventProcessorConfig cfg) {
         EventFlow.subscribe(String.class);
     }
 

@@ -35,9 +35,9 @@ import com.fluxtion.runtime.stream.helpers.Predicates;
 
 /*
  * <pre>
- * generation time   : 2022-06-13T01:06:46.138023200
- * eventProcessorGenerator version : 6.0.0
- * api version       : 6.0.0
+ * generation time   : 2022-06-14T16:27:40.908053400
+ * eventProcessorGenerator version : 6.0.2-SNAPSHOT
+ * api version       : 6.0.2-SNAPSHOT
  * </pre>
  * @author Greg Higgins
  */

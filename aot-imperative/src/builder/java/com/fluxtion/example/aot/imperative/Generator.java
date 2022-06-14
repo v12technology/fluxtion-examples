@@ -2,7 +2,7 @@ package com.fluxtion.example.aot.imperative;
 
 import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.builder.factory.RootInjectedNode;
+import com.fluxtion.compiler.RootNodeConfig;
 import com.fluxtion.compiler.builder.stream.EventFlow;
 import com.fluxtion.runtime.stream.helpers.Mappers;
 
@@ -13,7 +13,7 @@ public class Generator {
         System.out.println("Running generation");
         Fluxtion.compileAot(Generator::sampleProcessor);
         Fluxtion.compileAot(
-                new RootInjectedNode("myRoot", MyRootClass.class, Collections.emptyMap()),
+                new RootNodeConfig("myRoot", MyRootClass.class, Collections.emptyMap()),
                 "com.fluxtion.example.aot.imperative.generator");
     }
 

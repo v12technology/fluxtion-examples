@@ -34,9 +34,9 @@ import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
 
 /*
  * <pre>
- * generation time   : 2022-06-13T01:06:44.623022100
- * eventProcessorGenerator version : 6.0.0
- * api version       : 6.0.0
+ * generation time   : 2022-06-14T16:27:39.296052100
+ * eventProcessorGenerator version : 6.0.2-SNAPSHOT
+ * api version       : 6.0.2-SNAPSHOT
  * </pre>
  * @author Greg Higgins
  */

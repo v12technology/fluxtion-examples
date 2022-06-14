@@ -8,10 +8,6 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <properties>
-        <fluxtion.version>6.0.0</fluxtion.version>
-    </properties>
-
     <modelVersion>4.0.0</modelVersion>
     <artifactId>aot-imperative</artifactId>
 
