@@ -9,7 +9,7 @@ import com.fluxtion.runtime.annotations.OnTrigger;
 /**
  * creates a processing graph imperatively, extracts double values from events, calculates the sum and prints a
  * message to console if the sum is greater than a 100.
- *
+ * <p>
  * Uses @{@link OnEventHandler} annotation to declare the entry point of an execution path
  * {@link OnTrigger} annotated methods indicate call back methods to be invoked if a parent propagates a change.
  * The return flag from the {@link OnTrigger} method indicates if the event should be propagated. In this case
@@ -17,13 +17,7 @@ import com.fluxtion.runtime.annotations.OnTrigger;
  */
 public class Main {
     public static void main(String[] args) {
-        EventProcessor eventProcessor = Fluxtion.interpret(cfg -> {
-            SumLogger sumLogger = new SumLogger(
-                    new DataAddition(
-                            new Data1handler(), new Data2handler()));
-            //need to add one root node so fluxtion can calculate the execution graph for the event processor
-            cfg.addNode(sumLogger);
-        });
+        var eventProcessor = Fluxtion.interpret(cfg -> cfg.addNode(new SumLogger()));
         eventProcessor.init();
         eventProcessor.onEvent(new Data1(34.4));
         eventProcessor.onEvent(new Data2(52.1));
@@ -90,6 +84,10 @@ public class Main {
             this.data2handler = data2handler;
         }
 
+        public DataAddition() {
+            this(new Data1handler(), new Data2handler());
+        }
+
         /**
          * The {@link OnTrigger} annotation marks this method to be called if any parents have changed
          *
@@ -112,6 +110,10 @@ public class Main {
 
         public SumLogger(DataAddition dataAddition) {
             this.dataAddition = dataAddition;
+        }
+
+        public SumLogger() {
+            this(new DataAddition());
         }
 
         @OnTrigger
