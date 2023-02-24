@@ -4,9 +4,8 @@ import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.StaticEventProcessor;
 import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.OnEventHandler;
-import com.fluxtion.runtime.annotations.builder.AssignToField;
 import com.fluxtion.runtime.annotations.builder.Inject;
-import com.fluxtion.runtime.event.Signal.IntSignal;
+import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventProcessorFeed;
 import com.fluxtion.runtime.input.SubscriptionManager;
 
@@ -16,86 +15,72 @@ import java.util.Set;
 public class SubscriptionExample {
 
     public static void main(String[] args) {
-        var processor1 = Fluxtion.compile(c -> c.addNode(
-                new MySubscriberNode("subscribe_AGE", "graph1", null))
-        );
-
-        var processor2 = Fluxtion.compile(c -> c.addNode(
-                new MySubscriberNode("subscribe_AGE", "graph2", null),
-                new MySubscriberNode("subscribe_HEIGHT", "graph2", null)
-                )
-        );
-        processor1.init();
-        processor2.init();
+        var marketPriceProcessor = Fluxtion.interpret(c -> c.addNode(
+                new SharePriceSubscriber("MSFT"),
+                new SharePriceSubscriber("AMZN")
+        ));
+        marketPriceProcessor.init();
 
         System.out.println("\nadding feeds:");
-        IntSignalEventFeed eventFeed = new IntSignalEventFeed();
-        processor1.addEventProcessorFeed(eventFeed);
-        processor2.addEventProcessorFeed(eventFeed);
+        MarketDataFeed eventFeed = new MarketDataFeed();
+        marketPriceProcessor.addEventProcessorFeed(eventFeed);
 
-        //publish
         System.out.println("\npublishing from feed:");
-        eventFeed.publish("subscribe_AGE", 20);
-        eventFeed.publish("subscribe_AGE", 25);
-        eventFeed.publish("subscribe_HEIGHT", 179);
+        eventFeed.publish("MSFT", 21.36);
+        eventFeed.publish("MSFT", 22.11);
+        eventFeed.publish("AMZN", 72.6);
+        eventFeed.publish("IBM", 25);
+        eventFeed.publish("GOOGL", 179);
 
-        //stop processor2
         System.out.println("\ntear down a subscriber");
-        processor2.tearDown();
-        eventFeed.publish("subscribe_HEIGHT", 179);
+        marketPriceProcessor.tearDown();
+        eventFeed.publish("MSFT", 23.64);
 
-        //restart processor2
         System.out.println("\nrestart subscriber");
-        processor2.init();
-
-        //publish
-        System.out.println("\npublishing from feed:");
-        eventFeed.publish("subscribe_HEIGHT", 179);
+        marketPriceProcessor.init();
+        eventFeed.publish("MSFT", 22.51);
     }
 
-    public static class MySubscriberNode {
+    public record AssetPrice(String symbolId, double price) implements Event {
+        public String filterString() {
+            return symbolId;
+        }
+    }
 
-        private final String subscriberId;
-        private final String graphId;
+    public static class SharePriceSubscriber {
+
+        private final String symbolId;
         @Inject
-        private final SubscriptionManager subscriptionManager;
+        public SubscriptionManager subscriptionManager;
 
-        public MySubscriberNode(
-                @AssignToField("subscriberId") String subscriberId,
-                @AssignToField("graphId") String graphId,
-                SubscriptionManager subscriptionManager) {
-            this.subscriberId = subscriberId;
-            this.graphId = graphId;
-            this.subscriptionManager = subscriptionManager;
+        public SharePriceSubscriber(String symbolId) {
+            this.symbolId = symbolId;
         }
 
         @Initialise
-        public void init(){
-            System.out.println("INIT " + graphId+ ":" + subscriberId + " subscribing");
-            subscriptionManager.subscribe(subscriberId);
+        public void init() {
+            subscriptionManager.subscribe(symbolId);
         }
 
-        @OnEventHandler(filterVariable = "subscriberId")
-        public void subscriptionId(IntSignal newSubscriptionSymbol) {
-            System.out.println(
-                    "UPDATE " + graphId+ ":" + subscriberId + " received -> " + newSubscriptionSymbol.getValue());
+        @OnEventHandler(filterVariable = "symbolId")
+        public void AssetPrice(AssetPrice assetPriceUpdate) {
+            System.out.println("subscriber:" + symbolId + " -> " + assetPriceUpdate);
         }
-
     }
 
-    public static class IntSignalEventFeed implements EventProcessorFeed {
+    public static class MarketDataFeed implements EventProcessorFeed {
 
         private final Set<StaticEventProcessor> targetProcessorSet = new HashSet<>();
 
-        public void publish(String symbolId, int value){
-            targetProcessorSet.forEach(e ->{
-                e.publishIntSignal(symbolId, value);
+        public void publish(String symbolId, double price) {
+            targetProcessorSet.forEach(e -> {
+                e.onEvent(new AssetPrice(symbolId, price));
             });
         }
 
         @Override
         public void subscribe(StaticEventProcessor target, Object subscriptionId) {
-            if(!targetProcessorSet.contains(target)){
+            if (!targetProcessorSet.contains(target)) {
                 targetProcessorSet.add(target);
                 System.out.println("FEED adding processor current subscriber count:" + targetProcessorSet.size());
             }
