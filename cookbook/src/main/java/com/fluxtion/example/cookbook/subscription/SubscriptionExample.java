@@ -21,20 +21,19 @@ import java.util.Set;
  * Running the example produces:
  * <pre>
  *
- * adding feeds:
- * FEED adding processor current subscriber count:1
+ * MarketDataFeed adding EventProcessor as a sink, count:1
  *
- * publishing from feed:
- * subscriber:MSFT -> AssetPrice[symbolId=MSFT, price=21.36]
- * subscriber:MSFT -> AssetPrice[symbolId=MSFT, price=22.11]
- * subscriber:AMZN -> AssetPrice[symbolId=AMZN, price=72.6]
+ * publishing prices from MarketDataFeed:
+ * subscriber:MSFT -> SharePrice[symbolId=MSFT, price=21.36]
+ * subscriber:MSFT -> SharePrice[symbolId=MSFT, price=22.11]
+ * subscriber:AMZN -> SharePrice[symbolId=AMZN, price=72.6]
  *
- * tear down a subscriber
- * FEED removing processor current subscriber count:0
+ * tear down marketPriceProcessor:
+ * MarketDataFeed removing EventProcessor as sink, count:0
  *
- * restart subscriber
- * FEED adding processor current subscriber count:1
- * subscriber:MSFT -> AssetPrice[symbolId=MSFT, price=22.51]
+ * restart marketPriceProcessor:
+ * MarketDataFeed adding EventProcessor as a sink, count:1
+ * subscriber:MSFT -> SharePrice[symbolId=MSFT, price=22.51]
  * </pre>
  */
 public class SubscriptionExample {
@@ -46,27 +45,26 @@ public class SubscriptionExample {
         ));
         marketPriceProcessor.init();
 
-        System.out.println("\nadding feeds:");
         MarketDataFeed eventFeed = new MarketDataFeed();
         marketPriceProcessor.addEventProcessorFeed(eventFeed);
 
-        System.out.println("\npublishing from feed:");
+        System.out.println("\npublishing prices from MarketDataFeed:");
         eventFeed.publish("MSFT", 21.36);
         eventFeed.publish("MSFT", 22.11);
-        eventFeed.publish("AMZN", 72.6);
         eventFeed.publish("IBM", 25);
+        eventFeed.publish("AMZN", 72.6);
         eventFeed.publish("GOOGL", 179);
 
-        System.out.println("\ntear down a subscriber");
+        System.out.println("\ntear down marketPriceProcessor:");
         marketPriceProcessor.tearDown();
         eventFeed.publish("MSFT", 23.64);
 
-        System.out.println("\nrestart subscriber");
+        System.out.println("\nrestart marketPriceProcessor:");
         marketPriceProcessor.init();
         eventFeed.publish("MSFT", 22.51);
     }
 
-    public record AssetPrice(String symbolId, double price) implements Event {
+    public record SharePrice(String symbolId, double price) implements Event {
         public String filterString() {
             return symbolId;
         }
@@ -88,7 +86,7 @@ public class SubscriptionExample {
         }
 
         @OnEventHandler(filterVariable = "symbolId")
-        public void AssetPrice(AssetPrice assetPriceUpdate) {
+        public void AssetPrice(SharePrice assetPriceUpdate) {
             System.out.println("subscriber:" + symbolId + " -> " + assetPriceUpdate);
         }
     }
@@ -99,7 +97,7 @@ public class SubscriptionExample {
 
         public void publish(String symbolId, double price) {
             targetProcessorSet.forEach(e -> {
-                e.onEvent(new AssetPrice(symbolId, price));
+                e.onEvent(new SharePrice(symbolId, price));
             });
         }
 
@@ -107,7 +105,7 @@ public class SubscriptionExample {
         public void subscribe(StaticEventProcessor target, Object subscriptionId) {
             if (!targetProcessorSet.contains(target)) {
                 targetProcessorSet.add(target);
-                System.out.println("FEED adding processor current subscriber count:" + targetProcessorSet.size());
+                System.out.println("MarketDataFeed adding EventProcessor as a sink, count:" + targetProcessorSet.size());
             }
         }
 
@@ -119,7 +117,7 @@ public class SubscriptionExample {
         @Override
         public void removeAllSubscriptions(StaticEventProcessor eventProcessor) {
             targetProcessorSet.remove(eventProcessor);
-            System.out.println("FEED removing processor current subscriber count:" + targetProcessorSet.size());
+            System.out.println("MarketDataFeed removing EventProcessor as sink, count:" + targetProcessorSet.size());
         }
     }
 }
