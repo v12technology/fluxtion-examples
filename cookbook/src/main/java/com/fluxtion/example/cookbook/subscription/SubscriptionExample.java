@@ -12,6 +12,10 @@ import com.fluxtion.runtime.input.SubscriptionManager;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Example demonstrating the use of the {@link SubscriptionManager} and how it binds graph node subscription request to
+ * {@link EventProcessorFeed}'s that live outside the graph
+ */
 public class SubscriptionExample {
 
     public static void main(String[] args) {
