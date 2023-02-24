@@ -1,7 +1,7 @@
 package com.fluxtion.example.unplugged.part1;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.SEPConfig;
+import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.example.unplugged.part1.Trade.AssetPrice;
 import com.fluxtion.example.unplugged.part1.Trade.TradeLeg;
 import com.fluxtion.runtime.EventProcessor;
@@ -90,7 +90,7 @@ public class TradingCalculator {
      * Build the actual processing graph
      *
      */
-    private void buildProcessor(SEPConfig config) {
+    private void buildProcessor(EventProcessorConfig config) {
         var resetTrigger = subscribeToSignal("reset");
         var publishTrigger = subscribeToSignal("publish");
 

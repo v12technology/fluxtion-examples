@@ -2,6 +2,8 @@ package com.fluxtion.example.unplugged.part1;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.EventProcessor;
+import com.fluxtion.runtime.annotations.Initialise;
+import com.fluxtion.runtime.annotations.TearDown;
 
 import static com.fluxtion.compiler.builder.stream.EventFlow.subscribe;
 
@@ -17,7 +19,7 @@ import static com.fluxtion.compiler.builder.stream.EventFlow.subscribe;
 public class HelloWorld {
     public static void main(String[] args) {
         //builds the EventProcessor
-        EventProcessor eventProcessor = Fluxtion.interpret(cfg -> {
+        EventProcessor eventProcessor = Fluxtion.compile(cfg -> {
             var data1Stream = subscribe(Data1.class)
                     .console("rcvd -> {}")
                     .mapToDouble(Data1::value);
@@ -26,7 +28,7 @@ public class HelloWorld {
                     .console("rcvd -> {}")
                     .mapToDouble(Data2::value)
                     .map(Double::sum, data1Stream)
-                    .filter(d -> d > 100)
+//                    .filter(d -> d > 100)
                     .console("OUT: sum {} > 100");
         });
         //init and send events
@@ -43,5 +45,14 @@ public class HelloWorld {
     }
 
     public record Data2(double value) {
+    }
+
+    public static class MyNode{
+        @Initialise
+        public void myInitMethod(){}
+
+        @TearDown
+        public void myTearDownMethod(){}
+
     }
 }
