@@ -27,7 +27,7 @@ along with this program.  If not, see
         <module>unplugged/parentpom</module>
         <module>unplugged/part1</module>
         <module>imperative-helloworld</module>
-        <module>sliding-window</module>
+        <module>cookbook</module>
     </modules>
 
     <properties>
