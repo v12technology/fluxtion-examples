@@ -14,7 +14,28 @@ import java.util.Set;
 
 /**
  * Example demonstrating the use of the {@link SubscriptionManager} and how it binds graph node subscription request to
- * {@link EventProcessorFeed}'s that live outside the graph
+ * {@link EventProcessorFeed}'s that live outside the graph. The event handler methods apply Fluxtion in built filtering
+ * using the symbol id. This removes the need to filter in the client consumer code.
+ *
+ * <p>
+ * Running the example produces:
+ * <pre>
+ *
+ * adding feeds:
+ * FEED adding processor current subscriber count:1
+ *
+ * publishing from feed:
+ * subscriber:MSFT -> AssetPrice[symbolId=MSFT, price=21.36]
+ * subscriber:MSFT -> AssetPrice[symbolId=MSFT, price=22.11]
+ * subscriber:AMZN -> AssetPrice[symbolId=AMZN, price=72.6]
+ *
+ * tear down a subscriber
+ * FEED removing processor current subscriber count:0
+ *
+ * restart subscriber
+ * FEED adding processor current subscriber count:1
+ * subscriber:MSFT -> AssetPrice[symbolId=MSFT, price=22.51]
+ * </pre>
  */
 public class SubscriptionExample {
 
