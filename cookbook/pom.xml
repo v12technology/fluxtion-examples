@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>compiler</artifactId>
-            <version>7.0.18</version>
+            <version>7.0.19</version>
         </dependency>
     </dependencies>
 
