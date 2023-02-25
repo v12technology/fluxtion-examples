@@ -23,6 +23,7 @@ public class MarketDataFeed implements EventFeed {
 
     @Override
     public void subscribe(StaticEventProcessor target, Object subscriptionId) {
+        System.out.println("MarketDataFeed subscription request symbolId:" + subscriptionId);
         if (!targetProcessorSet.contains(target)) {
             targetProcessorSet.add(target);
             System.out.println("MarketDataFeed adding EventProcessor as a sink, count:" + targetProcessorSet.size());
