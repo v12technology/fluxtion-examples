@@ -53,6 +53,7 @@ public class SubscriptionExample {
 
         System.out.println("\nrestart marketPriceProcessor:");
         marketPriceProcessor.init();
+        System.out.println("\npublishing prices from MarketDataFeed:");
         eventFeed.publish("MSFT", 22.51);
     }
 
