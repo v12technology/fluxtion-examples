@@ -1,17 +1,19 @@
-package com.fluxtion.example.cookbook.subscription;
+package com.fluxtion.example.cookbook.subscription.imperative;
 
+import com.fluxtion.example.cookbook.subscription.SharePriceEvent;
 import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.OnEventHandler;
+import com.fluxtion.runtime.annotations.TearDown;
 import com.fluxtion.runtime.annotations.builder.Inject;
 import com.fluxtion.runtime.input.SubscriptionManager;
 
-public class SharePriceSubscriber {
+public class SharePriceNode {
 
     private final String symbolId;
     @Inject
     public SubscriptionManager subscriptionManager;
 
-    public SharePriceSubscriber(String symbolId) {
+    public SharePriceNode(String symbolId) {
         this.symbolId = symbolId;
     }
 
@@ -20,8 +22,13 @@ public class SharePriceSubscriber {
         subscriptionManager.subscribe(symbolId);
     }
 
+    @TearDown
+    public void tearDown(){
+        subscriptionManager.unSubscribe(symbolId);
+    }
+
     @OnEventHandler(filterVariable = "symbolId")
-    public void AssetPrice(SharePrice assetPriceUpdate) {
-        System.out.println("subscriber:" + symbolId + " -> " + assetPriceUpdate);
+    public void AssetPrice(SharePriceEvent assetPriceUpdate) {
+        System.out.println("SharePriceNode:" + symbolId + " -> " + assetPriceUpdate);
     }
 }

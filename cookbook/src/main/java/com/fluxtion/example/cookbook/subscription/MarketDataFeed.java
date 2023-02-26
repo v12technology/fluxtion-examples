@@ -8,36 +8,36 @@ import java.util.Set;
 
 public class MarketDataFeed implements EventFeed {
 
-    private final Set<StaticEventProcessor> targetProcessorSet = new HashSet<>();
+    private final Set<StaticEventProcessor> subscriberSet = new HashSet<>();
 
     public void publish(String symbolId, double price) {
-        targetProcessorSet.forEach(e -> {
-            e.onEvent(new SharePrice(symbolId, price));
+        subscriberSet.forEach(e -> {
+            e.onEvent(new SharePriceEvent(symbolId, price));
         });
     }
 
     @Override
-    public void registerFeedTarget(StaticEventProcessor staticEventProcessor) {
-        //do nothing feed arrived
+    public void registerSubscriber(StaticEventProcessor subscriber) {
+        System.out.println("subscriber registered");
     }
 
     @Override
-    public void subscribe(StaticEventProcessor target, Object subscriptionId) {
-        System.out.println("MarketDataFeed subscription request symbolId:" + subscriptionId);
-        if (!targetProcessorSet.contains(target)) {
-            targetProcessorSet.add(target);
-            System.out.println("MarketDataFeed adding EventProcessor as a sink, count:" + targetProcessorSet.size());
+    public void subscribe(StaticEventProcessor subscriber, Object subscriptionId) {
+        if (!subscriberSet.contains(subscriber)) {
+            subscriberSet.add(subscriber);
+            System.out.println("MarketDataFeed adding new subscriber, count:" + subscriberSet.size());
         }
+        System.out.println("MarketDataFeed subscription:" + subscriptionId);
     }
 
     @Override
-    public void unSubscribe(StaticEventProcessor target, Object subscriptionId) {
-        //some complex unsubscription logic
+    public void unSubscribe(StaticEventProcessor subscriber, Object subscriptionId) {
+        System.out.println("remove subscription:" + subscriptionId + " subscriber:" + subscriber);
     }
 
     @Override
-    public void removeAllSubscriptions(StaticEventProcessor eventProcessor) {
-        targetProcessorSet.remove(eventProcessor);
-        System.out.println("MarketDataFeed removing EventProcessor as sink, count:" + targetProcessorSet.size());
+    public void removeAllSubscriptions(StaticEventProcessor subscriber) {
+        subscriberSet.remove(subscriber);
+        System.out.println("MarketDataFeed removing subscriber, count:" + subscriberSet.size());
     }
 }
