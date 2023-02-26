@@ -28,7 +28,7 @@ public class SharePriceNode {
     }
 
     @OnEventHandler(filterVariable = "symbolId")
-    public void AssetPrice(SharePriceEvent assetPriceUpdate) {
+    public void priceUpdated(SharePriceEvent assetPriceUpdate) {
         System.out.println("SharePriceNode:" + symbolId + " -> " + assetPriceUpdate);
     }
 }

@@ -1,4 +1,4 @@
-package com.fluxtion.example.cookbook.subscription.streaming;
+package com.fluxtion.example.cookbook.subscription.functional;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.stream.EventFlow;
