@@ -1,9 +1,9 @@
 package com.fluxtion.example.functional.helloworld;
 
 import com.fluxtion.compiler.Fluxtion;
+import com.fluxtion.compiler.builder.stream.EventFlow;
 import com.fluxtion.runtime.EventProcessor;
 
-import static com.fluxtion.compiler.builder.stream.EventFlow.subscribe;
 
 /**
  * Simple Fluxtion hello world stream example. Add two numbers and log when sum > 100
@@ -17,12 +17,12 @@ import static com.fluxtion.compiler.builder.stream.EventFlow.subscribe;
 public class Main {
     public static void main(String[] args) {
         //builds the EventProcessor
-        EventProcessor eventProcessor = Fluxtion.compileAot(cfg -> {
-            var data1Stream = subscribe(Data1.class)
+        EventProcessor eventProcessor = Fluxtion.interpret(cfg -> {
+            var data1Stream = EventFlow.subscribe(Data1.class)
                     .console("rcvd -> {}")
                     .mapToDouble(Data1::value);
 
-            subscribe(Data2.class)
+            EventFlow.subscribe(Data2.class)
                     .console("rcvd -> {}")
                     .mapToDouble(Data2::value)
                     .mapBiFunction(Double::sum, data1Stream)
