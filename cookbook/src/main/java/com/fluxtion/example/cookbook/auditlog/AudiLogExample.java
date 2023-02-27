@@ -47,7 +47,7 @@ public class AudiLogExample {
 
         var eventProcessor = Fluxtion.interpret(cfg -> {
             cfg.addNode(publishHandler);
-            cfg.addEventAudit(LogLevel.DEBUG);
+            cfg.addEventAudit(LogLevel.INFO);
         });
 
         eventProcessor.init();
@@ -116,7 +116,9 @@ public class AudiLogExample {
 
         @OnTrigger
         public boolean calculatorTriggered(){
+            auditLog.debug("recalculateDebug", true);
             auditLog.info("recalculate", true);
+            auditLog.warn("recalculateWarn", true);
             return true;
         }
 
