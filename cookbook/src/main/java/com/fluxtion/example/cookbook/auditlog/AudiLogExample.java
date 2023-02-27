@@ -47,18 +47,18 @@ public class AudiLogExample {
 
         var eventProcessor = Fluxtion.interpret(cfg -> {
             cfg.addNode(publishHandler);
-            cfg.addEventAudit(LogLevel.INFO);
+            cfg.addEventAudit(LogLevel.DEBUG);
         });
 
         eventProcessor.init();
-        eventProcessor.setAuditLogLevel(LogLevel.WARN);
+//        eventProcessor.setAuditLogLevel(LogLevel.WARN);
         eventProcessor.onEvent(new DataEvent("A"));
         eventProcessor.onEvent(new DataEvent("B"));
         eventProcessor.onEvent(new PublishEvent());
         eventProcessor.onEvent(new CalculateEvent("ABC"));
         eventProcessor.onEvent(new ConfigEvent());
         eventProcessor.onEvent(new DataEvent("EFG"));
-        System.out.println("\nXXXXXX uping the trace level XXXX\n");
+        System.out.println("\nXXXXXX uping the trace level  to DEBUG XXXX\n");
         eventProcessor.setAuditLogLevel(LogLevel.DEBUG);
         eventProcessor.onEvent(new DataEvent("C"));
         eventProcessor.onEvent(new CalculateEvent("AB"));
@@ -107,13 +107,18 @@ public class AudiLogExample {
         }
     }
 
-    public static class PublishCalcHandler {
+    public static class PublishCalcHandler extends EventLogNode {
         private final List<CalcHandler> calcHandlerList;
 
         public PublishCalcHandler(List<CalcHandler> calcHandlerList) {
             this.calcHandlerList = calcHandlerList;
         }
 
+        @OnTrigger
+        public boolean calculatorTriggered(){
+            auditLog.info("recalculate", true);
+            return true;
+        }
 
         @OnEventHandler
         public void publish(PublishEvent publishEvent) {
