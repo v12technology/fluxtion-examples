@@ -1,10 +1,12 @@
 package com.fluxtion.example.cookbook.auditlog;
 
+import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnTrigger;
 import com.fluxtion.runtime.audit.EventLogControlEvent.LogLevel;
 import com.fluxtion.runtime.audit.EventLogNode;
+import com.fluxtion.runtime.audit.LogRecord;
 import com.fluxtion.runtime.node.NamedNode;
 
 import java.util.List;
@@ -12,7 +14,43 @@ import java.util.List;
 public class AudiLogExample {
 
     public static void main(String[] args) {
+        var eventProcessor = Fluxtion.interpret(AudiLogExample::buildProcessor);
 
+        eventProcessor.init();
+        eventProcessor.setAuditLogProcessor(AudiLogExample::printLogRecord);
+        eventProcessor.onEvent(new DataEvent("A"));
+        eventProcessor.onEvent(new DataEvent("B"));
+        eventProcessor.onEvent(new PublishEvent());
+        eventProcessor.onEvent(new CalculateEvent("ABC"));
+        eventProcessor.onEvent(new ConfigEvent());
+        eventProcessor.onEvent(new DataEvent("EFG"));
+
+        System.out.println("\nXXXXXX upping the audit log level to DEBUG XXXX\n");
+        eventProcessor.setAuditLogLevel(LogLevel.DEBUG);
+        eventProcessor.onEvent(new DataEvent("C"));
+        eventProcessor.onEvent(new CalculateEvent("AB"));
+        eventProcessor.onEvent(new CalculateEvent("ABNHGH"));
+        eventProcessor.onEvent(new ConfigEvent());
+        eventProcessor.onEvent(new PublishEvent());
+
+        System.out.println("\nXXXXXX log level NONE for all XXXX\n");
+        eventProcessor.setAuditLogLevel(LogLevel.NONE);
+        System.out.println("\nXXXXXX log level DEBUG for publisher XXXX\n");
+        eventProcessor.setAuditLogLevel(LogLevel.DEBUG, "publisher");
+        ;
+        eventProcessor.onEvent(new DataEvent("A"));
+        eventProcessor.onEvent(new CalculateEvent("AB"));
+        eventProcessor.onEvent(new DataEvent("B"));
+        eventProcessor.onEvent(new CalculateEvent("ABNHGH"));
+        eventProcessor.onEvent(new ConfigEvent());
+        eventProcessor.onEvent(new PublishEvent());
+    }
+
+    private static void printLogRecord(LogRecord logRecord) {
+        System.out.println(logRecord.toString() + "\n---");
+    }
+
+    private static void buildProcessor(EventProcessorConfig cfg) {
         var configHandler = new ConfigHandler();
         var dataHandlerA = new DataHandler("A");
         var dataHandlerB = new DataHandler("B");
@@ -44,28 +82,8 @@ public class AudiLogExample {
                 calcHandlerAC,
                 calcHandlerABC
         ));
-
-        var eventProcessor = Fluxtion.interpret(cfg -> {
-            cfg.addNode(publishHandler);
-            cfg.addEventAudit(LogLevel.DEBUG);
-        });
-
-        eventProcessor.init();
-//        eventProcessor.setAuditLogLevel(LogLevel.WARN);
-        eventProcessor.onEvent(new DataEvent("A"));
-        eventProcessor.onEvent(new DataEvent("B"));
-        eventProcessor.onEvent(new PublishEvent());
-        eventProcessor.onEvent(new CalculateEvent("ABC"));
-        eventProcessor.onEvent(new ConfigEvent());
-        eventProcessor.onEvent(new DataEvent("EFG"));
-        System.out.println("\nXXXXXX uping the trace level  to DEBUG XXXX\n");
-        eventProcessor.setAuditLogLevel(LogLevel.DEBUG);
-        eventProcessor.onEvent(new DataEvent("C"));
-        eventProcessor.onEvent(new CalculateEvent("AB"));
-        eventProcessor.onEvent(new CalculateEvent("ABNHGH"));
-        eventProcessor.onEvent(new ConfigEvent());
-        eventProcessor.onEvent(new PublishEvent());
-
+        cfg.addNode(publishHandler);
+        cfg.addEventAudit(LogLevel.DEBUG);
     }
 
     public record ConfigEvent() {
@@ -84,7 +102,7 @@ public class AudiLogExample {
     public static class ConfigHandler {
 
         @OnEventHandler
-        public boolean configUpdated(ConfigEvent configEvent){
+        public boolean configUpdated(ConfigEvent configEvent) {
             return false;
         }
     }
@@ -107,7 +125,7 @@ public class AudiLogExample {
         }
     }
 
-    public static class PublishCalcHandler extends EventLogNode {
+    public static class PublishCalcHandler extends EventLogNode implements NamedNode {
         private final List<CalcHandler> calcHandlerList;
 
         public PublishCalcHandler(List<CalcHandler> calcHandlerList) {
@@ -115,7 +133,7 @@ public class AudiLogExample {
         }
 
         @OnTrigger
-        public boolean calculatorTriggered(){
+        public boolean calculatorTriggered() {
             auditLog.info("recalculate", true);
             return true;
         }
@@ -125,6 +143,10 @@ public class AudiLogExample {
 
         }
 
+        @Override
+        public String getName() {
+            return "publisher";
+        }
     }
 
     public static class CalcHandler extends EventLogNode implements NamedNode {
