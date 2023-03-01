@@ -27,6 +27,7 @@ public class AudiLogExample {
 
         System.out.println("\nXXXXXX upping the audit log level to DEBUG XXXX\n");
         eventProcessor.setAuditLogLevel(LogLevel.DEBUG);
+        eventProcessor.onEvent("TEST_STRING_EVENT");
         eventProcessor.onEvent(new DataEvent("C"));
         eventProcessor.onEvent(new CalculateEvent("AB"));
         eventProcessor.onEvent(new CalculateEvent("ABNHGH"));
@@ -35,6 +36,12 @@ public class AudiLogExample {
 
         System.out.println("\nXXXXXX log level NONE for all XXXX\n");
         eventProcessor.setAuditLogLevel(LogLevel.NONE);
+        eventProcessor.onEvent(new DataEvent("C"));
+        eventProcessor.onEvent(new CalculateEvent("AB"));
+        eventProcessor.onEvent(new CalculateEvent("ABNHGH"));
+        eventProcessor.onEvent(new ConfigEvent());
+        eventProcessor.onEvent(new PublishEvent());
+
         System.out.println("\nXXXXXX log level DEBUG for publisher XXXX\n");
         eventProcessor.setAuditLogLevel(LogLevel.DEBUG, "publisher");
         ;
