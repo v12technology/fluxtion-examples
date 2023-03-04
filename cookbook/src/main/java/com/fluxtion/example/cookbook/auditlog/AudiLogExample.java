@@ -146,8 +146,8 @@ public class AudiLogExample {
         }
 
         @OnEventHandler
-        public void publish(PublishEvent publishEvent) {
-
+        public boolean publish(PublishEvent publishEvent) {
+            return true;
         }
 
         @Override
