@@ -12,6 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         var stringProcessor = Fluxtion.interpret(c -> c.addNode(new StringProcessor()));
+        //bind instances ready for lookup
         stringProcessor.injectInstance(Main::title, Supplier.class);
         stringProcessor.injectNamedInstance(new ArrayList<>(), List.class, "upper");
         stringProcessor.injectNamedInstance(new ArrayList<>(), List.class, "lower");
