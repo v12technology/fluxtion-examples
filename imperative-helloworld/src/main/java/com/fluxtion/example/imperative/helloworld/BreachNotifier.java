@@ -14,7 +14,8 @@ public class BreachNotifier {
     }
 
     @OnTrigger
-    public void printWarning() {
+    public boolean printWarning() {
         System.out.println("WARNING DataSumCalculator value is greater than 100 sum = " + dataAddition.getSum());
+        return true;
     }
 }
