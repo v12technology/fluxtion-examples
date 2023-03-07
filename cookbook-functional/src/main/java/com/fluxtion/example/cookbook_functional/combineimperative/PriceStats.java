@@ -1,6 +1,6 @@
 package com.fluxtion.example.cookbook_functional.combineimperative;
 
-import com.fluxtion.example.cookbook_functional.combineimperative.Main.MarketUpdate;
+import com.fluxtion.example.cookbook_functional.events.MarketUpdate;
 import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.OnTrigger;
 import com.fluxtion.runtime.stream.EventStream.EventSupplier;

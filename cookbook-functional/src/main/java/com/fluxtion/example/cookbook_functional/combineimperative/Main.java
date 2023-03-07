@@ -2,9 +2,9 @@ package com.fluxtion.example.cookbook_functional.combineimperative;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.stream.EventFlow;
+import com.fluxtion.example.cookbook_functional.events.MarketUpdate;
+import com.fluxtion.example.cookbook_functional.events.Subscription;
 import com.fluxtion.runtime.EventProcessor;
-import com.fluxtion.runtime.stream.EventStream;
-import com.fluxtion.runtime.stream.EventStream.EventSupplier;
 
 public class Main {
 
@@ -41,10 +41,6 @@ public class Main {
         processor.onEvent(new MarketUpdate(11, "EURCHF", 1.06));
         processor.onEvent(new MarketUpdate(15, "USDGBP", 1.15));
     }
-
-    public record MarketUpdate(long id, String name, double mid){}
-
-    public record Subscription(long id){}
 
     public static boolean isSubscribed(MarketUpdate id1, Subscription id2){
         return id1.id() == id2.id();

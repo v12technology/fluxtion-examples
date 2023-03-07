@@ -3,6 +3,8 @@ package com.fluxtion.example.cookbook_functional.dynamicfilter;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.stream.EventFlow;
 import com.fluxtion.compiler.builder.stream.EventStreamBuilder;
+import com.fluxtion.example.cookbook_functional.events.MarketUpdate;
+import com.fluxtion.example.cookbook_functional.events.Subscription;
 import com.fluxtion.runtime.EventProcessor;
 
 public class Main {
@@ -40,9 +42,6 @@ public class Main {
         processor.onEvent(new MarketUpdate(15, "USDGBP", 1.15));
     }
 
-    record MarketUpdate(long id, String name, double mid){}
-
-    record Subscription(long id){}
 
     public static boolean isSubscribed(MarketUpdate id1, Subscription id2){
         return id1.id() == id2.id();
