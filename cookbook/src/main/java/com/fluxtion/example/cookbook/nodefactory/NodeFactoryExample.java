@@ -24,12 +24,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Build an event processor using factories and config only. No imperative building of nodes, no calls to
+ * Build an event processor using factories and config only. No imperative building of nodes, i.e. no calls to
  * {@link com.fluxtion.compiler.EventProcessorConfig#addNode(Object)}.
  *
  * Running the example builds the graph and sends market data for processing:
  * <ul>
- *     <li>MarketStatsCalculator prints out the stats for several smoothed mid price calculator</li>
+ *     <li>MarketStatsCalculator prints out the stats for several smoothed mid price calculators</li>
  *     <li>A SmoothedMarketRate calculates a moving average for {@link MarketDataSupplier#midPrice()}</li>
  *     <li>A SmoothedMarketRate has a unique time window size and number of buckets for the calculation</li>
  *     <li>A MarketDataSupplier either listens to a market directly or is a cross calcualtion</li>
@@ -39,9 +39,11 @@ import java.util.concurrent.TimeUnit;
  * Each node has an associated {@link com.fluxtion.compiler.builder.factory.NodeFactory} that builds the node. The factory
  * has access to other factories via {@link com.fluxtion.compiler.builder.factory.NodeRegistry#findOrCreateNode(Class, Map, String)}
  * to create dependencies needed to build the current node.
- *
+ *<p></p>
  * The configuration is passed as a map to the root instance. Subsequent findOrCreateNode calls receive the map the currently
  * executing NodeFactory wants to provide.
+ *<p></p>
+ * Factories are registered programmtically with Fluxtion, provided in the example {@link NodeFactoryExample#nodeFactories()}
  *
  */
 public class NodeFactoryExample {
@@ -99,6 +101,10 @@ public class NodeFactoryExample {
                 .scheduleAtFixedRate(NodeFactoryExample::publishMarketData, 0, 200, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * The factories registered programmatically
+     * @return
+     */
     private static NodeFactoryRegistration nodeFactories() {
         return new NodeFactoryRegistration(
                 new SmoothedMarketRateFactory(),

@@ -15,7 +15,8 @@ public class MarketDataNodeFactory implements NodeFactory<MarketDataSupplier> {
 
     @Override
     public MarketDataSupplier createNode(Map<String, Object> config, NodeRegistry registry) {
-        MarketDataSupplierConfig mktSupplierConfig = (MarketDataSupplierConfig) config.get(MarketDataSupplierConfig.class.getCanonicalName());
+        MarketDataSupplierConfig mktSupplierConfig = (MarketDataSupplierConfig) config.get(
+                MarketDataSupplierConfig.class.getCanonicalName());
 
         String symbol = mktSupplierConfig.symbol();
         if(symbol.equals("GBPDKK")){

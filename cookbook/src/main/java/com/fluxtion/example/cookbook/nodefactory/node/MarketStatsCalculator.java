@@ -16,10 +16,13 @@ public class MarketStatsCalculator {
     private final FixedRateTrigger fixedRateTrigger;
 
     @OnTrigger
-    public boolean calculateMarketStats(){
+    public boolean calculateMarketStats() {
         String statsString = publishers.stream()
                 .map(SmoothedMarketRate::formattedResults)
-                .collect(Collectors.joining("\n", "-----------------------\n", "\n-----------------------\n"));
+                .collect(Collectors.joining(
+                        "\n",
+                        "-----------------------\n",
+                        "\n-----------------------\n"));
         System.out.println(statsString);
         return true;
     }

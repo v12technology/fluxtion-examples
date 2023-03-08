@@ -13,7 +13,8 @@ import java.util.Map;
 public class SmoothedMarketRateFactory implements NodeFactory<SmoothedMarketRate> {
     @Override
     public SmoothedMarketRate createNode(Map<String, Object> config, NodeRegistry registry) {
-        SmoothedMarketRateConfig publisherConfig = (SmoothedMarketRateConfig) config.get(SmoothedMarketRateConfig.class.getCanonicalName());
+        SmoothedMarketRateConfig publisherConfig = (SmoothedMarketRateConfig) config.get(
+                SmoothedMarketRateConfig.class.getCanonicalName());
 
         return new SmoothedMarketRate(
                 publisherConfig.name(),
