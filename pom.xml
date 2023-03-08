@@ -46,6 +46,11 @@ along with this program.  If not, see
             <artifactId>compiler</artifactId>
             <version>${fluxtion.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.14.2</version>
+        </dependency>
     </dependencies>
 
 </project>
