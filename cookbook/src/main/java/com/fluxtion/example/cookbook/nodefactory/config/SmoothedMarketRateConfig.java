@@ -4,5 +4,5 @@ public record SmoothedMarketRateConfig(
         int publishRate,
         int windowSize,
         String name,
-        MarketDataSupplierConfig marketDataSupplierConfigList) {
+        MarketDataSupplierConfig marketDataSupplier) {
 }

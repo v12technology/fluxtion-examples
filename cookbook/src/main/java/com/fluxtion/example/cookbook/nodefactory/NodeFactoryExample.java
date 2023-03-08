@@ -46,15 +46,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class NodeFactoryExample {
 
-    private static boolean programmaticConfig = false;
+    private final static boolean programmaticConfig = false;
+    private final static boolean interpret = true;
+    private static EventProcessor<?> eventProcessor;
     public static String config = """
             {
-              "publisherConfigList": [
+              "smoothedMarketRateConfigList": [
                 {
                   "publishRate": 1000,
                   "windowSize": 10,
                   "name": "smoothedEURUSD_1s",
-                  "marketDataSupplierConfigList": {
+                  "marketDataSupplier": {
                     "symbol": "EURUSD"
                   }
                 },
@@ -62,7 +64,7 @@ public class NodeFactoryExample {
                   "publishRate": 5000,
                   "windowSize": 5,
                   "name": "smoothedEURUSD_5s",
-                  "marketDataSupplierConfigList": {
+                  "marketDataSupplier": {
                     "symbol": "EURUSD"
                   }
                 },
@@ -70,7 +72,7 @@ public class NodeFactoryExample {
                   "publishRate": 1000,
                   "windowSize": 6,
                   "name": "smoothedGBPDKK_1s",
-                  "marketDataSupplierConfigList": {
+                  "marketDataSupplier": {
                     "symbol": "GBPDKK"
                   }
                 }
@@ -80,15 +82,21 @@ public class NodeFactoryExample {
             """;
 
     public static void main(String[] args) {
-        final EventProcessor<?> eventProcessor = Fluxtion.compileAot(c -> {
-            c.setRootNodeConfig(builderConfig());
-            c.setNodeFactoryRegistration(nodeFactories());
-        }, "com.fluxtion.example.cookbook.nodefactory.generated", "Processor");
+        if(interpret){
+            eventProcessor = Fluxtion.interpret(c -> {
+                c.setRootNodeConfig(builderConfig());
+                c.setNodeFactoryRegistration(nodeFactories());
+            });
+        }else{
+            eventProcessor = Fluxtion.compileAot(c -> {
+                c.setRootNodeConfig(builderConfig());
+                c.setNodeFactoryRegistration(nodeFactories());
+            }, "com.fluxtion.example.cookbook.nodefactory.generated", "Processor");
+        }
         eventProcessor.init();
-
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(
-                () -> publishMarketData(eventProcessor), 0, 200, TimeUnit.MILLISECONDS);
-
+        System.out.println("generated processor - sending market data");
+        Executors.newSingleThreadScheduledExecutor()
+                .scheduleAtFixedRate(NodeFactoryExample::publishMarketData, 0, 200, TimeUnit.MILLISECONDS);
     }
 
     private static NodeFactoryRegistration nodeFactories() {
@@ -123,11 +131,11 @@ public class NodeFactoryExample {
         return new RootNodeConfig(processorName, rootClass, configMap, nodes);
     }
 
-    private static void publishMarketData(EventProcessor<?> processor) {
+    private static void publishMarketData() {
         Random random = new Random();
-        processor.onEvent(new MarketUpdate("EURGBP", 0.89 + random.nextInt(100) * 0.001));
-        processor.onEvent(new MarketUpdate("GBPUSD", 1.18 + random.nextInt(100) * 0.001));
-        processor.onEvent(new MarketUpdate("EURUSD", 1.05 + random.nextInt(100) * 0.001));
-        processor.onEvent(new MarketUpdate("EURDKK", 7.44 + random.nextInt(100) * 0.001));
+        eventProcessor.onEvent(new MarketUpdate("EURGBP", 0.89 + random.nextInt(100) * 0.001));
+        eventProcessor.onEvent(new MarketUpdate("GBPUSD", 1.18 + random.nextInt(100) * 0.001));
+        eventProcessor.onEvent(new MarketUpdate("EURUSD", 1.05 + random.nextInt(100) * 0.001));
+        eventProcessor.onEvent(new MarketUpdate("EURDKK", 7.44 + random.nextInt(100) * 0.001));
     }
 }

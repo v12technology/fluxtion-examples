@@ -20,7 +20,7 @@ public class SmoothedMarketRateFactory implements NodeFactory<SmoothedMarketRate
                 FixedRateTrigger.atMillis(publisherConfig.publishRate()),
                 registry.findOrCreateNode(
                         MarketDataSupplier.class,
-                        Map.of(MarketDataSupplierConfig.class.getCanonicalName(), publisherConfig.marketDataSupplierConfigList()),
+                        Map.of(MarketDataSupplierConfig.class.getCanonicalName(), publisherConfig.marketDataSupplier()),
                         null),
                 publisherConfig.windowSize());
     }

@@ -16,7 +16,7 @@ public class MarketStatsCalculatorFactory implements NodeFactory<MarketStatsCalc
     @Override
     public MarketStatsCalculator createNode(Map<String, Object> config, NodeRegistry registry) {
         MarketStatsCalculatorConfig statsCalcConfig = (MarketStatsCalculatorConfig) config.get(MarketStatsCalculatorConfig.class.getCanonicalName());
-        List<SmoothedMarketRate> throttledPublishers = statsCalcConfig.publisherConfigList().stream()
+        List<SmoothedMarketRate> throttledPublishers = statsCalcConfig.smoothedMarketRateConfigList().stream()
                 .map(cfg -> registry.findOrCreateNode(
                         SmoothedMarketRate.class,
                         Map.of(SmoothedMarketRateConfig.class.getCanonicalName(), cfg),
