@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * The configuration is passed as a map to the root instance. Subsequent findOrCreateNode calls receive the map the currently
  * executing NodeFactory wants to provide.
  *<p></p>
- * Factories are registered programmtically with Fluxtion, provided in the example {@link NodeFactoryExample#nodeFactories()}
+ * Factories are registered programmatically with Fluxtion, provided in the example {@link NodeFactoryExample#nodeFactories()}
  *
  */
 public class NodeFactoryExample {
@@ -88,11 +88,13 @@ public class NodeFactoryExample {
             eventProcessor = Fluxtion.interpret(c -> {
                 c.setRootNodeConfig(builderConfig());
                 c.setNodeFactoryRegistration(nodeFactories());
+                //c.addEventAudit(LogLevel.INFO);
             });
         }else{
             eventProcessor = Fluxtion.compileAot(c -> {
                 c.setRootNodeConfig(builderConfig());
                 c.setNodeFactoryRegistration(nodeFactories());
+                //c.addEventAudit(LogLevel.INFO);
             }, "com.fluxtion.example.cookbook.nodefactory.generated", "Processor");
         }
         eventProcessor.init();

@@ -26,10 +26,10 @@ public class MarketDataCrossNode implements NamedNode, MarketDataSupplier {
 
     @OnTrigger
     public boolean calculateCrossRate() {
-        double newRate = rate2.midPrice() / rate1.midPrice() ;
+        double newRate = rate2.midPrice() / rate1.midPrice();
         boolean updated = !(newRate == midPrice || Double.isNaN(newRate) && Double.isNaN(midPrice));
         midPrice = newRate;
-        return !updated;
+        return updated;
     }
 
     @Override

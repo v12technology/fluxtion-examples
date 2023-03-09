@@ -1,7 +1,6 @@
 package com.fluxtion.example.cookbook.nodefactory.node;
 
 import com.fluxtion.example.cookbook.nodefactory.MarketDataSupplier;
-import com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate;
 import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.NoTriggerReference;
 import com.fluxtion.runtime.annotations.OnTrigger;
@@ -10,8 +9,6 @@ import com.fluxtion.runtime.time.FixedRateTrigger;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 public class SmoothedMarketRate implements NamedNode {
     private final String name;
@@ -19,20 +16,20 @@ public class SmoothedMarketRate implements NamedNode {
     @NoTriggerReference
     private final MarketDataSupplier marketDataNode;
     private final int windowSize;
-   private final transient DescriptiveStatistics stats = new DescriptiveStatistics();
+    private final transient DescriptiveStatistics stats = new DescriptiveStatistics();
 
     @OnTrigger
-    public boolean calculateSmoothedRate(){
+    public boolean calculateSmoothedRate() {
         stats.addValue(marketDataNode.midPrice());
         return true;
     }
 
-    public double smoothedRate(){
+    public double smoothedRate() {
         return stats.getMean();
     }
 
     @Initialise
-    public void init(){
+    public void init() {
         stats.setWindowSize(windowSize);
     }
 
@@ -41,7 +38,7 @@ public class SmoothedMarketRate implements NamedNode {
         return name;
     }
 
-    public String formattedResults(){
+    public String formattedResults() {
         return "%s, %.4f".formatted(getName(), smoothedRate());
     }
 }

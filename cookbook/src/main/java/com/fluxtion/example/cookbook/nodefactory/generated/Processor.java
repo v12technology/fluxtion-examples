@@ -50,7 +50,7 @@ import java.util.function.Consumer;
 /*
  *
  * <pre>
- * generation time                 : 2023-03-08T15:22:20.107469
+ * generation time                 : 2023-03-09T12:10:53.492424
  * eventProcessorGenerator version : 8.0.5
  * api version                     : 8.0.5
  * </pre>
@@ -273,17 +273,6 @@ public class Processor
   public void bufferEvent(Object event) {
     buffering = true;
     switch (event.getClass().getName()) {
-      case ("java.lang.Object"):
-        {
-          Object typedEvent = (Object) event;
-          auditEvent(typedEvent);
-          isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
-          //event stack unwind callbacks
-          break;
-        }
       case ("com.fluxtion.runtime.time.ClockStrategy$ClockStrategyEvent"):
         {
           ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
@@ -297,6 +286,17 @@ public class Processor
           isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.setClockStrategy(typedEvent);
           isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
           isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.setClockStrategy(typedEvent);
+          //event stack unwind callbacks
+          break;
+        }
+      case ("java.lang.Object"):
+        {
+          Object typedEvent = (Object) event;
+          auditEvent(typedEvent);
+          isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.hasExpired(typedEvent);
+          isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.hasExpired(typedEvent);
+          isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.hasExpired(typedEvent);
+          isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
           //event stack unwind callbacks
           break;
         }
