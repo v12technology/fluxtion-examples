@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>artticles.data-oriented-1</artifactId>
+    <name>article :: data-oriented-1</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
