@@ -45,7 +45,7 @@ public class SubscriberFunctional {
         var marketPriceProcessor = Fluxtion.interpret(c -> {
             EventFlow.subscribe(SharePriceEvent.class, "MSFT").console("SharePriceNode:MSFT -> {}");
             EventFlow.subscribe(SharePriceEvent.class, "AMZN").console("SharePriceNode:AMZN -> {}");
-        });
+        }, true);
         marketPriceProcessor.init();
 
         MarketDataFeed eventFeed = new MarketDataFeed();

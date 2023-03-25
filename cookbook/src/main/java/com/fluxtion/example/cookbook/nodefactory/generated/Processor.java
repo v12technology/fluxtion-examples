@@ -29,6 +29,7 @@ import com.fluxtion.example.cookbook.nodefactory.node.MarketStatsCalculator;
 import com.fluxtion.example.cookbook.nodefactory.node.SmoothedMarketRate;
 import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
+import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
 import com.fluxtion.runtime.callback.CallbackDispatcherImpl;
 import com.fluxtion.runtime.event.Event;
@@ -50,9 +51,9 @@ import java.util.function.Consumer;
 /*
  *
  * <pre>
- * generation time                 : 2023-03-09T12:10:53.492424
- * eventProcessorGenerator version : 8.0.5
- * api version                     : 8.0.5
+ * generation time                 : 2023-03-24T19:42:10.606782
+ * eventProcessorGenerator version : 8.1.13-SNAPSHOT
+ * api version                     : 8.1.13-SNAPSHOT
  * </pre>
  * @author Greg Higgins
  */
@@ -93,6 +94,7 @@ public class Processor
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
   //Dirty flags
+  private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
@@ -147,29 +149,15 @@ public class Processor
   }
 
   public void onEventInternal(Object event) {
-    switch (event.getClass().getName()) {
-      case ("com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate"):
-        {
-          MarketUpdate typedEvent = (MarketUpdate) event;
-          handleEvent(typedEvent);
-          break;
-        }
-      case ("com.fluxtion.runtime.time.ClockStrategy$ClockStrategyEvent"):
-        {
-          ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
-          handleEvent(typedEvent);
-          break;
-        }
-      case ("java.lang.Object"):
-        {
-          Object typedEvent = (Object) event;
-          handleEvent(typedEvent);
-          break;
-        }
-      default:
-        {
-          handleEvent(event);
-        }
+    if (event instanceof com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate) {
+      MarketUpdate typedEvent = (MarketUpdate) event;
+      handleEvent(typedEvent);
+    } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
+      ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
+      handleEvent(typedEvent);
+    } else if (event instanceof java.lang.Object) {
+      Object typedEvent = (Object) event;
+      handleEvent(typedEvent);
     }
   }
 
@@ -272,65 +260,55 @@ public class Processor
 
   public void bufferEvent(Object event) {
     buffering = true;
-    switch (event.getClass().getName()) {
-      case ("com.fluxtion.runtime.time.ClockStrategy$ClockStrategyEvent"):
-        {
-          ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
-          auditEvent(typedEvent);
-          clock.setClockStrategy(typedEvent);
-          isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.setClockStrategy(typedEvent);
-          isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.setClockStrategy(typedEvent);
-          isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.setClockStrategy(typedEvent);
-          isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.setClockStrategy(typedEvent);
+    if (event instanceof com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate) {
+      MarketUpdate typedEvent = (MarketUpdate) event;
+      auditEvent(typedEvent);
+      switch (typedEvent.filterString()) {
+          //Event Class:[com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate] filterString:[EURDKK]
+        case ("EURDKK"):
+          isDirty_marketDataNode_EURDKK = marketDataNode_EURDKK.marketUpdate(typedEvent);
           //event stack unwind callbacks
-          break;
-        }
-      case ("java.lang.Object"):
-        {
-          Object typedEvent = (Object) event;
-          auditEvent(typedEvent);
-          isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
+          afterEvent();
+          return;
+          //Event Class:[com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate] filterString:[EURGBP]
+        case ("EURGBP"):
+          isDirty_marketDataNode_EURGBP = marketDataNode_EURGBP.marketUpdate(typedEvent);
           //event stack unwind callbacks
-          break;
-        }
-      case ("com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate"):
-        {
-          MarketUpdate typedEvent = (MarketUpdate) event;
-          auditEvent(typedEvent);
-          switch (typedEvent.filterString()) {
-              //Event Class:[com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate] filterString:[EURDKK]
-            case ("EURDKK"):
-              isDirty_marketDataNode_EURDKK = marketDataNode_EURDKK.marketUpdate(typedEvent);
-              //event stack unwind callbacks
-              afterEvent();
-              return;
-              //Event Class:[com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate] filterString:[EURGBP]
-            case ("EURGBP"):
-              isDirty_marketDataNode_EURGBP = marketDataNode_EURGBP.marketUpdate(typedEvent);
-              //event stack unwind callbacks
-              afterEvent();
-              return;
-              //Event Class:[com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate] filterString:[EURUSD]
-            case ("EURUSD"):
-              marketDataNode_EURUSD.marketUpdate(typedEvent);
-              //event stack unwind callbacks
-              afterEvent();
-              return;
-          }
-          isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.hasExpired(typedEvent);
-          isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
+          afterEvent();
+          return;
+          //Event Class:[com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate] filterString:[EURUSD]
+        case ("EURUSD"):
+          marketDataNode_EURUSD.marketUpdate(typedEvent);
           //event stack unwind callbacks
-          break;
-        }
+          afterEvent();
+          return;
+      }
+      isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
+      //event stack unwind callbacks
+    } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
+      ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
+      auditEvent(typedEvent);
+      clock.setClockStrategy(typedEvent);
+      isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.setClockStrategy(typedEvent);
+      isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.setClockStrategy(typedEvent);
+      isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.setClockStrategy(typedEvent);
+      isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.setClockStrategy(typedEvent);
+      //event stack unwind callbacks
+    } else if (event instanceof java.lang.Object) {
+      Object typedEvent = (Object) event;
+      auditEvent(typedEvent);
+      isDirty_fixedRateTrigger_1 = fixedRateTrigger_1.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_2 = fixedRateTrigger_2.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_3 = fixedRateTrigger_3.hasExpired(typedEvent);
+      isDirty_fixedRateTrigger_4 = fixedRateTrigger_4.hasExpired(typedEvent);
+      //event stack unwind callbacks
     }
   }
 
@@ -397,6 +375,7 @@ public class Processor
 
   @Override
   public void init() {
+    initCalled = true;
     //initialise dirty lookup map
     isDirty("test");
     clock.init();
@@ -411,7 +390,22 @@ public class Processor
   }
 
   @Override
+  public void start() {
+    if (!initCalled) {
+      throw new RuntimeException("init() must be called before start()");
+    }
+  }
+
+  @Override
+  public void stop() {
+    if (!initCalled) {
+      throw new RuntimeException("init() must be called before stop()");
+    }
+  }
+
+  @Override
   public void tearDown() {
+    initCalled = false;
     nodeNameLookup.tearDown();
     clock.tearDown();
     subscriptionManager.tearDown();
@@ -477,6 +471,12 @@ public class Processor
   }
 
   @Override
+  public <A extends Auditor> A getAuditorById(String id)
+      throws NoSuchFieldException, IllegalAccessException {
+    return (A) this.getClass().getField(id).get(this);
+  }
+
+  @Override
   public void addEventFeed(EventFeed eventProcessorFeed) {
     subscriptionManager.addEventProcessorFeed(eventProcessorFeed);
   }
@@ -491,7 +491,19 @@ public class Processor
     return new Processor();
   }
 
+  @Override
   public Processor newInstance(Map<Object, Object> contextMap) {
     return new Processor();
+  }
+
+  @Override
+  public String getLastAuditLogRecord() {
+    try {
+      EventLogManager eventLogManager =
+          (EventLogManager) this.getClass().getField(EventLogManager.NODE_NAME).get(this);
+      return eventLogManager.lastRecordAsString();
+    } catch (Throwable e) {
+      return "";
+    }
   }
 }

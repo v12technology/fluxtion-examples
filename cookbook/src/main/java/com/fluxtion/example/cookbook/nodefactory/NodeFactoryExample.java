@@ -1,6 +1,5 @@
 package com.fluxtion.example.cookbook.nodefactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.RootNodeConfig;
@@ -26,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Build an event processor using factories and config only. No imperative building of nodes, i.e. no calls to
  * {@link com.fluxtion.compiler.EventProcessorConfig#addNode(Object)}.
- *
+ * <p>
  * Running the example builds the graph and sends market data for processing:
  * <ul>
  *     <li>MarketStatsCalculator prints out the stats for several smoothed mid price calculators</li>
@@ -35,22 +34,20 @@ import java.util.concurrent.TimeUnit;
  *     <li>A MarketDataSupplier either listens to a market directly or is a cross calcualtion</li>
  *     <li>If the market cannot be subscribed to directly the {@link MarketDataNodeFactory} supplies a {@link com.fluxtion.example.cookbook.nodefactory.node.MarketDataCrossNode}</li>
  * </ul>
- *
+ * <p>
  * Each node has an associated {@link com.fluxtion.compiler.builder.factory.NodeFactory} that builds the node. The factory
  * has access to other factories via {@link com.fluxtion.compiler.builder.factory.NodeRegistry#findOrCreateNode(Class, Map, String)}
  * to create dependencies needed to build the current node.
- *<p></p>
+ * <p></p>
  * The configuration is passed as a map to the root instance. Subsequent findOrCreateNode calls receive the map the currently
  * executing NodeFactory wants to provide.
- *<p></p>
+ * <p></p>
  * Factories are registered programmatically with Fluxtion, provided in the example {@link NodeFactoryExample#nodeFactories()}
- *
  */
 public class NodeFactoryExample {
 
     private final static boolean programmaticConfig = false;
-    private final static boolean interpret = true;
-    private static EventProcessor<?> eventProcessor;
+    private final static boolean interpret = false;
     public static String config = """
             {
               "smoothedMarketRateConfigList": [
@@ -82,15 +79,16 @@ public class NodeFactoryExample {
               "reportingIntervalSeconds": 2
             }
             """;
+    private static EventProcessor<?> eventProcessor;
 
     public static void main(String[] args) {
-        if(interpret){
+        if (interpret) {
             eventProcessor = Fluxtion.interpret(c -> {
                 c.setRootNodeConfig(builderConfig());
                 c.setNodeFactoryRegistration(nodeFactories());
                 //c.addEventAudit(LogLevel.INFO);
             });
-        }else{
+        } else {
             eventProcessor = Fluxtion.compileAot(c -> {
                 c.setRootNodeConfig(builderConfig());
                 c.setNodeFactoryRegistration(nodeFactories());
@@ -105,6 +103,7 @@ public class NodeFactoryExample {
 
     /**
      * The factories registered programmatically
+     *
      * @return
      */
     private static NodeFactoryRegistration nodeFactories() {
@@ -117,7 +116,7 @@ public class NodeFactoryExample {
     @SneakyThrows
     public static RootNodeConfig builderConfig() {
         final MarketStatsCalculatorConfig statsCalculatorConfig;
-        if(programmaticConfig){
+        if (programmaticConfig) {
             //various publishers
             SmoothedMarketRateConfig publisherConfig = new SmoothedMarketRateConfig(
                     1_000, 10, "smoothedEURUSD_1s", new MarketDataSupplierConfig("EURUSD"));
@@ -128,9 +127,9 @@ public class NodeFactoryExample {
             //root config
             statsCalculatorConfig = new MarketStatsCalculatorConfig(
                     List.of(publisherConfig, publisherConfig_EURUSD_5s, publisherConfig_GBPDKK_1s), 2);
-        }else{
+        } else {
             ObjectMapper mapper = new ObjectMapper();
-            statsCalculatorConfig =  mapper.readValue(config, MarketStatsCalculatorConfig.class);
+            statsCalculatorConfig = mapper.readValue(config, MarketStatsCalculatorConfig.class);
         }
         Class<?> rootClass = MarketStatsCalculator.class;
         Map<String, Object> configMap = Map.of(MarketStatsCalculatorConfig.class.getCanonicalName(), statsCalculatorConfig);
