@@ -2,16 +2,21 @@ package com.fluxtion.example.article.dataoriented1.fluxtion;
 
 import com.fluxtion.example.article.dataoriented1.Events.FoodSaleEvent;
 import com.fluxtion.example.article.dataoriented1.Events.FoodTaxRateEvent;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 
-public class FoodSaleHandler extends AbstractSaleHandler{
+public class FoodSaleHandler extends AbstractSaleHandler {
 
-    public void handleSale(FoodSaleEvent foodSaleEvent) {
+    @OnEventHandler
+    public boolean handleSale(FoodSaleEvent foodSaleEvent) {
         totalSales += foodSaleEvent.amount();
         calculateTaxLiability();
+        return true;
     }
 
-    public void handleUpdatedTaxRate(FoodTaxRateEvent foodTaxRateEvent) {
+    @OnEventHandler
+    public boolean handleUpdatedTaxRate(FoodTaxRateEvent foodTaxRateEvent) {
         currentTaxRate = foodTaxRateEvent.amount();
         calculateTaxLiability();
+        return true;
     }
 }

@@ -2,6 +2,9 @@ package com.fluxtion.example.article.dataoriented1;
 
 public interface Events {
 
+    record SaleEvent(double amount) {
+    }
+
     record BookSaleEvent(double amount) {
     }
 
@@ -9,6 +12,9 @@ public interface Events {
     }
 
     record HardwareSaleEvent(double amount) {
+    }
+
+    record SalesTaxRateEvent(double amount) {
     }
 
     record BookTaxRateEvent(double amount) {
@@ -21,5 +27,8 @@ public interface Events {
     }
 
     record TaxLiabilityNotificationThresholdEvent(double amount) {
+    }
+
+    record TaxPaymentEvent(double amount) {
     }
 }

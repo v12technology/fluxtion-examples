@@ -6,16 +6,22 @@ import com.fluxtion.runtime.annotations.OnTrigger;
 import lombok.Data;
 
 @Data
-public class TaxThresholdNotifier {
-    private final TotalTaxLiabilityCalculator taxLiabilityCalculator;
+public class TaxLiabilityThresholdMonitor {
+    final TaxLiabilityCalculator taxLiabilityCalculator;
     transient double threshold;
 
+    @OnEventHandler
     public boolean thresholdUpdated(TaxLiabilityNotificationThresholdEvent thresholdEvent) {
         this.threshold = thresholdEvent.amount();
-        return notifyOfBreach();
+        return isTaxLiabilityBreached();
     }
 
-    public boolean notifyOfBreach() {
+    @OnTrigger
+    public boolean isTaxLiabilityBreached() {
         return taxLiabilityCalculator.getTaxLiability() > threshold;
+    }
+
+    public double taxLiability(){
+        return taxLiabilityCalculator.getTaxLiability();
     }
 }
