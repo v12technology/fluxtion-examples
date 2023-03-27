@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TaxProcessorAotBuilder" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="com.fluxtion.example.article.dataoriented1.fluxtion.TaxProcessorAotBuilder" />
+    <module name="artticles.data-oriented-1" />
+    <option name="VM_PARAMETERS" value="--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/articles/data-oriented-1" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.fluxtion.example.article.dataoriented1.fluxtion.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

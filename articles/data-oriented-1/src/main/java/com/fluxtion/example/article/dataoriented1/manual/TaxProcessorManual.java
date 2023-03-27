@@ -64,7 +64,8 @@ public class TaxProcessorManual {
                 }
             }
             case TaxPaymentEvent e -> {
-                if (taxLiabilityCalculator.taxPayment(e) && thresholdNotifier.isTaxLiabilityBreached()) {
+                if (taxLiabilityCalculator.taxPayment(e)
+                        && thresholdNotifier.isTaxLiabilityBreached()) {
                     alerter.publishTaxLiabilityWarning();
                 }
             }
@@ -74,7 +75,8 @@ public class TaxProcessorManual {
     }
 
     private void checkLiability() {
-        if (taxLiabilityCalculator.hasTaxLiabilityChanged() && thresholdNotifier.isTaxLiabilityBreached()) {
+        if (taxLiabilityCalculator.hasTaxLiabilityChanged()
+                && thresholdNotifier.isTaxLiabilityBreached()) {
             alerter.publishTaxLiabilityWarning();
         }
     }

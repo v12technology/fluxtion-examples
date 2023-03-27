@@ -33,4 +33,12 @@
         </plugins>
     </build>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.google.googlejavaformat</groupId>
+            <artifactId>google-java-format</artifactId>
+            <version>1.16.0</version>
+        </dependency>
+    </dependencies>
+
 </project>
