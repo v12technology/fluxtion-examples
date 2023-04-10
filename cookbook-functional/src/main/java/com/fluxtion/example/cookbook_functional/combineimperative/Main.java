@@ -1,7 +1,7 @@
 package com.fluxtion.example.cookbook_functional.combineimperative;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.builder.stream.EventFlow;
+import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.example.cookbook_functional.events.MarketUpdate;
 import com.fluxtion.example.cookbook_functional.events.Subscription;
 import com.fluxtion.runtime.EventProcessor;
@@ -11,9 +11,9 @@ public class Main {
     public static void main(String[] args) {
 
         var eventProcessor = Fluxtion.compileAot(c -> {
-            var marketUpdateEventSupplier = EventFlow.subscribe(MarketUpdate.class)
-                    .filter(Main::isSubscribed, EventFlow.subscribe(Subscription.class))
-                    .getEventSupplier();
+            var marketUpdateEventSupplier = DataFlow.subscribe(MarketUpdate.class)
+                    .filter(Main::isSubscribed, DataFlow.subscribe(Subscription.class))
+                    .flowSupplier();
             c.addNode(new PriceStats(marketUpdateEventSupplier));
 
         });

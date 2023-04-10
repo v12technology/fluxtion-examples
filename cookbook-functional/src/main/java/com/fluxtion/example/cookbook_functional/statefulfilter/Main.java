@@ -1,10 +1,10 @@
 package com.fluxtion.example.cookbook_functional.statefulfilter;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.builder.stream.EventFlow;
+import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.example.cookbook_functional.events.MarketUpdate;
 import com.fluxtion.runtime.EventProcessor;
-import com.fluxtion.runtime.stream.lookup.LongLookupPredicate;
+import com.fluxtion.runtime.dataflow.lookup.LongLookupPredicate;
 
 import java.util.function.ToLongFunction;
 
@@ -12,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         var eventProcessor = Fluxtion.interpret(c -> {
-            EventFlow.subscribe(MarketUpdate.class)
+            DataFlow.subscribe(MarketUpdate.class)
                     .filterByProperty(
                             MarketUpdate::id,
                             LongLookupPredicate.buildPredicate("EURUSD", "marketRefData"))

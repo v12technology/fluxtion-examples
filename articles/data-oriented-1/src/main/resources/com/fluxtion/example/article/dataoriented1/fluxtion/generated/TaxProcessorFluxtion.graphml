@@ -101,15 +101,6 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="BookTaxRateEvent">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;BookTaxRateEvent"/>
-                    <jGraph:Style properties="EVENT"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
         <node id="BookSaleEvent">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
@@ -119,11 +110,11 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="FoodTaxRateEvent">
+        <node id="BookTaxRateEvent">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;FoodTaxRateEvent"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;BookTaxRateEvent"/>
                     <jGraph:Style properties="EVENT"/>
                 </jGraph:ShapeNode>
             </data>
@@ -137,11 +128,11 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="HardwareTaxRateEvent">
+        <node id="FoodTaxRateEvent">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;HardwareTaxRateEvent"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;FoodTaxRateEvent"/>
                     <jGraph:Style properties="EVENT"/>
                 </jGraph:ShapeNode>
             </data>
@@ -151,6 +142,15 @@
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
                     <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;HardwareSaleEvent"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="HardwareTaxRateEvent">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;HardwareTaxRateEvent"/>
                     <jGraph:Style properties="EVENT"/>
                 </jGraph:ShapeNode>
             </data>
@@ -209,32 +209,32 @@
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="10" source="BookTaxRateEvent" target="bookSaleHandler_3">
+        <edge id="10" source="BookSaleEvent" target="bookSaleHandler_3">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="11" source="BookSaleEvent" target="bookSaleHandler_3">
+        <edge id="11" source="BookTaxRateEvent" target="bookSaleHandler_3">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="12" source="FoodTaxRateEvent" target="foodSaleHandler_4">
+        <edge id="12" source="FoodSaleEvent" target="foodSaleHandler_4">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="13" source="FoodSaleEvent" target="foodSaleHandler_4">
+        <edge id="13" source="FoodTaxRateEvent" target="foodSaleHandler_4">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="14" source="HardwareTaxRateEvent" target="hardwareSaleHandler_5">
+        <edge id="14" source="HardwareSaleEvent" target="hardwareSaleHandler_5">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="15" source="HardwareSaleEvent" target="hardwareSaleHandler_5">
+        <edge id="15" source="HardwareTaxRateEvent" target="hardwareSaleHandler_5">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>

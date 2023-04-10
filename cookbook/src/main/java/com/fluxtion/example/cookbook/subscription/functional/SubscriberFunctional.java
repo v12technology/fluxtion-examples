@@ -1,7 +1,7 @@
 package com.fluxtion.example.cookbook.subscription.functional;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.builder.stream.EventFlow;
+import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.example.cookbook.subscription.MarketDataFeed;
 import com.fluxtion.example.cookbook.subscription.SharePriceEvent;
 
@@ -43,9 +43,9 @@ public class SubscriberFunctional {
 
     public static void main(String[] args) {
         var marketPriceProcessor = Fluxtion.interpret(c -> {
-            EventFlow.subscribe(SharePriceEvent.class, "MSFT").console("SharePriceNode:MSFT -> {}");
-            EventFlow.subscribe(SharePriceEvent.class, "AMZN").console("SharePriceNode:AMZN -> {}");
-        }, true);
+            DataFlow.subscribe(SharePriceEvent.class, "MSFT").console("SharePriceNode:MSFT -> {}");
+            DataFlow.subscribe(SharePriceEvent.class, "AMZN").console("SharePriceNode:AMZN -> {}");
+        });
         marketPriceProcessor.init();
 
         MarketDataFeed eventFeed = new MarketDataFeed();

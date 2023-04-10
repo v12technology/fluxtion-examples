@@ -3,14 +3,14 @@ package com.fluxtion.example.cookbook_functional.combineimperative;
 import com.fluxtion.example.cookbook_functional.events.MarketUpdate;
 import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.OnTrigger;
-import com.fluxtion.runtime.stream.EventStream.EventSupplier;
+import com.fluxtion.runtime.dataflow.FlowSupplier;
 
 public class PriceStats {
 
-    private final EventSupplier<MarketUpdate> marketUpdateEventStream;
+    private final FlowSupplier<MarketUpdate> marketUpdateEventStream;
     private double previousHigh;
 
-    public PriceStats(EventSupplier<MarketUpdate> marketUpdateEventStream) {
+    public PriceStats(FlowSupplier<MarketUpdate> marketUpdateEventStream) {
         this.marketUpdateEventStream = marketUpdateEventStream;
     }
 

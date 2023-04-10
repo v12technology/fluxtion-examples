@@ -1,8 +1,7 @@
 package com.fluxtion.example.cookbook_functional.dynamicfilter;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.builder.stream.EventFlow;
-import com.fluxtion.compiler.builder.stream.EventStreamBuilder;
+import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.example.cookbook_functional.events.MarketUpdate;
 import com.fluxtion.example.cookbook_functional.events.Subscription;
 import com.fluxtion.runtime.EventProcessor;
@@ -12,8 +11,8 @@ public class Main {
     public static void main(String[] args) {
 
         var eventProcessor = Fluxtion.interpret(c -> {
-            EventFlow.subscribe(MarketUpdate.class)
-                    .filter(Main::isSubscribed, EventFlow.subscribe(Subscription.class))
+            DataFlow.subscribe(MarketUpdate.class)
+                    .filter(Main::isSubscribed, DataFlow.subscribe(Subscription.class))
                     .console("Filtered :{}");
 
         });

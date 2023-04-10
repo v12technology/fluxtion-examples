@@ -43,12 +43,13 @@ public class Main {
                 new BookSaleEvent(150),
                 new FoodSaleEvent(150),
                 new HardwareSaleEvent(150),
+                //breach threshold - warnings published
                 new HardwareSaleEvent(1500),
                 new HardwareSaleEvent(150),
-                //pay some tax no breach warnings
+                //pay some tax removes breach warnings
                 new TaxPaymentEvent(300),
                 new HardwareSaleEvent(150),
-                //update tax rate for food push over the threshold
+                //update tax rate for food will breach threshold
                 new FoodSaleEvent(500),
                 new FoodTaxRateEvent(0.2)
         ).forEach(streamProcessor::accept);

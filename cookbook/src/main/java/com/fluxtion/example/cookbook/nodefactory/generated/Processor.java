@@ -36,6 +36,7 @@ import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
+import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.time.Clock;
@@ -48,13 +49,23 @@ import java.util.IdentityHashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-/*
+/**
+ *
  *
  * <pre>
- * generation time                 : 2023-03-24T19:42:10.606782
- * eventProcessorGenerator version : 8.1.13-SNAPSHOT
- * api version                     : 8.1.13-SNAPSHOT
+ * generation time                 : 2023-04-10T11:03:48.104397
+ * eventProcessorGenerator version : 9.0.1
+ * api version                     : 9.0.1
  * </pre>
+ *
+ * Event classes supported:
+ *
+ * <ul>
+ *   <li>com.fluxtion.example.cookbook.nodefactory.event.MarketUpdate
+ *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
+ *   <li>java.lang.Object
+ * </ul>
+ *
  * @author Greg Higgins
  */
 @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
@@ -108,6 +119,8 @@ public class Processor
   private boolean isDirty_fixedRateTrigger_4 = false;
   private boolean isDirty_marketDataNode_EURDKK = false;
   private boolean isDirty_marketDataNode_EURGBP = false;
+  //Forked declarations
+
   //Filter constants
 
   public Processor(Map<Object, Object> contextMap) {
@@ -363,6 +376,7 @@ public class Processor
   }
 
   private void afterEvent() {
+
     clock.processingComplete();
     nodeNameLookup.processingComplete();
     isDirty_fixedRateTrigger_1 = false;
@@ -419,6 +433,10 @@ public class Processor
 
   @Override
   public boolean isDirty(Object node) {
+    return dirtySupplier(node).getAsBoolean();
+  }
+
+  public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
       dirtyFlagSupplierMap.put(fixedRateTrigger_1, () -> isDirty_fixedRateTrigger_1);
       dirtyFlagSupplierMap.put(fixedRateTrigger_2, () -> isDirty_fixedRateTrigger_2);
@@ -427,9 +445,7 @@ public class Processor
       dirtyFlagSupplierMap.put(marketDataNode_EURDKK, () -> isDirty_marketDataNode_EURDKK);
       dirtyFlagSupplierMap.put(marketDataNode_EURGBP, () -> isDirty_marketDataNode_EURGBP);
     }
-    return dirtyFlagSupplierMap
-        .getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE)
-        .getAsBoolean();
+    return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
 
   @Override

@@ -45,6 +45,7 @@ import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
+import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import java.util.Map;
@@ -53,13 +54,28 @@ import java.util.IdentityHashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-/*
+/**
+ *
  *
  * <pre>
- * generation time                 : 2023-03-27T08:55:36.163376
- * eventProcessorGenerator version : 8.1.12
- * api version                     : 8.1.12
+ * generation time                 : 2023-04-10T11:35:40.776617
+ * eventProcessorGenerator version : 9.0.1
+ * api version                     : 9.0.1
  * </pre>
+ *
+ * Event classes supported:
+ *
+ * <ul>
+ *   <li>com.fluxtion.example.article.dataoriented1.Events.BookSaleEvent
+ *   <li>com.fluxtion.example.article.dataoriented1.Events.BookTaxRateEvent
+ *   <li>com.fluxtion.example.article.dataoriented1.Events.FoodSaleEvent
+ *   <li>com.fluxtion.example.article.dataoriented1.Events.FoodTaxRateEvent
+ *   <li>com.fluxtion.example.article.dataoriented1.Events.HardwareSaleEvent
+ *   <li>com.fluxtion.example.article.dataoriented1.Events.HardwareTaxRateEvent
+ *   <li>com.fluxtion.example.article.dataoriented1.Events.TaxLiabilityNotificationThresholdEvent
+ *   <li>com.fluxtion.example.article.dataoriented1.Events.TaxPaymentEvent
+ * </ul>
+ *
  * @author Greg Higgins
  */
 @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
@@ -100,6 +116,8 @@ public class TaxProcessorFluxtion
   private boolean isDirty_hardwareSaleHandler_5 = false;
   private boolean isDirty_taxLiabilityCalculator_2 = false;
   private boolean isDirty_taxLiabilityThresholdMonitor_1 = false;
+  // Forked declarations
+
   // Filter constants
 
   public TaxProcessorFluxtion(Map<Object, Object> contextMap) {
@@ -374,6 +392,7 @@ public class TaxProcessorFluxtion
   }
 
   private void afterEvent() {
+
     nodeNameLookup.processingComplete();
     isDirty_bookSaleHandler_3 = false;
     isDirty_foodSaleHandler_4 = false;
@@ -418,6 +437,10 @@ public class TaxProcessorFluxtion
 
   @Override
   public boolean isDirty(Object node) {
+    return dirtySupplier(node).getAsBoolean();
+  }
+
+  public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
       dirtyFlagSupplierMap.put(bookSaleHandler_3, () -> isDirty_bookSaleHandler_3);
       dirtyFlagSupplierMap.put(foodSaleHandler_4, () -> isDirty_foodSaleHandler_4);
@@ -426,9 +449,7 @@ public class TaxProcessorFluxtion
       dirtyFlagSupplierMap.put(
           taxLiabilityThresholdMonitor_1, () -> isDirty_taxLiabilityThresholdMonitor_1);
     }
-    return dirtyFlagSupplierMap
-        .getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE)
-        .getAsBoolean();
+    return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
 
   @Override

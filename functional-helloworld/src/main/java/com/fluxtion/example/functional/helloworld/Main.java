@@ -1,7 +1,7 @@
 package com.fluxtion.example.functional.helloworld;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.builder.stream.EventFlow;
+import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.runtime.EventProcessor;
 
 
@@ -18,11 +18,11 @@ public class Main {
     public static void main(String[] args) {
         //builds the EventProcessor
         EventProcessor eventProcessor = Fluxtion.interpret(cfg -> {
-            var data1Stream = EventFlow.subscribe(Data1.class)
+            var data1Stream = DataFlow.subscribe(Data1.class)
                     .console("rcvd -> {}")
                     .mapToDouble(Data1::value);
 
-            EventFlow.subscribe(Data2.class)
+            DataFlow.subscribe(Data2.class)
                     .console("rcvd -> {}")
                     .mapToDouble(Data2::value)
                     .mapBiFunction(Double::sum, data1Stream)
