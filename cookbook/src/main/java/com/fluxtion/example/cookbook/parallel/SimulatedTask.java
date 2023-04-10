@@ -20,11 +20,11 @@ public class SimulatedTask {
     protected boolean _executeTask(){
         executingThreadName = Thread.currentThread().getName();
         startTime = System.currentTimeMillis();
-        log.debug("{}: start task", getName());
+        log.debug("{}: start", getName());
         Thread.sleep(workDurationMillis);
         completeTime = System.currentTimeMillis();
         totalTime = completeTime - startTime;
-        log.debug("{}: complete task", getName());
+        log.debug("{}: complete - {}ms", getName(), totalTime);
         return true;
     }
 

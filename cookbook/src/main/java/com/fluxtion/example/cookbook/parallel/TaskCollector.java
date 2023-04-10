@@ -34,7 +34,7 @@ public class TaskCollector {
         results = taskList.stream()
                 .map(t -> {
                     String dur = "*".repeat((int) (Math.max(1, t.getTotalTime() / timeStepSize)));
-                    String delay = ".".repeat((int) ((t.getStartTime() - startTIme) / timeStepSize));
+                    String delay = " ".repeat((int) ((t.getStartTime() - startTIme) / timeStepSize));
                     return "%-7s %12s | %s %s".formatted(
                             t.getName(),
                             t.getExecutingThreadName().replace("ForkJoinPool.commonPool-worker", "FJ-worker"),
@@ -44,7 +44,7 @@ public class TaskCollector {
                 .collect(Collectors.joining("\n"));
         results += "\n" + ("-".repeat(100)) + "\n";
         results += """
-                Time milliesconds    0    50   100  150  200  250  300  350  400  450  500  550  600  650  700  750 
+                Time milliesconds      0   50   100  150  200  250  300  350  400  450  500  550  600  650  700 
                 """;
         return true;
     }

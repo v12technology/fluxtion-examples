@@ -20,7 +20,7 @@ import com.fluxtion.runtime.EventProcessor;
  * async3   FJ-worker-3 |  **
  * async4   FJ-worker-4 |  *******************
  * ----------------------------------------------------------------------------------------------------
- * Time milliesconds    0    50   100  150  200  250  300  350  400  450  500  550  600  650  700  750
+ * Time milliesconds      0   50   100  150  200  250  300  350  400  450  500  550  600  650  700
  *
  *
  * Synchronous trigger test
@@ -29,11 +29,11 @@ import com.fluxtion.runtime.EventProcessor;
  * TOTAL EXECUTION TIME : 694ms
  * ----------------------------------------------------------------------------------------------------
  * sync1           main |  *************************
- * sync2           main | ......................... ***********************
- * sync3           main | ................................................ *
- * sync4           main | .................................................. *******************
+ * sync2           main |                           ***********************
+ * sync3           main |                                                  *
+ * sync4           main |                                                   *******************
  * ----------------------------------------------------------------------------------------------------
- * Time milliesconds    0    50   100  150  200  250  300  350  400  450  500  550  600  650  700  750
+ * Time milliesconds      0   50   100  150  200  250  300  350  400  450  500  550  600  650  700
  * </pre>
  *
  * The {@link com.fluxtion.runtime.annotations.OnTrigger} annotation controls the parallel execution of the trigger
@@ -47,7 +47,7 @@ public class Main {
 
     public static void main(String[] args) throws NoSuchFieldException {
         //uncomment to see task execution log output
-//        System.setProperty("org.slf4j.simpleLogger.log.com.fluxtion.example.cookbook.parallel", "DEBUG");
+        //System.setProperty("org.slf4j.simpleLogger.log.com.fluxtion.example.cookbook.parallel", "DEBUG");
         var eventProcessor = Fluxtion.interpret(c -> {
             RequestHandler requestHandler = new RequestHandler();
             c.addNode(
