@@ -36,6 +36,11 @@ public class SimulatedTask {
             super(name, workDurationMillis, requestHandler);
         }
 
+        /**
+         * The trigger method is annotated with parallelExecution, signaling this method should be run in parallel
+         * if possible
+         * @return notification of a change
+         */
         @SneakyThrows
         @OnTrigger(parallelExecution = true)
         public boolean executeTask(){
@@ -50,6 +55,11 @@ public class SimulatedTask {
             super(name, workDurationMillis, requestHandler);
         }
 
+
+        /**
+         * The trigger method should be run synchronously before or after sibling trigger methods
+         * @return notification of a change
+         */
         @SneakyThrows
         @OnTrigger
         public boolean executeTask(){

@@ -21,29 +21,31 @@ public class TaskCollector {
     @Singular("task")
     private List<SimulatedTask> taskList;
     private RequestHandler requestHandler;
+    private String results;
+    private long duration;
 
     @OnTrigger
     public boolean collectResults() {
+        log.debug("collectingResults");
         long startTIme = requestHandler.getStartTime();
         long endTime = System.currentTimeMillis();
-        long duration = endTime - startTIme;
-        String results = taskList.stream()
+        duration = endTime - startTIme;
+        int timeStepSize = 10;
+        results = taskList.stream()
                 .map(t -> {
-                    String dur = "*".repeat((int) (Math.max(1, t.getTotalTime()/25)));
-                    String delay = "_".repeat((int) ((t.getStartTime() - startTIme)/25));
-                    return "%s %35s | %s %s".formatted(
-                            t.getName(), t.getExecutingThreadName(), delay, dur);
+                    String dur = "*".repeat((int) (Math.max(1, t.getTotalTime() / timeStepSize)));
+                    String delay = ".".repeat((int) ((t.getStartTime() - startTIme) / timeStepSize));
+                    return "%-7s %12s | %s %s".formatted(
+                            t.getName(),
+                            t.getExecutingThreadName().replace("ForkJoinPool.commonPool-worker", "FJ-worker"),
+                            delay,
+                            dur);
                 })
                 .collect(Collectors.joining("\n"));
-        System.out.println(results);
-        System.out.println("-".repeat(80));
-        log.info("collecting results duration:" + duration);
+        results += "\n" + ("-".repeat(100)) + "\n";
+        results += """
+                Time milliesconds    0    50   100  150  200  250  300  350  400  450  500  550  600  650  700  750 
+                """;
         return true;
-    }
-
-    private static class ThreadTiming {
-        String name;
-        long startTime;
-        long stopTime;
     }
 }
