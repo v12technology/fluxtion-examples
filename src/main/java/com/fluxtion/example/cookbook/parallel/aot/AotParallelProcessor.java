@@ -48,7 +48,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-04-11T10:46:25.341374
+ * generation time                 : 2023-04-11T11:34:08.247774
  * eventProcessorGenerator version : 9.0.1
  * api version                     : 9.0.1
  * </pre>
@@ -72,19 +72,19 @@ public class AotParallelProcessor
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final RequestHandler requestHandler_2 = new RequestHandler();
-  private final Asynchronous asynchronous_1 = new Asynchronous("async1", 250, requestHandler_2);
-  private final Asynchronous asynchronous_3 = new Asynchronous("async2", 225, requestHandler_2);
-  private final Asynchronous asynchronous_4 = new Asynchronous("async3", 18, requestHandler_2);
-  private final Asynchronous asynchronous_5 = new Asynchronous("async4", 185, requestHandler_2);
+  private final RequestHandler requestHandler_1 = new RequestHandler();
+  private final Asynchronous asynchronous_0 = new Asynchronous("async1", 250, requestHandler_1);
+  private final Asynchronous asynchronous_2 = new Asynchronous("async2", 225, requestHandler_1);
+  private final Asynchronous asynchronous_3 = new Asynchronous("async3", 18, requestHandler_1);
+  private final Asynchronous asynchronous_4 = new Asynchronous("async4", 185, requestHandler_1);
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  public final TaskCollector taskCollector =
+  private final TaskCollector taskCollector =
       new TaskCollector(
-          Arrays.asList(asynchronous_1, asynchronous_3, asynchronous_4, asynchronous_5),
-          requestHandler_2);
+          Arrays.asList(asynchronous_0, asynchronous_2, asynchronous_3, asynchronous_4),
+          requestHandler_1);
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
@@ -94,20 +94,20 @@ public class AotParallelProcessor
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(5);
 
-  private boolean isDirty_asynchronous_1 = false;
+  private boolean isDirty_asynchronous_0 = false;
+  private boolean isDirty_asynchronous_2 = false;
   private boolean isDirty_asynchronous_3 = false;
   private boolean isDirty_asynchronous_4 = false;
-  private boolean isDirty_asynchronous_5 = false;
-  private boolean isDirty_requestHandler_2 = false;
+  private boolean isDirty_requestHandler_1 = false;
   //Forked declarations
-  private final ForkedTriggerTask fork_asynchronous_1 =
-      new ForkedTriggerTask(asynchronous_1::executeTask, "asynchronous_1");
+  private final ForkedTriggerTask fork_asynchronous_0 =
+      new ForkedTriggerTask(asynchronous_0::executeTask, "asynchronous_0");
+  private final ForkedTriggerTask fork_asynchronous_2 =
+      new ForkedTriggerTask(asynchronous_2::executeTask, "asynchronous_2");
   private final ForkedTriggerTask fork_asynchronous_3 =
       new ForkedTriggerTask(asynchronous_3::executeTask, "asynchronous_3");
   private final ForkedTriggerTask fork_asynchronous_4 =
       new ForkedTriggerTask(asynchronous_4::executeTask, "asynchronous_4");
-  private final ForkedTriggerTask fork_asynchronous_5 =
-      new ForkedTriggerTask(asynchronous_5::executeTask, "asynchronous_5");
 
   //Filter constants
 
@@ -158,18 +158,18 @@ public class AotParallelProcessor
   public void handleEvent(String typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
-    isDirty_requestHandler_2 = requestHandler_2.stringRequest(typedEvent);
-    if (guardCheck_asynchronous_1()) {
-      fork_asynchronous_1.onTrigger();
+    isDirty_requestHandler_1 = requestHandler_1.stringRequest(typedEvent);
+    if (guardCheck_asynchronous_0()) {
+      fork_asynchronous_0.onTrigger();
+    }
+    if (guardCheck_asynchronous_2()) {
+      fork_asynchronous_2.onTrigger();
     }
     if (guardCheck_asynchronous_3()) {
       fork_asynchronous_3.onTrigger();
     }
     if (guardCheck_asynchronous_4()) {
       fork_asynchronous_4.onTrigger();
-    }
-    if (guardCheck_asynchronous_5()) {
-      fork_asynchronous_5.onTrigger();
     }
     if (guardCheck_taskCollector()) {
       taskCollector.collectResults();
@@ -183,7 +183,7 @@ public class AotParallelProcessor
     if (event instanceof java.lang.String) {
       String typedEvent = (String) event;
       auditEvent(typedEvent);
-      isDirty_requestHandler_2 = requestHandler_2.stringRequest(typedEvent);
+      isDirty_requestHandler_1 = requestHandler_1.stringRequest(typedEvent);
       //event stack unwind callbacks
     }
   }
@@ -191,17 +191,17 @@ public class AotParallelProcessor
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
-    if (guardCheck_asynchronous_1()) {
-      fork_asynchronous_1.onTrigger();
+    if (guardCheck_asynchronous_0()) {
+      fork_asynchronous_0.onTrigger();
+    }
+    if (guardCheck_asynchronous_2()) {
+      fork_asynchronous_2.onTrigger();
     }
     if (guardCheck_asynchronous_3()) {
       fork_asynchronous_3.onTrigger();
     }
     if (guardCheck_asynchronous_4()) {
       fork_asynchronous_4.onTrigger();
-    }
-    if (guardCheck_asynchronous_5()) {
-      fork_asynchronous_5.onTrigger();
     }
     if (guardCheck_taskCollector()) {
       taskCollector.collectResults();
@@ -219,36 +219,36 @@ public class AotParallelProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(requestHandler_2, "requestHandler_2");
-    auditor.nodeRegistered(asynchronous_1, "asynchronous_1");
+    auditor.nodeRegistered(requestHandler_1, "requestHandler_1");
+    auditor.nodeRegistered(asynchronous_0, "asynchronous_0");
+    auditor.nodeRegistered(asynchronous_2, "asynchronous_2");
     auditor.nodeRegistered(asynchronous_3, "asynchronous_3");
     auditor.nodeRegistered(asynchronous_4, "asynchronous_4");
-    auditor.nodeRegistered(asynchronous_5, "asynchronous_5");
     auditor.nodeRegistered(taskCollector, "taskCollector");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(subscriptionManager, "subscriptionManager");
     auditor.nodeRegistered(context, "context");
-    auditor.nodeRegistered(fork_asynchronous_1, "fork_asynchronous_1");
+    auditor.nodeRegistered(fork_asynchronous_0, "fork_asynchronous_0");
+    auditor.nodeRegistered(fork_asynchronous_2, "fork_asynchronous_2");
     auditor.nodeRegistered(fork_asynchronous_3, "fork_asynchronous_3");
     auditor.nodeRegistered(fork_asynchronous_4, "fork_asynchronous_4");
-    auditor.nodeRegistered(fork_asynchronous_5, "fork_asynchronous_5");
   }
 
   private void afterEvent() {
-    fork_asynchronous_1.reinitialize();
+    fork_asynchronous_0.reinitialize();
+    fork_asynchronous_2.reinitialize();
     fork_asynchronous_3.reinitialize();
     fork_asynchronous_4.reinitialize();
-    fork_asynchronous_5.reinitialize();
     nodeNameLookup.processingComplete();
-    isDirty_asynchronous_1 = false;
+    isDirty_asynchronous_0 = false;
+    isDirty_asynchronous_2 = false;
     isDirty_asynchronous_3 = false;
     isDirty_asynchronous_4 = false;
-    isDirty_asynchronous_5 = false;
-    isDirty_requestHandler_2 = false;
-    fork_asynchronous_1.reinitialize();
+    isDirty_requestHandler_1 = false;
+    fork_asynchronous_0.reinitialize();
+    fork_asynchronous_2.reinitialize();
     fork_asynchronous_3.reinitialize();
     fork_asynchronous_4.reinitialize();
-    fork_asynchronous_5.reinitialize();
   }
 
   @Override
@@ -292,11 +292,11 @@ public class AotParallelProcessor
 
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
-      dirtyFlagSupplierMap.put(asynchronous_1, () -> isDirty_asynchronous_1);
+      dirtyFlagSupplierMap.put(asynchronous_0, () -> isDirty_asynchronous_0);
+      dirtyFlagSupplierMap.put(asynchronous_2, () -> isDirty_asynchronous_2);
       dirtyFlagSupplierMap.put(asynchronous_3, () -> isDirty_asynchronous_3);
       dirtyFlagSupplierMap.put(asynchronous_4, () -> isDirty_asynchronous_4);
-      dirtyFlagSupplierMap.put(asynchronous_5, () -> isDirty_asynchronous_5);
-      dirtyFlagSupplierMap.put(requestHandler_2, () -> isDirty_requestHandler_2);
+      dirtyFlagSupplierMap.put(requestHandler_1, () -> isDirty_requestHandler_1);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
@@ -304,45 +304,45 @@ public class AotParallelProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
-      dirtyFlagUpdateMap.put(asynchronous_1, (b) -> isDirty_asynchronous_1 = b);
+      dirtyFlagUpdateMap.put(asynchronous_0, (b) -> isDirty_asynchronous_0 = b);
+      dirtyFlagUpdateMap.put(asynchronous_2, (b) -> isDirty_asynchronous_2 = b);
       dirtyFlagUpdateMap.put(asynchronous_3, (b) -> isDirty_asynchronous_3 = b);
       dirtyFlagUpdateMap.put(asynchronous_4, (b) -> isDirty_asynchronous_4 = b);
-      dirtyFlagUpdateMap.put(asynchronous_5, (b) -> isDirty_asynchronous_5 = b);
-      dirtyFlagUpdateMap.put(requestHandler_2, (b) -> isDirty_requestHandler_2 = b);
+      dirtyFlagUpdateMap.put(requestHandler_1, (b) -> isDirty_requestHandler_1 = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
-  private boolean guardCheck_asynchronous_1() {
-    return isDirty_requestHandler_2;
+  private boolean guardCheck_asynchronous_0() {
+    return isDirty_requestHandler_1;
+  }
+
+  private boolean guardCheck_asynchronous_2() {
+    return isDirty_requestHandler_1;
   }
 
   private boolean guardCheck_asynchronous_3() {
-    return isDirty_requestHandler_2;
+    return isDirty_requestHandler_1;
   }
 
   private boolean guardCheck_asynchronous_4() {
-    return isDirty_requestHandler_2;
-  }
-
-  private boolean guardCheck_asynchronous_5() {
-    return isDirty_requestHandler_2;
+    return isDirty_requestHandler_1;
   }
 
   private boolean guardCheck_taskCollector() {
-    isDirty_asynchronous_1 = fork_asynchronous_1.afterEvent();
-    if (isDirty_asynchronous_1) {}
+    isDirty_asynchronous_0 = fork_asynchronous_0.afterEvent();
+    if (isDirty_asynchronous_0) {}
+    isDirty_asynchronous_2 = fork_asynchronous_2.afterEvent();
+    if (isDirty_asynchronous_2) {}
     isDirty_asynchronous_3 = fork_asynchronous_3.afterEvent();
     if (isDirty_asynchronous_3) {}
     isDirty_asynchronous_4 = fork_asynchronous_4.afterEvent();
     if (isDirty_asynchronous_4) {}
-    isDirty_asynchronous_5 = fork_asynchronous_5.afterEvent();
-    if (isDirty_asynchronous_5) {}
-    return isDirty_asynchronous_1
+    return isDirty_asynchronous_0
+        | isDirty_asynchronous_2
         | isDirty_asynchronous_3
         | isDirty_asynchronous_4
-        | isDirty_asynchronous_5
-        | isDirty_requestHandler_2;
+        | isDirty_requestHandler_1;
   }
 
   @Override

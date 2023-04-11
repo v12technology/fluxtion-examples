@@ -48,7 +48,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-04-11T10:46:27.917907
+ * generation time                 : 2023-04-11T11:34:11.084380
  * eventProcessorGenerator version : 9.0.1
  * api version                     : 9.0.1
  * </pre>
@@ -72,19 +72,19 @@ public class AotSynchronousProcessor
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final RequestHandler requestHandler_2 = new RequestHandler();
+  private final RequestHandler requestHandler_1 = new RequestHandler();
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  private final Synchronous synchronous_1 = new Synchronous("sync1", 250, requestHandler_2);
-  private final Synchronous synchronous_3 = new Synchronous("sync2", 225, requestHandler_2);
-  private final Synchronous synchronous_4 = new Synchronous("sync3", 18, requestHandler_2);
-  private final Synchronous synchronous_5 = new Synchronous("sync4", 185, requestHandler_2);
-  public final TaskCollector taskCollector =
+  private final Synchronous synchronous_0 = new Synchronous("sync1", 250, requestHandler_1);
+  private final Synchronous synchronous_2 = new Synchronous("sync2", 225, requestHandler_1);
+  private final Synchronous synchronous_3 = new Synchronous("sync3", 18, requestHandler_1);
+  private final Synchronous synchronous_4 = new Synchronous("sync4", 185, requestHandler_1);
+  private final TaskCollector taskCollector =
       new TaskCollector(
-          Arrays.asList(synchronous_1, synchronous_3, synchronous_4, synchronous_5),
-          requestHandler_2);
+          Arrays.asList(synchronous_0, synchronous_2, synchronous_3, synchronous_4),
+          requestHandler_1);
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
@@ -94,11 +94,11 @@ public class AotSynchronousProcessor
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(5);
 
-  private boolean isDirty_requestHandler_2 = false;
-  private boolean isDirty_synchronous_1 = false;
+  private boolean isDirty_requestHandler_1 = false;
+  private boolean isDirty_synchronous_0 = false;
+  private boolean isDirty_synchronous_2 = false;
   private boolean isDirty_synchronous_3 = false;
   private boolean isDirty_synchronous_4 = false;
-  private boolean isDirty_synchronous_5 = false;
   //Forked declarations
 
   //Filter constants
@@ -150,18 +150,18 @@ public class AotSynchronousProcessor
   public void handleEvent(String typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
-    isDirty_requestHandler_2 = requestHandler_2.stringRequest(typedEvent);
-    if (guardCheck_synchronous_1()) {
-      isDirty_synchronous_1 = synchronous_1.executeTask();
+    isDirty_requestHandler_1 = requestHandler_1.stringRequest(typedEvent);
+    if (guardCheck_synchronous_0()) {
+      isDirty_synchronous_0 = synchronous_0.executeTask();
+    }
+    if (guardCheck_synchronous_2()) {
+      isDirty_synchronous_2 = synchronous_2.executeTask();
     }
     if (guardCheck_synchronous_3()) {
       isDirty_synchronous_3 = synchronous_3.executeTask();
     }
     if (guardCheck_synchronous_4()) {
       isDirty_synchronous_4 = synchronous_4.executeTask();
-    }
-    if (guardCheck_synchronous_5()) {
-      isDirty_synchronous_5 = synchronous_5.executeTask();
     }
     if (guardCheck_taskCollector()) {
       taskCollector.collectResults();
@@ -175,7 +175,7 @@ public class AotSynchronousProcessor
     if (event instanceof java.lang.String) {
       String typedEvent = (String) event;
       auditEvent(typedEvent);
-      isDirty_requestHandler_2 = requestHandler_2.stringRequest(typedEvent);
+      isDirty_requestHandler_1 = requestHandler_1.stringRequest(typedEvent);
       //event stack unwind callbacks
     }
   }
@@ -183,17 +183,17 @@ public class AotSynchronousProcessor
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
-    if (guardCheck_synchronous_1()) {
-      isDirty_synchronous_1 = synchronous_1.executeTask();
+    if (guardCheck_synchronous_0()) {
+      isDirty_synchronous_0 = synchronous_0.executeTask();
+    }
+    if (guardCheck_synchronous_2()) {
+      isDirty_synchronous_2 = synchronous_2.executeTask();
     }
     if (guardCheck_synchronous_3()) {
       isDirty_synchronous_3 = synchronous_3.executeTask();
     }
     if (guardCheck_synchronous_4()) {
       isDirty_synchronous_4 = synchronous_4.executeTask();
-    }
-    if (guardCheck_synchronous_5()) {
-      isDirty_synchronous_5 = synchronous_5.executeTask();
     }
     if (guardCheck_taskCollector()) {
       taskCollector.collectResults();
@@ -211,11 +211,11 @@ public class AotSynchronousProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(requestHandler_2, "requestHandler_2");
-    auditor.nodeRegistered(synchronous_1, "synchronous_1");
+    auditor.nodeRegistered(requestHandler_1, "requestHandler_1");
+    auditor.nodeRegistered(synchronous_0, "synchronous_0");
+    auditor.nodeRegistered(synchronous_2, "synchronous_2");
     auditor.nodeRegistered(synchronous_3, "synchronous_3");
     auditor.nodeRegistered(synchronous_4, "synchronous_4");
-    auditor.nodeRegistered(synchronous_5, "synchronous_5");
     auditor.nodeRegistered(taskCollector, "taskCollector");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(subscriptionManager, "subscriptionManager");
@@ -225,11 +225,11 @@ public class AotSynchronousProcessor
   private void afterEvent() {
 
     nodeNameLookup.processingComplete();
-    isDirty_requestHandler_2 = false;
-    isDirty_synchronous_1 = false;
+    isDirty_requestHandler_1 = false;
+    isDirty_synchronous_0 = false;
+    isDirty_synchronous_2 = false;
     isDirty_synchronous_3 = false;
     isDirty_synchronous_4 = false;
-    isDirty_synchronous_5 = false;
   }
 
   @Override
@@ -273,11 +273,11 @@ public class AotSynchronousProcessor
 
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
-      dirtyFlagSupplierMap.put(requestHandler_2, () -> isDirty_requestHandler_2);
-      dirtyFlagSupplierMap.put(synchronous_1, () -> isDirty_synchronous_1);
+      dirtyFlagSupplierMap.put(requestHandler_1, () -> isDirty_requestHandler_1);
+      dirtyFlagSupplierMap.put(synchronous_0, () -> isDirty_synchronous_0);
+      dirtyFlagSupplierMap.put(synchronous_2, () -> isDirty_synchronous_2);
       dirtyFlagSupplierMap.put(synchronous_3, () -> isDirty_synchronous_3);
       dirtyFlagSupplierMap.put(synchronous_4, () -> isDirty_synchronous_4);
-      dirtyFlagSupplierMap.put(synchronous_5, () -> isDirty_synchronous_5);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
@@ -285,37 +285,37 @@ public class AotSynchronousProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
-      dirtyFlagUpdateMap.put(requestHandler_2, (b) -> isDirty_requestHandler_2 = b);
-      dirtyFlagUpdateMap.put(synchronous_1, (b) -> isDirty_synchronous_1 = b);
+      dirtyFlagUpdateMap.put(requestHandler_1, (b) -> isDirty_requestHandler_1 = b);
+      dirtyFlagUpdateMap.put(synchronous_0, (b) -> isDirty_synchronous_0 = b);
+      dirtyFlagUpdateMap.put(synchronous_2, (b) -> isDirty_synchronous_2 = b);
       dirtyFlagUpdateMap.put(synchronous_3, (b) -> isDirty_synchronous_3 = b);
       dirtyFlagUpdateMap.put(synchronous_4, (b) -> isDirty_synchronous_4 = b);
-      dirtyFlagUpdateMap.put(synchronous_5, (b) -> isDirty_synchronous_5 = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
-  private boolean guardCheck_synchronous_1() {
-    return isDirty_requestHandler_2;
+  private boolean guardCheck_synchronous_0() {
+    return isDirty_requestHandler_1;
+  }
+
+  private boolean guardCheck_synchronous_2() {
+    return isDirty_requestHandler_1;
   }
 
   private boolean guardCheck_synchronous_3() {
-    return isDirty_requestHandler_2;
+    return isDirty_requestHandler_1;
   }
 
   private boolean guardCheck_synchronous_4() {
-    return isDirty_requestHandler_2;
-  }
-
-  private boolean guardCheck_synchronous_5() {
-    return isDirty_requestHandler_2;
+    return isDirty_requestHandler_1;
   }
 
   private boolean guardCheck_taskCollector() {
-    return isDirty_requestHandler_2
-        | isDirty_synchronous_1
+    return isDirty_requestHandler_1
+        | isDirty_synchronous_0
+        | isDirty_synchronous_2
         | isDirty_synchronous_3
-        | isDirty_synchronous_4
-        | isDirty_synchronous_5;
+        | isDirty_synchronous_4;
   }
 
   @Override

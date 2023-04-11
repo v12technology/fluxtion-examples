@@ -11,21 +11,30 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="synchronous_1">
+        <node id="synchronous_0">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="synchronous_1:&#10;Synchronous"/>
+                    <jGraph:label text="synchronous_0:&#10;Synchronous"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="requestHandler_2">
+        <node id="requestHandler_1">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;requestHandler_2:&#10;RequestHandler"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;requestHandler_1:&#10;RequestHandler"/>
                     <jGraph:Style properties="EVENTHANDLER"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="synchronous_2">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="synchronous_2:&#10;Synchronous"/>
+                    <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
@@ -43,15 +52,6 @@
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
                     <jGraph:label text="synchronous_4:&#10;Synchronous"/>
-                    <jGraph:Style properties="NODE"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
-        <node id="synchronous_5">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="synchronous_5:&#10;Synchronous"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
@@ -101,47 +101,47 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <edge id="1" source="synchronous_1" target="taskCollector">
+        <edge id="1" source="synchronous_0" target="taskCollector">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="2" source="requestHandler_2" target="synchronous_1">
+        <edge id="2" source="requestHandler_1" target="synchronous_0">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="3" source="synchronous_3" target="taskCollector">
+        <edge id="3" source="synchronous_2" target="taskCollector">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="4" source="synchronous_4" target="taskCollector">
+        <edge id="4" source="synchronous_3" target="taskCollector">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="5" source="synchronous_5" target="taskCollector">
+        <edge id="5" source="synchronous_4" target="taskCollector">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="6" source="requestHandler_2" target="synchronous_3">
+        <edge id="6" source="requestHandler_1" target="synchronous_2">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="7" source="requestHandler_2" target="synchronous_4">
+        <edge id="7" source="requestHandler_1" target="synchronous_3">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="8" source="requestHandler_2" target="synchronous_5">
+        <edge id="8" source="requestHandler_1" target="synchronous_4">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="9" source="requestHandler_2" target="taskCollector">
+        <edge id="9" source="requestHandler_1" target="taskCollector">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
@@ -161,7 +161,7 @@
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="13" source="String" target="requestHandler_2">
+        <edge id="13" source="String" target="requestHandler_1">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>

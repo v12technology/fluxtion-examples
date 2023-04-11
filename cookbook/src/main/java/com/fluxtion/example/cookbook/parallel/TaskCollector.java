@@ -1,6 +1,7 @@
 package com.fluxtion.example.cookbook.parallel;
 
 import com.fluxtion.runtime.annotations.OnTrigger;
+import com.fluxtion.runtime.node.NamedNode;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder
-public class TaskCollector {
+public class TaskCollector implements NamedNode {
 
     @Singular("task")
     private final List<SimulatedTask> taskList;
@@ -40,8 +41,13 @@ public class TaskCollector {
                 .collect(Collectors.joining("\n"));
         results += "\n" + ("-".repeat(100)) + "\n";
         results += """
-                Time milliesconds      0   50   100  150  200  250  300  350  400  450  500  550  600  650  700 
+                Time milliseconds      0   50   100  150  200  250  300  350  400  450  500  550  600  650  700 
                 """;
         return true;
+    }
+
+    @Override
+    public String getName() {
+        return "taskCollector";
     }
 }

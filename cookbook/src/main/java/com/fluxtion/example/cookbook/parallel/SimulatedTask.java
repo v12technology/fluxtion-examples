@@ -5,6 +5,14 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Base class for a simulated long-running task. Configurable parameters:
+ * <ul>
+ *     <li>Task name</li>
+ *     <li>Duration of task in millis</li>
+ *     <li>The {@link RequestHandler} that triggers this execution</li>
+ * </ul>
+ */
 @Data
 @Slf4j
 public class SimulatedTask {
