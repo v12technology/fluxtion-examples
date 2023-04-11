@@ -7,6 +7,7 @@ import com.fluxtion.example.cookbook.parallel.SimulatedTask.Synchronous;
 import com.fluxtion.example.cookbook.parallel.aot.AotParallelProcessor;
 import com.fluxtion.example.cookbook.parallel.aot.AotSynchronousProcessor;
 import com.fluxtion.runtime.EventProcessor;
+import lombok.SneakyThrows;
 
 /**
  * Example of using parallel execution in Fluxtion. The {@link TaskCollector} collects the results from a list of parent
@@ -71,19 +72,24 @@ public class Main {
         if (GENERATE_AOT) {
             System.out.println("Generating and compiling processors ahead of time");
             Fluxtion.compileAot(Main::buildParallelProcessor,
-                    "com.fluxtion.example.cookbook.parallel.aot", "AotParallelProcessor");
+                    "com.fluxtion.example.cookbook.parallel.aot",
+                    "AotParallelProcessor");
             Fluxtion.compileAot(Main::buildSynchronousProcessor,
-                    "com.fluxtion.example.cookbook.parallel.aot", "AotSynchronousProcessor");
+                    "com.fluxtion.example.cookbook.parallel.aot",
+                    "AotSynchronousProcessor");
         }
         if (DEBUG_LOG) {
-            System.setProperty("org.slf4j.simpleLogger.log.com.fluxtion.example.cookbook.parallel", "DEBUG");
+            System.setProperty(
+                    "org.slf4j.simpleLogger.log.com.fluxtion.example.cookbook.parallel", "DEBUG");
         }
         if (RUN_AOT) {
             runTest(new AotParallelProcessor(), "\nAOT Parallel trigger test");
             runTest(new AotSynchronousProcessor(), "\nAOT Synchronous trigger test");
         } else {
-            runTest(Fluxtion.interpret(Main::buildParallelProcessor), "Interpreted Parallel trigger test");
-            runTest(Fluxtion.interpret(Main::buildSynchronousProcessor), "\nInterpreted Synchronous trigger test");
+            runTest(Fluxtion.interpret(Main::buildParallelProcessor),
+                    "Interpreted Parallel trigger test");
+            runTest(Fluxtion.interpret(Main::buildSynchronousProcessor),
+                    "\nInterpreted Synchronous trigger test");
         }
     }
 
@@ -111,7 +117,8 @@ public class Main {
                         .build());
     }
 
-    private static void runTest(EventProcessor<?> eventProcessor, String title) throws NoSuchFieldException {
+    @SneakyThrows
+    private static void runTest(EventProcessor<?> eventProcessor, String title) {
         eventProcessor.init();
         TaskCollector taskCollector = eventProcessor.getNodeById("taskCollector");
         if (DEBUG_LOG) {
