@@ -3,6 +3,7 @@ package com.fluxtion.example.cookbook.parallel;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.example.cookbook.parallel.SimulatedTask.Asynchronous;
 import com.fluxtion.example.cookbook.parallel.SimulatedTask.Synchronous;
+import com.fluxtion.example.cookbook.parallel.aot.generated.AotParallelProcessor;
 import com.fluxtion.runtime.EventProcessor;
 
 /**
@@ -48,21 +49,15 @@ public class Main {
     public static void main(String[] args) throws NoSuchFieldException {
         //uncomment to see task execution log output
         //System.setProperty("org.slf4j.simpleLogger.log.com.fluxtion.example.cookbook.parallel", "DEBUG");
-        var eventProcessor = Fluxtion.interpret(c -> {
-            RequestHandler requestHandler = new RequestHandler();
-            c.addNode(
-                    TaskCollector.builder()
-                            .task(new Asynchronous("async1", 250, requestHandler))
-                            .task(new Asynchronous("async2", 225, requestHandler))
-                            .task(new Asynchronous("async3", 18, requestHandler))
-                            .task(new Asynchronous("async4", 185, requestHandler))
-                            .requestHandler(requestHandler)
-                            .build(), "taskCollector"
-            );
-        });
-        runTest(eventProcessor, "Parallel trigger test");
 
-        eventProcessor = Fluxtion.interpret(c -> {
+        //uncomment this line to run the AOT version
+        //runTest(new AotParallelProcessor(), "\nAOT Parallel trigger test");
+        runTest(buildSynchronousProcessor(), "\nSynchronous trigger test");
+        runTest(buildParallelProcessor(), "Parallel trigger test");
+    }
+
+    public static EventProcessor<?> buildSynchronousProcessor() {
+        return Fluxtion.interpret(c -> {
             RequestHandler requestHandler = new RequestHandler();
             c.addNode(
                     TaskCollector.builder()
@@ -74,7 +69,21 @@ public class Main {
                             .build(), "taskCollector"
             );
         });
-        runTest(eventProcessor, "\nSynchronous trigger test");
+    }
+
+    public static EventProcessor<?> buildParallelProcessor() {
+        return Fluxtion.interpret(c -> {
+            RequestHandler requestHandler = new RequestHandler();
+            c.addNode(
+                    TaskCollector.builder()
+                            .task(new Asynchronous("async1", 250, requestHandler))
+                            .task(new Asynchronous("async2", 225, requestHandler))
+                            .task(new Asynchronous("async3", 18, requestHandler))
+                            .task(new Asynchronous("async4", 185, requestHandler))
+                            .requestHandler(requestHandler)
+                            .build(), "taskCollector"
+            );
+        });
     }
 
     private static void runTest(EventProcessor<?> eventProcessor, String title) throws NoSuchFieldException {

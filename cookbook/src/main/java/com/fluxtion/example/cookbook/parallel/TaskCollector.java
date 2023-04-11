@@ -1,11 +1,7 @@
 package com.fluxtion.example.cookbook.parallel;
 
 import com.fluxtion.runtime.annotations.OnTrigger;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Singular;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -14,15 +10,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Builder
 public class TaskCollector {
 
     @Singular("task")
-    private List<SimulatedTask> taskList;
-    private RequestHandler requestHandler;
-    private String results;
-    private long duration;
+    private final List<SimulatedTask> taskList;
+    private final RequestHandler requestHandler;
+    private transient String results;
+    private transient long duration;
 
     @OnTrigger
     public boolean collectResults() {
