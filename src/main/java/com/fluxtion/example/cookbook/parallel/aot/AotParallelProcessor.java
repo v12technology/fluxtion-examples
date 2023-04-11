@@ -15,7 +15,7 @@
 *
 <http://www.mongodb.com/licensing/server-side-public-license>.
 */
-package com.fluxtion.example.cookbook.parallel.aot.generated;
+package com.fluxtion.example.cookbook.parallel.aot;
 
 import com.fluxtion.runtime.StaticEventProcessor;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
@@ -48,7 +48,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-04-11T07:07:46.522395
+ * generation time                 : 2023-04-11T10:46:25.341374
  * eventProcessorGenerator version : 9.0.1
  * api version                     : 9.0.1
  * </pre>
