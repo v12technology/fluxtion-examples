@@ -1,10 +1,10 @@
 package com.fluxtion.example.cookbook.exportfunction;
 
 
-import com.fluxtion.example.cookbook.exportfunction.events.Electronic;
-import com.fluxtion.example.cookbook.exportfunction.events.Food;
-import com.fluxtion.example.cookbook.exportfunction.events.Furniture;
-import com.fluxtion.example.cookbook.exportfunction.events.StockDelivery;
+import com.fluxtion.example.cookbook.exportfunction.data.Electronic;
+import com.fluxtion.example.cookbook.exportfunction.data.Food;
+import com.fluxtion.example.cookbook.exportfunction.data.Furniture;
+import com.fluxtion.example.cookbook.exportfunction.data.StockDelivery;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 
 import java.util.Date;

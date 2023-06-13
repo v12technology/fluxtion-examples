@@ -58,7 +58,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-06-12T10:52:14.919459
+ * generation time                 : 2023-06-12T12:09:45.729551
  * eventProcessorGenerator version : 9.0.8
  * api version                     : 9.0.8
  * </pre>
@@ -227,24 +227,24 @@ public class RealtimeCashMonitor
   }
 
   public void electronicStockUpdate(
-      com.fluxtion.example.cookbook.exportfunction.events.StockDelivery<
-              com.fluxtion.example.cookbook.exportfunction.events.Electronic>
+      com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
+              com.fluxtion.example.cookbook.exportfunction.data.Electronic>
           arg0) {
     stockTracker_2.setTriggered(stockTracker_2.addStockElectronic(arg0));
     onEvent(handlerExportFunctionTriggerEvent_4.getEvent());
   }
 
   public void foodStockUpdate(
-      com.fluxtion.example.cookbook.exportfunction.events.StockDelivery<
-              com.fluxtion.example.cookbook.exportfunction.events.Food>
+      com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
+              com.fluxtion.example.cookbook.exportfunction.data.Food>
           arg0) {
     stockTracker_2.setTriggered(stockTracker_2.addStock(arg0));
     onEvent(handlerExportFunctionTriggerEvent_2.getEvent());
   }
 
   public void furnitureStockUpdate(
-      com.fluxtion.example.cookbook.exportfunction.events.StockDelivery<
-              com.fluxtion.example.cookbook.exportfunction.events.Furniture>
+      com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
+              com.fluxtion.example.cookbook.exportfunction.data.Furniture>
           arg0) {
     stockTracker_2.setTriggered(stockTracker_2.addStockFurniture(arg0));
     onEvent(handlerExportFunctionTriggerEvent_5.getEvent());
