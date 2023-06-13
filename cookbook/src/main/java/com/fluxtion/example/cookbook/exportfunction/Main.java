@@ -14,12 +14,7 @@ public class Main {
     private static final boolean GENERATE_PROCESSOR = false;
 
     public static void main(String[] args) {
-        final CashMonitor realtimeCashMonitor;
-        if (GENERATE_PROCESSOR) {
-            realtimeCashMonitor = generateRealtimeProcessor();
-        } else {
-            realtimeCashMonitor = new RealtimeCashMonitor();
-        }
+        final CashMonitor realtimeCashMonitor = generateRealtimeProcessor();
         realtimeCashMonitor.init();
         //add fx rate or everything is NaN for gbp
         realtimeCashMonitor.onEvent(new FxRate("GBPUSD", 1.2));
@@ -42,9 +37,13 @@ public class Main {
     }
 
     private static CashMonitor generateRealtimeProcessor() {
-        return (CashMonitor) Fluxtion.compileAot(c -> {
-            c.addNode(new BankAlert());
-            c.addInterfaceImplementation(CashMonitor.class);
-        }, "com.fluxtion.example.cookbook.exportfunction.generated", "RealtimeCashMonitor");
+        if (GENERATE_PROCESSOR) {
+            return (CashMonitor) Fluxtion.compileAot(c -> {
+                c.addNode(new BankAlert());
+                c.addInterfaceImplementation(CashMonitor.class);
+            }, "com.fluxtion.example.cookbook.exportfunction.generated", "RealtimeCashMonitor");
+        } else {
+            return new RealtimeCashMonitor();
+        }
     }
 }
