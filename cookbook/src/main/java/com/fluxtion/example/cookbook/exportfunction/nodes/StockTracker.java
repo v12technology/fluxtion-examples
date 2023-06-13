@@ -1,5 +1,9 @@
 package com.fluxtion.example.cookbook.exportfunction.nodes;
 
+import com.fluxtion.example.cookbook.exportfunction.data.Electronic;
+import com.fluxtion.example.cookbook.exportfunction.data.Food;
+import com.fluxtion.example.cookbook.exportfunction.data.Furniture;
+import com.fluxtion.example.cookbook.exportfunction.data.StockDelivery;
 import com.fluxtion.example.cookbook.exportfunction.events.*;
 import com.fluxtion.runtime.annotations.ExportFunction;
 import com.fluxtion.runtime.annotations.Initialise;

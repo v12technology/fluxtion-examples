@@ -1,9 +1,9 @@
 package com.fluxtion.example.cookbook.exportfunction;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.example.cookbook.exportfunction.events.Food;
+import com.fluxtion.example.cookbook.exportfunction.data.Food;
 import com.fluxtion.example.cookbook.exportfunction.events.FxRate;
-import com.fluxtion.example.cookbook.exportfunction.events.StockDelivery;
+import com.fluxtion.example.cookbook.exportfunction.data.StockDelivery;
 import com.fluxtion.example.cookbook.exportfunction.generated.RealtimeCashMonitor;
 import com.fluxtion.example.cookbook.exportfunction.nodes.BankAlert;
 
