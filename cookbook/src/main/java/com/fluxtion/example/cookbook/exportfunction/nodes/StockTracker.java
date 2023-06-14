@@ -4,7 +4,7 @@ import com.fluxtion.example.cookbook.exportfunction.data.Electronic;
 import com.fluxtion.example.cookbook.exportfunction.data.Food;
 import com.fluxtion.example.cookbook.exportfunction.data.Furniture;
 import com.fluxtion.example.cookbook.exportfunction.data.StockDelivery;
-import com.fluxtion.example.cookbook.exportfunction.events.*;
+import com.fluxtion.example.cookbook.exportfunction.events.FxRate;
 import com.fluxtion.runtime.annotations.ExportFunction;
 import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.OnEventHandler;
@@ -16,8 +16,9 @@ public class StockTracker extends ExportFunctionNode {
     private double stockValueUsd;
     private double stockValueGbp;
     private double rate;
+
     @OnEventHandler(filterString = "GBPUSD")
-    public boolean fxChange(FxRate fxRate){
+    public boolean fxChange(FxRate fxRate) {
         rate = fxRate.getRate();
         stockValueGbp = stockValueUsd * rate;
         System.out.println("StockTracker - fx update stockValueGbp:" + stockValueGbp);
@@ -25,20 +26,20 @@ public class StockTracker extends ExportFunctionNode {
     }
 
     @ExportFunction("saleUpdate")
-    public boolean updateStockLevels(String reference, int quantity, double amount){
+    public boolean updateStockLevels(String reference, int quantity, double amount) {
         totalQuantity -= quantity;
-        if(totalQuantity < 5){
+        if (totalQuantity < 5) {
             System.out.println("StockTracker Low stock level - " + totalQuantity);
         }
         return false;
     }
 
     @ExportFunction("foodStockUpdate")
-    public boolean addStock(StockDelivery<Food> stockQuantity){
-        if(stockQuantity.removingStock()){
+    public boolean addStock(StockDelivery<Food> stockQuantity) {
+        if (stockQuantity.removingStock()) {
             totalQuantity -= stockQuantity.amount();
             stockValueUsd -= stockQuantity.amount() * stockQuantity.costPerItem();
-        }else {
+        } else {
             totalQuantity += stockQuantity.amount();
             stockValueUsd += stockQuantity.amount() * stockQuantity.costPerItem();
         }
@@ -48,19 +49,19 @@ public class StockTracker extends ExportFunctionNode {
     }
 
     @ExportFunction("electronicStockUpdate")
-    public boolean addStockElectronic(StockDelivery<Electronic> stockQuantity){
+    public boolean addStockElectronic(StockDelivery<Electronic> stockQuantity) {
         //ignore
         return false;
     }
 
     @ExportFunction("furnitureStockUpdate")
-    public boolean addStockFurniture(StockDelivery<Furniture> stockQuantity){
+    public boolean addStockFurniture(StockDelivery<Furniture> stockQuantity) {
         //ignore
         return false;
     }
 
     @Initialise
-    public void init(){
+    public void init() {
         totalQuantity = 0;
         stockValueUsd = 0;
         stockValueGbp = Double.NaN;

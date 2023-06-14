@@ -1,9 +1,10 @@
 package com.fluxtion.example.cookbook.exportfunction;
 
+import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.example.cookbook.exportfunction.data.Food;
-import com.fluxtion.example.cookbook.exportfunction.events.FxRate;
 import com.fluxtion.example.cookbook.exportfunction.data.StockDelivery;
+import com.fluxtion.example.cookbook.exportfunction.events.FxRate;
 import com.fluxtion.example.cookbook.exportfunction.generated.RealtimeCashMonitor;
 import com.fluxtion.example.cookbook.exportfunction.nodes.BankAlert;
 
@@ -11,7 +12,7 @@ import java.util.Date;
 
 public class Main {
 
-    private static final boolean GENERATE_PROCESSOR = false;
+    private static final GenerationStrategy generationStrategy = GenerationStrategy.USE_AOT;
 
     public static void main(String[] args) {
         final CashMonitor realtimeCashMonitor = generateRealtimeProcessor();
@@ -37,13 +38,20 @@ public class Main {
     }
 
     private static CashMonitor generateRealtimeProcessor() {
-        if (GENERATE_PROCESSOR) {
-            return (CashMonitor) Fluxtion.compileAot(c -> {
-                c.addNode(new BankAlert());
-                c.addInterfaceImplementation(CashMonitor.class);
-            }, "com.fluxtion.example.cookbook.exportfunction.generated", "RealtimeCashMonitor");
-        } else {
-            return new RealtimeCashMonitor();
-        }
+        return switch (generationStrategy) {
+            case USE_AOT -> new RealtimeCashMonitor();
+            case INTERPRET -> Fluxtion.interpret(Main::buildGraph).asInterface();
+            case COMPILE -> Fluxtion.compile(Main::buildGraph).asInterface();
+            case GENERATE_AOT -> Fluxtion.compileAot(Main::buildGraph,
+                    "com.fluxtion.example.cookbook.exportfunction.generated",
+                    "RealtimeCashMonitor").asInterface();
+        };
     }
+
+    private static void buildGraph(EventProcessorConfig processorConfig) {
+        processorConfig.addNode(new BankAlert());
+        processorConfig.addInterfaceImplementation(CashMonitor.class);
+    }
+
+    private enum GenerationStrategy {COMPILE, GENERATE_AOT, USE_AOT, INTERPRET}
 }

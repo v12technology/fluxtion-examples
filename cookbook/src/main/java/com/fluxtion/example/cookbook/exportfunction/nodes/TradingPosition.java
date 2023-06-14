@@ -12,7 +12,7 @@ public class TradingPosition extends ExportFunctionNode {
     private final SalesTracker salesTracker;
     private double tradePosition;
 
-    public TradingPosition(){
+    public TradingPosition() {
         this(new StockTracker(), new SalesTracker());
     }
 
@@ -22,7 +22,7 @@ public class TradingPosition extends ExportFunctionNode {
     }
 
     @ExportFunction
-    public boolean addCash(String reference, Date date, double amount){
+    public boolean addCash(String reference, Date date, double amount) {
         tradePosition += amount;
         System.out.println("TradingPosition - cash received:" + amount);
         System.out.println("TradingPosition - current:" + tradePosition);
@@ -30,7 +30,7 @@ public class TradingPosition extends ExportFunctionNode {
     }
 
     @ExportFunction
-    public boolean payBill(String reference, Date date, double amount){
+    public boolean payBill(String reference, Date date, double amount) {
         tradePosition -= amount;
         System.out.println("TradingPosition - pay bill:" + amount);
         System.out.println("TradingPosition - current:" + tradePosition);
@@ -38,14 +38,14 @@ public class TradingPosition extends ExportFunctionNode {
     }
 
     @OnParentUpdate
-    public void stockChange(StockTracker stockTracker){
+    public void stockChange(StockTracker stockTracker) {
         tradePosition -= stockTracker.getStockValueGbp();
         System.out.println("TradingPosition - stockTracker change current:" + tradePosition);
         setTriggered(true);
     }
 
     @OnParentUpdate
-    public void salesChange(SalesTracker salesTracker){
+    public void salesChange(SalesTracker salesTracker) {
         tradePosition += salesTracker.getIncomeGbp();
         System.out.println("TradingPosition - salesTracker change current:" + tradePosition);
         setTriggered(true);

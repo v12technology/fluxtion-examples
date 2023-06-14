@@ -12,14 +12,15 @@ public class SalesTracker extends ExportFunctionNode {
     private double rate;
 
     @OnEventHandler(filterString = "GBPUSD")
-    public boolean fxChange(FxRate fxRate){
+    public boolean fxChange(FxRate fxRate) {
         rate = fxRate.getRate();
         incomeGbp = incomeUsd * rate;
         System.out.println("SalesTracker - fx update incomeGbp:" + incomeGbp);
         return !Double.isNaN(incomeGbp);
     }
+
     @ExportFunction("saleUpdate")
-    public boolean updateSalesIncome(String reference, int quantity, double amount){
+    public boolean updateSalesIncome(String reference, int quantity, double amount) {
         incomeUsd += quantity * amount;
         incomeGbp = incomeUsd * rate;
         System.out.println("SalesTracker - sales income  incomeGbp:" + incomeGbp);
@@ -27,7 +28,7 @@ public class SalesTracker extends ExportFunctionNode {
     }
 
     @Initialise
-    public void init(){
+    public void init() {
         incomeUsd = 0;
         incomeGbp = Double.NaN;
         rate = Double.NaN;

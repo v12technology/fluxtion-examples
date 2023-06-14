@@ -58,9 +58,9 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-06-12T12:09:45.729551
- * eventProcessorGenerator version : 9.0.8
- * api version                     : 9.0.8
+ * generation time                 : 2023-06-14T20:54:01.116988
+ * eventProcessorGenerator version : 9.0.12
+ * api version                     : 9.0.12
  * </pre>
  *
  * Event classes supported:
@@ -142,9 +142,9 @@ public class RealtimeCashMonitor
     handlerExportFunctionTriggerEvent_1.setFunctionPointerList(
         Arrays.asList(tradingPosition_1, tradingPosition_1));
     handlerExportFunctionTriggerEvent_2.setFunctionPointerList(
-        Arrays.asList(stockTracker_2, stockTracker_2));
-    handlerExportFunctionTriggerEvent_3.setFunctionPointerList(
         Arrays.asList(stockTracker_2, stockTracker_2, salesTracker_3, salesTracker_3));
+    handlerExportFunctionTriggerEvent_3.setFunctionPointerList(
+        Arrays.asList(stockTracker_2, stockTracker_2));
     handlerExportFunctionTriggerEvent_4.setFunctionPointerList(
         Arrays.asList(stockTracker_2, stockTracker_2));
     handlerExportFunctionTriggerEvent_5.setFunctionPointerList(
@@ -221,44 +221,74 @@ public class RealtimeCashMonitor
     }
   }
 
-  public void addCash(java.lang.String arg0, java.util.Date arg1, double arg2) {
+  public void addCash(String arg0, java.util.Date arg1, double arg2) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
     tradingPosition_1.setTriggered(tradingPosition_1.addCash(arg0, arg1, arg2));
-    onEvent(handlerExportFunctionTriggerEvent_0.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_0) handlerExportFunctionTriggerEvent_0.getEvent());
+    processing = false;
   }
 
   public void electronicStockUpdate(
       com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
               com.fluxtion.example.cookbook.exportfunction.data.Electronic>
           arg0) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
     stockTracker_2.setTriggered(stockTracker_2.addStockElectronic(arg0));
-    onEvent(handlerExportFunctionTriggerEvent_4.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
+    processing = false;
   }
 
   public void foodStockUpdate(
       com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
               com.fluxtion.example.cookbook.exportfunction.data.Food>
           arg0) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
     stockTracker_2.setTriggered(stockTracker_2.addStock(arg0));
-    onEvent(handlerExportFunctionTriggerEvent_2.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_5) handlerExportFunctionTriggerEvent_5.getEvent());
+    processing = false;
   }
 
   public void furnitureStockUpdate(
       com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
               com.fluxtion.example.cookbook.exportfunction.data.Furniture>
           arg0) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
     stockTracker_2.setTriggered(stockTracker_2.addStockFurniture(arg0));
-    onEvent(handlerExportFunctionTriggerEvent_5.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
+    processing = false;
   }
 
-  public void payBill(java.lang.String arg0, java.util.Date arg1, double arg2) {
+  public void payBill(String arg0, java.util.Date arg1, double arg2) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
     tradingPosition_1.setTriggered(tradingPosition_1.payBill(arg0, arg1, arg2));
-    onEvent(handlerExportFunctionTriggerEvent_1.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_1) handlerExportFunctionTriggerEvent_1.getEvent());
+    processing = false;
   }
 
-  public void saleUpdate(java.lang.String arg0, int arg1, double arg2) {
+  public void saleUpdate(String arg0, int arg1, double arg2) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
     stockTracker_2.setTriggered(stockTracker_2.updateStockLevels(arg0, arg1, arg2));
     salesTracker_3.setTriggered(salesTracker_3.updateSalesIncome(arg0, arg1, arg2));
-    onEvent(handlerExportFunctionTriggerEvent_3.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_2) handlerExportFunctionTriggerEvent_2.getEvent());
+    processing = false;
   }
 
   public void handleEvent(FxRate typedEvent) {
@@ -321,6 +351,12 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_2 =
         handlerExportFunctionTriggerEvent_2.onEvent(typedEvent);
+    if (guardCheck_salesTracker_3()) {
+      isDirty_salesTracker_3 = salesTracker_3.triggered();
+      if (isDirty_salesTracker_3) {
+        tradingPosition_1.salesChange(salesTracker_3);
+      }
+    }
     if (guardCheck_stockTracker_2()) {
       isDirty_stockTracker_2 = stockTracker_2.triggered();
       if (isDirty_stockTracker_2) {
@@ -342,12 +378,6 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_3 =
         handlerExportFunctionTriggerEvent_3.onEvent(typedEvent);
-    if (guardCheck_salesTracker_3()) {
-      isDirty_salesTracker_3 = salesTracker_3.triggered();
-      if (isDirty_salesTracker_3) {
-        tradingPosition_1.salesChange(salesTracker_3);
-      }
-    }
     if (guardCheck_stockTracker_2()) {
       isDirty_stockTracker_2 = stockTracker_2.triggered();
       if (isDirty_stockTracker_2) {
@@ -677,7 +707,7 @@ public class RealtimeCashMonitor
   }
 
   private boolean guardCheck_salesTracker_3() {
-    return isDirty_handlerExportFunctionTriggerEvent_3;
+    return isDirty_handlerExportFunctionTriggerEvent_2;
   }
 
   private boolean guardCheck_stockTracker_2() {
