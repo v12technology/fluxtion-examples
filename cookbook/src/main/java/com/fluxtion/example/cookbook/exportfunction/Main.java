@@ -7,6 +7,7 @@ import com.fluxtion.example.cookbook.exportfunction.data.StockDelivery;
 import com.fluxtion.example.cookbook.exportfunction.events.FxRate;
 import com.fluxtion.example.cookbook.exportfunction.generated.RealtimeCashMonitor;
 import com.fluxtion.example.cookbook.exportfunction.nodes.BankAlert;
+import com.fluxtion.example.cookbook.util.GenerationStrategy;
 
 import java.util.Date;
 
@@ -53,5 +54,4 @@ public class Main {
         processorConfig.addInterfaceImplementation(CashMonitor.class);
     }
 
-    private enum GenerationStrategy {COMPILE, GENERATE_AOT, USE_AOT, INTERPRET}
 }

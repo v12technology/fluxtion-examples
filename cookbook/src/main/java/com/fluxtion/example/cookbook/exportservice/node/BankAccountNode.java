@@ -39,6 +39,7 @@ public class BankAccountNode
     }
 
     @Override
+    @NoPropagateFunction
     public void replayStarted() {
     }
 
@@ -49,11 +50,13 @@ public class BankAccountNode
     }
 
     @Override
+    @NoPropagateFunction
     public void categoryUpdate(CategoryUpdate categoryUpdate) {
 
     }
 
     @Override
+    @NoPropagateFunction
     public void transactionUpdate(Transaction transaction) {
 
     }

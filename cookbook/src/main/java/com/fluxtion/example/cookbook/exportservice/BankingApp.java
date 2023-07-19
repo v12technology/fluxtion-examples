@@ -9,6 +9,7 @@ import com.fluxtion.example.cookbook.exportservice.node.TransactionStore;
 import com.fluxtion.example.cookbook.exportservice.service.BankAccount;
 import com.fluxtion.example.cookbook.exportservice.service.SpendingMonitor;
 import com.fluxtion.example.cookbook.exportservice.service.StatementPublisher;
+import com.fluxtion.example.cookbook.util.GenerationStrategy;
 import com.fluxtion.runtime.EventProcessor;
 import lombok.SneakyThrows;
 
@@ -26,13 +27,22 @@ public class BankingApp {
     private StatementPublisher statementPublisher;
 
     @SneakyThrows
-    public BankingApp() {
-        eventProcessor = new BankEventProcessor();
-//        BankAccount bankAccount = new BankAccountNode();
-//        SpendingMonitor spendingMonitor = new SpendingMonitorNode();
-//        StatementPublisher statementPublisher = new StatementPublisherNode(spendingMonitor, bankAccount);
-//        eventProcessor = Fluxtion.compileAot( "com.fluxtion.example.cookbook.exportservice.generated", "BankEventProcessor", statementPublisher);//, bankAccount, statementPublisher);
-//        eventProcessor = Fluxtion.interpret(statementPublisher);
+    public BankingApp(GenerationStrategy generationStrategy) {
+        eventProcessor = switch (generationStrategy) {
+            case USE_AOT -> new BankEventProcessor();
+            case INTERPRET -> Fluxtion.interpret(buildObjectGraph());
+            case COMPILE -> Fluxtion.compile(buildObjectGraph());
+            case GENERATE_AOT -> Fluxtion.compileAot(
+                    "com.fluxtion.example.cookbook.exportservice.generated",
+                    "BankEventProcessor", buildObjectGraph());
+        };
+    }
+
+    private static Object[] buildObjectGraph() {
+        BankAccount bankAccount = new BankAccountNode();
+        SpendingMonitor spendingMonitor = new SpendingMonitorNode();
+        StatementPublisher statementPublisher = new StatementPublisherNode(spendingMonitor, bankAccount);
+        return new Object[]{statementPublisher};
     }
 
     @SneakyThrows
