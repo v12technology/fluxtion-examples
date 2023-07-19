@@ -30,7 +30,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws NoSuchFieldException {
-        var voteProcessor = Fluxtion.interpret(c -> c.addNode(new ElectionTracker(List.of(
+        var voteProcessor = Fluxtion.compileAot(c -> c.addNode(new ElectionTracker(List.of(
                 new CandidateVoteHandler("Red_party"),
                 new CandidateVoteHandler("Blue_party"),
                 new CandidateVoteHandler("Green_party")

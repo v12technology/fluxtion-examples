@@ -16,7 +16,7 @@ import com.fluxtion.runtime.annotations.OnTrigger;
  */
 public class Main {
     public static void main(String[] args) {
-        var eventProcessor = Fluxtion.interpret(cfg -> cfg.addNode(new BreachNotifier()));
+        var eventProcessor = Fluxtion.interpret(new BreachNotifier());
         eventProcessor.init();
         eventProcessor.onEvent(new InputDataEvent_1(34.4));
         eventProcessor.onEvent(new InputDataEvent_2(52.1));
