@@ -30,4 +30,9 @@ public class AccountNode extends ExportFunctionNode implements @ExportService Ac
     public void clearTransaction() {
         currentTransaction = null;
     }
+
+    public void commitTransaction(){
+        //add to the account
+        currentTransaction = null;
+    }
 }

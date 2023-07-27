@@ -7,4 +7,6 @@ public interface TransactionProcessor {
     Transaction currentTransactionRequest();
 
     void clearTransaction();
+
+    void commitTransaction();
 }

@@ -3,6 +3,7 @@ package com.fluxtion.example.cookbook.spring;
 import com.fluxtion.compiler.extern.spring.FluxtionSpring;
 import com.fluxtion.example.cookbook.spring.generated.SpringBankEventProcessor;
 import com.fluxtion.example.cookbook.spring.service.Account;
+import com.fluxtion.example.cookbook.spring.service.BankingOperations;
 import com.fluxtion.example.cookbook.spring.service.CreditCheck;
 import com.fluxtion.example.cookbook.util.GenerationStrategy;
 import com.fluxtion.runtime.EventProcessor;
@@ -14,6 +15,7 @@ public class BankingApp {
     private final EventProcessor<?> eventProcessor;
     private Account bankAccount;
     private CreditCheck creditCheck;
+    private BankingOperations bankingOperations;
 
     @SneakyThrows
     public BankingApp(GenerationStrategy generationStrategy) {
@@ -33,6 +35,7 @@ public class BankingApp {
         eventProcessor.init();
         bankAccount = eventProcessor.asInterface();
         creditCheck = eventProcessor.asInterface();
+        bankingOperations = eventProcessor.asInterface();
     }
 
     public Account getBankAccount() {
@@ -41,5 +44,9 @@ public class BankingApp {
 
     public CreditCheck getCreditCheck() {
         return creditCheck;
+    }
+
+    public BankingOperations getBankingOperations() {
+        return bankingOperations;
     }
 }

@@ -7,6 +7,11 @@ public class Main {
     public static void main(String[] args) {
         BankingApp bankingApp = new BankingApp(GenerationStrategy.USE_AOT);
         bankingApp.start();
+        //should reject bank not open
+        bankingApp.getBankAccount().credit(100, 250.12);
+
+        //open bank
+        bankingApp.getBankingOperations().openForBusiness();
         bankingApp.getBankAccount().credit(100, 250.12);
 
         //blacklist an account
@@ -16,5 +21,9 @@ public class Main {
         //remove account from blacklist
         bankingApp.getCreditCheck().whiteListAccount(100);
         bankingApp.getBankAccount().credit(100, 46.90);
+
+        //close bank
+        bankingApp.getBankingOperations().closedForBusiness();
+        bankingApp.getBankAccount().credit(100, 13);
     }
 }

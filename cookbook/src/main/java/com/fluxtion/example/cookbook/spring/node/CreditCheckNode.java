@@ -5,7 +5,6 @@ import com.fluxtion.example.cookbook.spring.service.CreditCheck;
 import com.fluxtion.example.cookbook.spring.service.TransactionProcessor;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.NoPropagateFunction;
-import com.fluxtion.runtime.annotations.OnTrigger;
 import com.fluxtion.runtime.callback.ExportFunctionNode;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +22,14 @@ public class CreditCheckNode extends ExportFunctionNode implements @ExportServic
     @Override
     @NoPropagateFunction
     public void blackListAccount(int accountNumber) {
+        log.info("blacklisted:{}", accountNumber);
         blackListedAccounts.add(accountNumber);
     }
 
     @Override
     @NoPropagateFunction
     public void whiteListAccount(int accountNumber) {
+        log.info("whitelisted:{}", accountNumber);
         blackListedAccounts.remove(accountNumber);
     }
 
@@ -55,5 +56,9 @@ public class CreditCheckNode extends ExportFunctionNode implements @ExportServic
     @Override
     public void clearTransaction() {
         transactionSource.clearTransaction();
+    }
+
+    public void commitTransaction(){
+        transactionSource.commitTransaction();
     }
 }
