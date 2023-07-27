@@ -1,6 +1,7 @@
 package com.fluxtion.example.cookbook.exportservice.node;
 
 import com.fluxtion.example.cookbook.exportservice.data.CategoryUpdate;
+import com.fluxtion.example.cookbook.exportservice.service.DataStore;
 import com.fluxtion.example.cookbook.exportservice.service.SpendingMonitor;
 import com.fluxtion.example.cookbook.exportservice.data.Transaction;
 import com.fluxtion.runtime.annotations.ExportService;
@@ -10,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SpendingMonitorNode extends ExportFunctionNode implements @ExportService SpendingMonitor {
-    @Inject(singleton = true)
-    public TransactionStore transactionStore;
+
+    private DataStore dataStore;
 
     @Override
     public void addBucket(String name) {
@@ -20,7 +21,7 @@ public class SpendingMonitorNode extends ExportFunctionNode implements @ExportSe
 
     @Override
     public void assignToBucket(String userAccountName, String accountToGroup, String category) {
-        transactionStore.commitCategoryUpdate(new CategoryUpdate(category, userAccountName, accountToGroup, false));
+        dataStore.commitCategoryUpdate(new CategoryUpdate(category, userAccountName, accountToGroup, false));
     }
 
     @Override
@@ -31,5 +32,9 @@ public class SpendingMonitorNode extends ExportFunctionNode implements @ExportSe
     @Override
     public void debit(Transaction debit) {
         log.info("debit:{}", debit);
+    }
+
+    public void setDataStore(DataStore dataStore){
+        this.dataStore = dataStore;
     }
 }

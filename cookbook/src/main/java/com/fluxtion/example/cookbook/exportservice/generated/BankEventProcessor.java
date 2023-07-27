@@ -25,7 +25,6 @@ import com.fluxtion.runtime.callback.InternalEventProcessor;
 import com.fluxtion.example.cookbook.exportservice.node.BankAccountNode;
 import com.fluxtion.example.cookbook.exportservice.node.SpendingMonitorNode;
 import com.fluxtion.example.cookbook.exportservice.node.StatementPublisherNode;
-import com.fluxtion.example.cookbook.exportservice.node.TransactionStore;
 import com.fluxtion.example.cookbook.exportservice.service.BankAccount;
 import com.fluxtion.example.cookbook.exportservice.service.ReplaySink;
 import com.fluxtion.example.cookbook.exportservice.service.SpendingMonitor;
@@ -52,7 +51,6 @@ import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
 import com.fluxtion.runtime.node.ForkedTriggerTask;
-import com.fluxtion.runtime.node.InstanceSupplierNode;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.output.SinkDeregister;
@@ -70,9 +68,9 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-07-19T10:17:49.525842
- * eventProcessorGenerator version : 9.0.22
- * api version                     : 9.0.22
+ * generation time                 : 2023-07-27T11:33:06.918977
+ * eventProcessorGenerator version : 9.0.23
+ * api version                     : 9.0.23
  * </pre>
  *
  * Event classes supported:
@@ -102,30 +100,16 @@ public class BankEventProcessor
         InternalEventProcessor,
         BatchHandler,
         Lifecycle,
-        StatementPublisher,
-        BankAccount,
         ReplaySink,
-        SpendingMonitor {
+        SpendingMonitor,
+        StatementPublisher,
+        BankAccount {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SinkPublisher responseSink = new SinkPublisher<>("responseSink");
-  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
-  private final MutableEventProcessorContext context =
-      new MutableEventProcessorContext(
-          nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  private final InstanceSupplierNode contextService_Writer_categoryWriter1 =
-      new InstanceSupplierNode<>(
-          "java.io.Writer_categoryWriter", true, context, "contextService_Writer_categoryWriter1");
-  private final InstanceSupplierNode contextService_Writer_transactionWriter0 =
-      new InstanceSupplierNode<>(
-          "java.io.Writer_transactionWriter",
-          true,
-          context,
-          "contextService_Writer_transactionWriter0");
-  private final TransactionStore transactionStore_2 = new TransactionStore();
-  private final BankAccountNode bankAccountNode_3 = new BankAccountNode();
+  private final BankAccountNode bankAccountNode_2 = new BankAccountNode();
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_5 =
       new ExportFunctionTrigger(
           com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_5
@@ -168,11 +152,15 @@ public class BankEventProcessor
           com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_4
               .class);
   private final StatementPublisherNode statementPublisherNode_0 =
-      new StatementPublisherNode(spendingMonitorNode_1, bankAccountNode_3);
+      new StatementPublisherNode(spendingMonitorNode_1, bankAccountNode_2);
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_0 =
       new ExportFunctionTrigger(
           com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0
               .class);
+  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
+  private final MutableEventProcessorContext context =
+      new MutableEventProcessorContext(
+          nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
@@ -200,38 +188,34 @@ public class BankEventProcessor
 
   public BankEventProcessor(Map<Object, Object> contextMap) {
     context.replaceMappings(contextMap);
-    bankAccountNode_3.setTriggered(false);
-    bankAccountNode_3.transactionStore = transactionStore_2;
-    bankAccountNode_3.sinkPublisher = responseSink;
+    bankAccountNode_2.setTriggered(false);
+    bankAccountNode_2.sinkPublisher = responseSink;
     spendingMonitorNode_1.setTriggered(false);
-    spendingMonitorNode_1.transactionStore = transactionStore_2;
     statementPublisherNode_0.setTriggered(false);
     statementPublisherNode_0.sinkPublisher = responseSink;
-    transactionStore_2.transactionWriterSupplier = contextService_Writer_transactionWriter0;
-    transactionStore_2.categoryWriterSupplier = contextService_Writer_categoryWriter1;
     handlerExportFunctionTriggerEvent_0.setFunctionPointerList(
         Arrays.asList(statementPublisherNode_0, statementPublisherNode_0));
     handlerExportFunctionTriggerEvent_1.setFunctionPointerList(
-        Arrays.asList(spendingMonitorNode_1, spendingMonitorNode_1));
+        Arrays.asList(
+            spendingMonitorNode_1, spendingMonitorNode_1, bankAccountNode_2, bankAccountNode_2));
     handlerExportFunctionTriggerEvent_2.setFunctionPointerList(
         Arrays.asList(spendingMonitorNode_1, spendingMonitorNode_1));
     handlerExportFunctionTriggerEvent_3.setFunctionPointerList(
-        Arrays.asList(
-            spendingMonitorNode_1, spendingMonitorNode_1, bankAccountNode_3, bankAccountNode_3));
+        Arrays.asList(spendingMonitorNode_1, spendingMonitorNode_1));
     handlerExportFunctionTriggerEvent_4.setFunctionPointerList(
         Arrays.asList(spendingMonitorNode_1, spendingMonitorNode_1));
     handlerExportFunctionTriggerEvent_5.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_3, bankAccountNode_3));
+        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
     handlerExportFunctionTriggerEvent_6.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_3, bankAccountNode_3));
+        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
     handlerExportFunctionTriggerEvent_7.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_3, bankAccountNode_3));
+        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
     handlerExportFunctionTriggerEvent_8.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_3, bankAccountNode_3));
+        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
     handlerExportFunctionTriggerEvent_9.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_3, bankAccountNode_3));
+        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
     handlerExportFunctionTriggerEvent_10.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_3, bankAccountNode_3));
+        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
     //node auditors
     initialiseAuditor(nodeNameLookup);
     subscriptionManager.setSubscribingEventProcessor(this);
@@ -339,7 +323,7 @@ public class BankEventProcessor
     processing = true;
     spendingMonitorNode_1.addBucket(arg0);
     spendingMonitorNode_1.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_2) handlerExportFunctionTriggerEvent_2.getEvent());
     processing = false;
   }
 
@@ -350,7 +334,7 @@ public class BankEventProcessor
     processing = true;
     spendingMonitorNode_1.assignToBucket(arg0, arg1, arg2);
     spendingMonitorNode_1.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_1) handlerExportFunctionTriggerEvent_1.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
     processing = false;
   }
 
@@ -359,8 +343,8 @@ public class BankEventProcessor
       triggerCalculation();
     }
     processing = true;
-    bankAccountNode_3.categoryUpdate(arg0);
-    bankAccountNode_3.setTriggered(false);
+    bankAccountNode_2.categoryUpdate(arg0);
+    bankAccountNode_2.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_9) handlerExportFunctionTriggerEvent_9.getEvent());
     processing = false;
   }
@@ -372,9 +356,9 @@ public class BankEventProcessor
     processing = true;
     spendingMonitorNode_1.debit(arg0);
     spendingMonitorNode_1.setTriggered(true);
-    bankAccountNode_3.debit(arg0);
-    bankAccountNode_3.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
+    bankAccountNode_2.debit(arg0);
+    bankAccountNode_2.setTriggered(true);
+    handleEvent((ExportFunctionTriggerEvent_1) handlerExportFunctionTriggerEvent_1.getEvent());
     processing = false;
   }
 
@@ -383,9 +367,9 @@ public class BankEventProcessor
       triggerCalculation();
     }
     processing = true;
-    bankAccountNode_3.deposit(arg0);
-    bankAccountNode_3.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_6) handlerExportFunctionTriggerEvent_6.getEvent());
+    bankAccountNode_2.deposit(arg0);
+    bankAccountNode_2.setTriggered(true);
+    handleEvent((ExportFunctionTriggerEvent_5) handlerExportFunctionTriggerEvent_5.getEvent());
     processing = false;
   }
 
@@ -405,8 +389,8 @@ public class BankEventProcessor
       triggerCalculation();
     }
     processing = true;
-    bankAccountNode_3.replayComplete();
-    bankAccountNode_3.setTriggered(false);
+    bankAccountNode_2.replayComplete();
+    bankAccountNode_2.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_8) handlerExportFunctionTriggerEvent_8.getEvent());
     processing = false;
   }
@@ -416,8 +400,8 @@ public class BankEventProcessor
       triggerCalculation();
     }
     processing = true;
-    bankAccountNode_3.replayStarted();
-    bankAccountNode_3.setTriggered(false);
+    bankAccountNode_2.replayStarted();
+    bankAccountNode_2.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_7) handlerExportFunctionTriggerEvent_7.getEvent());
     processing = false;
   }
@@ -429,7 +413,7 @@ public class BankEventProcessor
     processing = true;
     spendingMonitorNode_1.resetBucket(arg0);
     spendingMonitorNode_1.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_2) handlerExportFunctionTriggerEvent_2.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
     processing = false;
   }
 
@@ -438,9 +422,9 @@ public class BankEventProcessor
       triggerCalculation();
     }
     processing = true;
-    bankAccountNode_3.setSpendingLimit(arg0);
-    bankAccountNode_3.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_5) handlerExportFunctionTriggerEvent_5.getEvent());
+    bankAccountNode_2.setSpendingLimit(arg0);
+    bankAccountNode_2.setTriggered(true);
+    handleEvent((ExportFunctionTriggerEvent_6) handlerExportFunctionTriggerEvent_6.getEvent());
     processing = false;
   }
 
@@ -449,8 +433,8 @@ public class BankEventProcessor
       triggerCalculation();
     }
     processing = true;
-    bankAccountNode_3.transactionUpdate(arg0);
-    bankAccountNode_3.setTriggered(false);
+    bankAccountNode_2.transactionUpdate(arg0);
+    bankAccountNode_2.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_10) handlerExportFunctionTriggerEvent_10.getEvent());
     processing = false;
   }
@@ -472,6 +456,9 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_1 =
         handlerExportFunctionTriggerEvent_1.onEvent(typedEvent);
+    if (guardCheck_bankAccountNode_2()) {
+      bankAccountNode_2.triggered();
+    }
     if (guardCheck_spendingMonitorNode_1()) {
       spendingMonitorNode_1.triggered();
     }
@@ -496,9 +483,6 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_3 =
         handlerExportFunctionTriggerEvent_3.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_3()) {
-      bankAccountNode_3.triggered();
-    }
     if (guardCheck_spendingMonitorNode_1()) {
       spendingMonitorNode_1.triggered();
     }
@@ -523,8 +507,8 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_5 =
         handlerExportFunctionTriggerEvent_5.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_3()) {
-      bankAccountNode_3.triggered();
+    if (guardCheck_bankAccountNode_2()) {
+      bankAccountNode_2.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -535,8 +519,8 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_6 =
         handlerExportFunctionTriggerEvent_6.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_3()) {
-      bankAccountNode_3.triggered();
+    if (guardCheck_bankAccountNode_2()) {
+      bankAccountNode_2.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -547,8 +531,8 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_7 =
         handlerExportFunctionTriggerEvent_7.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_3()) {
-      bankAccountNode_3.triggered();
+    if (guardCheck_bankAccountNode_2()) {
+      bankAccountNode_2.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -559,8 +543,8 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_8 =
         handlerExportFunctionTriggerEvent_8.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_3()) {
-      bankAccountNode_3.triggered();
+    if (guardCheck_bankAccountNode_2()) {
+      bankAccountNode_2.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -571,8 +555,8 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_9 =
         handlerExportFunctionTriggerEvent_9.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_3()) {
-      bankAccountNode_3.triggered();
+    if (guardCheck_bankAccountNode_2()) {
+      bankAccountNode_2.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -583,8 +567,8 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_10 =
         handlerExportFunctionTriggerEvent_10.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_3()) {
-      bankAccountNode_3.triggered();
+    if (guardCheck_bankAccountNode_2()) {
+      bankAccountNode_2.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -736,8 +720,8 @@ public class BankEventProcessor
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
-    if (guardCheck_bankAccountNode_3()) {
-      bankAccountNode_3.triggered();
+    if (guardCheck_bankAccountNode_2()) {
+      bankAccountNode_2.triggered();
     }
     if (guardCheck_spendingMonitorNode_1()) {
       spendingMonitorNode_1.triggered();
@@ -758,10 +742,9 @@ public class BankEventProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(bankAccountNode_3, "bankAccountNode_3");
+    auditor.nodeRegistered(bankAccountNode_2, "bankAccountNode_2");
     auditor.nodeRegistered(spendingMonitorNode_1, "spendingMonitorNode_1");
     auditor.nodeRegistered(statementPublisherNode_0, "statementPublisherNode_0");
-    auditor.nodeRegistered(transactionStore_2, "transactionStore_2");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(
         handlerExportFunctionTriggerEvent_0, "handlerExportFunctionTriggerEvent_0");
@@ -786,10 +769,6 @@ public class BankEventProcessor
     auditor.nodeRegistered(
         handlerExportFunctionTriggerEvent_10, "handlerExportFunctionTriggerEvent_10");
     auditor.nodeRegistered(subscriptionManager, "subscriptionManager");
-    auditor.nodeRegistered(
-        contextService_Writer_categoryWriter1, "contextService_Writer_categoryWriter1");
-    auditor.nodeRegistered(
-        contextService_Writer_transactionWriter0, "contextService_Writer_transactionWriter0");
     auditor.nodeRegistered(context, "context");
     auditor.nodeRegistered(responseSink, "responseSink");
   }
@@ -797,7 +776,7 @@ public class BankEventProcessor
   private void afterEvent() {
     statementPublisherNode_0.afterEvent();
     spendingMonitorNode_1.afterEvent();
-    bankAccountNode_3.afterEvent();
+    bankAccountNode_2.afterEvent();
 
     nodeNameLookup.processingComplete();
     isDirty_handlerExportFunctionTriggerEvent_0 = false;
@@ -820,10 +799,7 @@ public class BankEventProcessor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     //initialise dirty lookup map
     isDirty("test");
-    contextService_Writer_categoryWriter1.init();
-    contextService_Writer_transactionWriter0.init();
-    transactionStore_2.init();
-    bankAccountNode_3.init();
+    bankAccountNode_2.init();
     spendingMonitorNode_1.init();
     statementPublisherNode_0.init();
     afterEvent();
@@ -836,7 +812,7 @@ public class BankEventProcessor
     }
     processing = true;
     auditEvent(Lifecycle.LifecycleEvent.Start);
-    bankAccountNode_3.start();
+    bankAccountNode_2.start();
     spendingMonitorNode_1.start();
     statementPublisherNode_0.start();
     afterEvent();
@@ -862,9 +838,6 @@ public class BankEventProcessor
     initCalled = false;
     auditEvent(Lifecycle.LifecycleEvent.TearDown);
     nodeNameLookup.tearDown();
-    transactionStore_2.tearDown();
-    contextService_Writer_transactionWriter0.tearDown();
-    contextService_Writer_categoryWriter1.tearDown();
     subscriptionManager.tearDown();
     afterEvent();
   }
@@ -964,8 +937,8 @@ public class BankEventProcessor
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
-  private boolean guardCheck_bankAccountNode_3() {
-    return isDirty_handlerExportFunctionTriggerEvent_3
+  private boolean guardCheck_bankAccountNode_2() {
+    return isDirty_handlerExportFunctionTriggerEvent_1
         | isDirty_handlerExportFunctionTriggerEvent_5
         | isDirty_handlerExportFunctionTriggerEvent_6
         | isDirty_handlerExportFunctionTriggerEvent_7
