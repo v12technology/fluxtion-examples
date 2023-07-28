@@ -28,7 +28,7 @@ public class SalesTracker extends ExportFunctionNode {
     }
 
     @Initialise
-    public void init() {
+    public void initialise() {
         incomeUsd = 0;
         incomeGbp = Double.NaN;
         rate = Double.NaN;

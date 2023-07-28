@@ -11,6 +11,7 @@ import lombok.ToString;
 public class AccountNode extends ExportFunctionNode implements @ExportService Account, TransactionProcessor {
 
     private Transaction currentTransaction;
+    private TransactionResponsePublisher transactionResponsePublisher;
 
     @Override
     public void debit(int accountNumber, double debitAmount) {
@@ -34,5 +35,13 @@ public class AccountNode extends ExportFunctionNode implements @ExportService Ac
     public void commitTransaction(){
         //add to the account
         currentTransaction = null;
+    }
+
+    public TransactionResponsePublisher getTransactionResponsePublisher() {
+        return transactionResponsePublisher;
+    }
+
+    public void setTransactionResponsePublisher(TransactionResponsePublisher transactionResponsePublisher) {
+        this.transactionResponsePublisher = transactionResponsePublisher;
     }
 }

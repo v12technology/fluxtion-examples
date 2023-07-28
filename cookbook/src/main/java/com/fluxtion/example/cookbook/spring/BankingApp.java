@@ -33,9 +33,9 @@ public class BankingApp {
 
     public void start() {
         eventProcessor.init();
-        bankAccount = eventProcessor.asInterface();
-        creditCheck = eventProcessor.asInterface();
-        bankingOperations = eventProcessor.asInterface();
+        bankAccount = eventProcessor.getExportedService();
+        creditCheck = eventProcessor.getExportedService();
+        bankingOperations = eventProcessor.getExportedService();
     }
 
     public Account getBankAccount() {

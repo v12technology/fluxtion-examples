@@ -1,11 +1,9 @@
 package com.fluxtion.example.cookbook.spring.node;
 
-import com.fluxtion.example.cookbook.exportservice.service.DataStore;
 import com.fluxtion.example.cookbook.spring.data.Transaction;
 import com.fluxtion.example.cookbook.spring.service.BankingOperations;
 import com.fluxtion.example.cookbook.spring.service.TransactionProcessor;
 import com.fluxtion.runtime.annotations.ExportService;
-import com.fluxtion.runtime.annotations.OnTrigger;
 import com.fluxtion.runtime.callback.ExportFunctionNode;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -15,19 +13,19 @@ import lombok.extern.slf4j.Slf4j;
 public class BankTransactionStore extends ExportFunctionNode implements @ExportService BankingOperations {
     private TransactionProcessor transactionSource;
     private boolean openForBusiness = false;
+    private TransactionResponsePublisher transactionResponsePublisher;
 
     @Override
-    public boolean triggered() {
+    public boolean propagateParentNotification() {
         Transaction transaction = transactionSource.currentTransactionRequest();
-        if(transaction == null){
-            return false;
-        }
         if(openForBusiness){
-            log.info("accepting transaction:{}", transaction);
+            log.info("OPEN accept:{}", transaction);
             transactionSource.commitTransaction();
+            transactionResponsePublisher.acceptTransaction(transaction);
         }else{
-            log.warn("rejecting transaction:{}", transaction);
+            log.warn("CLOSED reject:{}", transaction);
             transactionSource.clearTransaction();
+            transactionResponsePublisher.rejectTransaction(transaction);
         }
         return openForBusiness;
     }

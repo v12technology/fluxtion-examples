@@ -18,6 +18,7 @@ public class CreditCheckNode extends ExportFunctionNode implements @ExportServic
 
     private transient Set<Integer> blackListedAccounts = new HashSet<>();
     private TransactionProcessor transactionSource;
+    private TransactionResponsePublisher transactionResponsePublisher;
 
     @Override
     @NoPropagateFunction
@@ -33,15 +34,13 @@ public class CreditCheckNode extends ExportFunctionNode implements @ExportServic
         blackListedAccounts.remove(accountNumber);
     }
 
-    public boolean triggered(){
+    public boolean propagateParentNotification(){
         Transaction transaction = transactionSource.currentTransactionRequest();
-        if(transaction == null){
-            return false;
-        }
         int accountNumber = transaction.accountNumber();
         if(blackListedAccounts.contains(accountNumber)){
             log.warn("FAILED CREDIT CHECK - {}", transaction);
             transactionSource.clearTransaction();
+            transactionResponsePublisher.rejectTransaction(transaction);
             return false;
         }
         log.info("passed credit check:{}", transaction);

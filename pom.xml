@@ -37,7 +37,7 @@ along with this program.  If not, see
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 <!--        <fluxtion.version>9.0.11</fluxtion.version>-->
-        <fluxtion.version>9.0.23</fluxtion.version>
+        <fluxtion.version>9.0.24</fluxtion.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

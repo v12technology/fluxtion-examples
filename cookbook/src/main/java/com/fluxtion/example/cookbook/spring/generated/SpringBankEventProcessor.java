@@ -15,19 +15,20 @@
 *
 <http://www.mongodb.com/licensing/server-side-public-license>.
 */
-package com.fluxtion.example.cookbook.exportfunction.generated;
+package com.fluxtion.example.cookbook.spring.generated;
 
 import com.fluxtion.runtime.StaticEventProcessor;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
-import com.fluxtion.example.cookbook.exportfunction.CashMonitor;
-import com.fluxtion.example.cookbook.exportfunction.events.FxRate;
-import com.fluxtion.example.cookbook.exportfunction.nodes.BankAlert;
-import com.fluxtion.example.cookbook.exportfunction.nodes.SalesTracker;
-import com.fluxtion.example.cookbook.exportfunction.nodes.StockTracker;
-import com.fluxtion.example.cookbook.exportfunction.nodes.TradingPosition;
+import com.fluxtion.example.cookbook.spring.node.AccountNode;
+import com.fluxtion.example.cookbook.spring.node.BankTransactionStore;
+import com.fluxtion.example.cookbook.spring.node.CreditCheckNode;
+import com.fluxtion.example.cookbook.spring.node.TransactionResponsePublisher;
+import com.fluxtion.example.cookbook.spring.service.Account;
+import com.fluxtion.example.cookbook.spring.service.BankingOperations;
+import com.fluxtion.example.cookbook.spring.service.CreditCheck;
 import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
@@ -59,7 +60,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-07-28T15:59:21.893224
+ * generation time                 : 2023-07-28T16:11:18.765128
  * eventProcessorGenerator version : 9.0.24
  * api version                     : 9.0.24
  * </pre>
@@ -67,7 +68,6 @@ import java.util.function.Consumer;
  * Event classes supported:
  *
  * <ul>
- *   <li>com.fluxtion.example.cookbook.exportfunction.events.FxRate
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_1
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_2
@@ -79,42 +79,27 @@ import java.util.function.Consumer;
  * @author Greg Higgins
  */
 @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
-public class RealtimeCashMonitor
-    implements EventProcessor<RealtimeCashMonitor>,
+public class SpringBankEventProcessor
+    implements EventProcessor<SpringBankEventProcessor>,
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
         Lifecycle,
-        CashMonitor {
+        CreditCheck,
+        Account,
+        BankingOperations {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final SalesTracker salesTracker_3 = new SalesTracker();
-  private final StockTracker stockTracker_2 = new StockTracker();
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_2 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_2
-              .class);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_3 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_3
-              .class);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_4 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_4
-              .class);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_5 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_5
-              .class);
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  private final TradingPosition tradingPosition_1 =
-      new TradingPosition(stockTracker_2, salesTracker_3);
-  private final BankAlert bankAlert_0 = new BankAlert(tradingPosition_1);
+  public final TransactionResponsePublisher transactionResponsePublisher =
+      new TransactionResponsePublisher();
+  public final AccountNode accountBean = new AccountNode();
+  public final CreditCheckNode creditCheck = new CreditCheckNode();
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_0 =
       new ExportFunctionTrigger(
           com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0
@@ -123,52 +108,74 @@ public class RealtimeCashMonitor
       new ExportFunctionTrigger(
           com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_1
               .class);
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_2 =
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_2
+              .class);
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_3 =
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_3
+              .class);
+  public final BankTransactionStore transactionStore = new BankTransactionStore();
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_4 =
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_4
+              .class);
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_5 =
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_5
+              .class);
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(9);
+      new IdentityHashMap<>(8);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(9);
+      new IdentityHashMap<>(8);
 
+  private boolean isDirty_accountBean = false;
+  private boolean isDirty_creditCheck = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_0 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_1 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_2 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_3 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_4 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_5 = false;
-  private boolean isDirty_salesTracker_3 = false;
-  private boolean isDirty_stockTracker_2 = false;
-  private boolean isDirty_tradingPosition_1 = false;
   //Forked declarations
 
   //Filter constants
 
-  public RealtimeCashMonitor(Map<Object, Object> contextMap) {
+  public SpringBankEventProcessor(Map<Object, Object> contextMap) {
     context.replaceMappings(contextMap);
-    salesTracker_3.setTriggered(false);
-    stockTracker_2.setTriggered(false);
-    tradingPosition_1.setTriggered(false);
+    accountBean.setTransactionResponsePublisher(transactionResponsePublisher);
+    accountBean.setTriggered(false);
+    transactionStore.setOpenForBusiness(false);
+    transactionStore.setTransactionResponsePublisher(transactionResponsePublisher);
+    transactionStore.setTransactionSource(creditCheck);
+    transactionStore.setTriggered(false);
+    creditCheck.setTransactionResponsePublisher(transactionResponsePublisher);
+    creditCheck.setTransactionSource(accountBean);
+    creditCheck.setTriggered(false);
     handlerExportFunctionTriggerEvent_0.setFunctionPointerList(
-        Arrays.asList(tradingPosition_1, tradingPosition_1));
+        Arrays.asList(accountBean, accountBean));
     handlerExportFunctionTriggerEvent_1.setFunctionPointerList(
-        Arrays.asList(tradingPosition_1, tradingPosition_1));
+        Arrays.asList(accountBean, accountBean));
     handlerExportFunctionTriggerEvent_2.setFunctionPointerList(
-        Arrays.asList(stockTracker_2, stockTracker_2));
+        Arrays.asList(creditCheck, creditCheck));
     handlerExportFunctionTriggerEvent_3.setFunctionPointerList(
-        Arrays.asList(stockTracker_2, stockTracker_2, salesTracker_3, salesTracker_3));
+        Arrays.asList(creditCheck, creditCheck));
     handlerExportFunctionTriggerEvent_4.setFunctionPointerList(
-        Arrays.asList(stockTracker_2, stockTracker_2));
+        Arrays.asList(transactionStore, transactionStore));
     handlerExportFunctionTriggerEvent_5.setFunctionPointerList(
-        Arrays.asList(stockTracker_2, stockTracker_2));
+        Arrays.asList(transactionStore, transactionStore));
     //node auditors
     initialiseAuditor(nodeNameLookup);
     subscriptionManager.setSubscribingEventProcessor(this);
     context.setEventProcessorCallback(this);
   }
 
-  public RealtimeCashMonitor() {
+  public SpringBankEventProcessor() {
     this(null);
   }
 
@@ -198,10 +205,7 @@ public class RealtimeCashMonitor
   }
 
   public void onEventInternal(Object event) {
-    if (event instanceof com.fluxtion.example.cookbook.exportfunction.events.FxRate) {
-      FxRate typedEvent = (FxRate) event;
-      handleEvent(typedEvent);
-    } else if (event
+    if (event
         instanceof
         com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0) {
       ExportFunctionTriggerEvent_0 typedEvent = (ExportFunctionTriggerEvent_0) event;
@@ -234,99 +238,70 @@ public class RealtimeCashMonitor
     }
   }
 
-  public void addCash(String arg0, java.util.Date arg1, double arg2) {
+  public void blackListAccount(int arg0) {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    tradingPosition_1.setTriggered(tradingPosition_1.addCash(arg0, arg1, arg2));
-    handleEvent((ExportFunctionTriggerEvent_0) handlerExportFunctionTriggerEvent_0.getEvent());
-    processing = false;
-  }
-
-  public void electronicStockUpdate(
-      com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
-              com.fluxtion.example.cookbook.exportfunction.data.Electronic>
-          arg0) {
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
-    stockTracker_2.setTriggered(stockTracker_2.addStockElectronic(arg0));
-    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
-    processing = false;
-  }
-
-  public void foodStockUpdate(
-      com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
-              com.fluxtion.example.cookbook.exportfunction.data.Food>
-          arg0) {
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
-    stockTracker_2.setTriggered(stockTracker_2.addStock(arg0));
+    creditCheck.blackListAccount(arg0);
+    creditCheck.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_2) handlerExportFunctionTriggerEvent_2.getEvent());
     processing = false;
   }
 
-  public void furnitureStockUpdate(
-      com.fluxtion.example.cookbook.exportfunction.data.StockDelivery<
-              com.fluxtion.example.cookbook.exportfunction.data.Furniture>
-          arg0) {
+  public void closedForBusiness() {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    stockTracker_2.setTriggered(stockTracker_2.addStockFurniture(arg0));
+    transactionStore.closedForBusiness();
+    transactionStore.setTriggered(true);
     handleEvent((ExportFunctionTriggerEvent_5) handlerExportFunctionTriggerEvent_5.getEvent());
     processing = false;
   }
 
-  public void payBill(String arg0, java.util.Date arg1, double arg2) {
+  public void credit(int arg0, double arg1) {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    tradingPosition_1.setTriggered(tradingPosition_1.payBill(arg0, arg1, arg2));
+    accountBean.credit(arg0, arg1);
+    accountBean.setTriggered(true);
     handleEvent((ExportFunctionTriggerEvent_1) handlerExportFunctionTriggerEvent_1.getEvent());
     processing = false;
   }
 
-  public void saleUpdate(String arg0, int arg1, double arg2) {
+  public void debit(int arg0, double arg1) {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    stockTracker_2.setTriggered(stockTracker_2.updateStockLevels(arg0, arg1, arg2));
-    salesTracker_3.setTriggered(salesTracker_3.updateSalesIncome(arg0, arg1, arg2));
-    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
+    accountBean.debit(arg0, arg1);
+    accountBean.setTriggered(true);
+    handleEvent((ExportFunctionTriggerEvent_0) handlerExportFunctionTriggerEvent_0.getEvent());
     processing = false;
   }
 
-  public void handleEvent(FxRate typedEvent) {
-    auditEvent(typedEvent);
-    switch (typedEvent.filterString()) {
-        //Event Class:[com.fluxtion.example.cookbook.exportfunction.events.FxRate] filterString:[GBPUSD]
-      case ("GBPUSD"):
-        isDirty_salesTracker_3 = salesTracker_3.fxChange(typedEvent);
-        if (isDirty_salesTracker_3) {
-          tradingPosition_1.salesChange(salesTracker_3);
-        }
-        isDirty_stockTracker_2 = stockTracker_2.fxChange(typedEvent);
-        if (isDirty_stockTracker_2) {
-          tradingPosition_1.stockChange(stockTracker_2);
-        }
-        if (guardCheck_tradingPosition_1()) {
-          isDirty_tradingPosition_1 = tradingPosition_1.triggered();
-        }
-        if (guardCheck_bankAlert_0()) {
-          bankAlert_0.checkTradePosition();
-        }
-        afterEvent();
-        return;
+  public void openForBusiness() {
+    if (buffering) {
+      triggerCalculation();
     }
-    afterEvent();
+    processing = true;
+    transactionStore.openForBusiness();
+    transactionStore.setTriggered(true);
+    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
+    processing = false;
+  }
+
+  public void whiteListAccount(int arg0) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
+    creditCheck.whiteListAccount(arg0);
+    creditCheck.setTriggered(false);
+    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
+    processing = false;
   }
 
   public void handleEvent(ExportFunctionTriggerEvent_0 typedEvent) {
@@ -334,11 +309,14 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_0 =
         handlerExportFunctionTriggerEvent_0.onEvent(typedEvent);
-    if (guardCheck_tradingPosition_1()) {
-      isDirty_tradingPosition_1 = tradingPosition_1.triggered();
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
     }
-    if (guardCheck_bankAlert_0()) {
-      bankAlert_0.checkTradePosition();
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -349,11 +327,14 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_1 =
         handlerExportFunctionTriggerEvent_1.onEvent(typedEvent);
-    if (guardCheck_tradingPosition_1()) {
-      isDirty_tradingPosition_1 = tradingPosition_1.triggered();
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
     }
-    if (guardCheck_bankAlert_0()) {
-      bankAlert_0.checkTradePosition();
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -364,17 +345,11 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_2 =
         handlerExportFunctionTriggerEvent_2.onEvent(typedEvent);
-    if (guardCheck_stockTracker_2()) {
-      isDirty_stockTracker_2 = stockTracker_2.triggered();
-      if (isDirty_stockTracker_2) {
-        tradingPosition_1.stockChange(stockTracker_2);
-      }
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
     }
-    if (guardCheck_tradingPosition_1()) {
-      isDirty_tradingPosition_1 = tradingPosition_1.triggered();
-    }
-    if (guardCheck_bankAlert_0()) {
-      bankAlert_0.checkTradePosition();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -385,23 +360,11 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_3 =
         handlerExportFunctionTriggerEvent_3.onEvent(typedEvent);
-    if (guardCheck_salesTracker_3()) {
-      isDirty_salesTracker_3 = salesTracker_3.triggered();
-      if (isDirty_salesTracker_3) {
-        tradingPosition_1.salesChange(salesTracker_3);
-      }
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
     }
-    if (guardCheck_stockTracker_2()) {
-      isDirty_stockTracker_2 = stockTracker_2.triggered();
-      if (isDirty_stockTracker_2) {
-        tradingPosition_1.stockChange(stockTracker_2);
-      }
-    }
-    if (guardCheck_tradingPosition_1()) {
-      isDirty_tradingPosition_1 = tradingPosition_1.triggered();
-    }
-    if (guardCheck_bankAlert_0()) {
-      bankAlert_0.checkTradePosition();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -412,17 +375,8 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_4 =
         handlerExportFunctionTriggerEvent_4.onEvent(typedEvent);
-    if (guardCheck_stockTracker_2()) {
-      isDirty_stockTracker_2 = stockTracker_2.triggered();
-      if (isDirty_stockTracker_2) {
-        tradingPosition_1.stockChange(stockTracker_2);
-      }
-    }
-    if (guardCheck_tradingPosition_1()) {
-      isDirty_tradingPosition_1 = tradingPosition_1.triggered();
-    }
-    if (guardCheck_bankAlert_0()) {
-      bankAlert_0.checkTradePosition();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -433,17 +387,8 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_5 =
         handlerExportFunctionTriggerEvent_5.onEvent(typedEvent);
-    if (guardCheck_stockTracker_2()) {
-      isDirty_stockTracker_2 = stockTracker_2.triggered();
-      if (isDirty_stockTracker_2) {
-        tradingPosition_1.stockChange(stockTracker_2);
-      }
-    }
-    if (guardCheck_tradingPosition_1()) {
-      isDirty_tradingPosition_1 = tradingPosition_1.triggered();
-    }
-    if (guardCheck_bankAlert_0()) {
-      bankAlert_0.checkTradePosition();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -451,25 +396,7 @@ public class RealtimeCashMonitor
 
   public void bufferEvent(Object event) {
     buffering = true;
-    if (event instanceof com.fluxtion.example.cookbook.exportfunction.events.FxRate) {
-      FxRate typedEvent = (FxRate) event;
-      auditEvent(typedEvent);
-      switch (typedEvent.filterString()) {
-          //Event Class:[com.fluxtion.example.cookbook.exportfunction.events.FxRate] filterString:[GBPUSD]
-        case ("GBPUSD"):
-          isDirty_salesTracker_3 = salesTracker_3.fxChange(typedEvent);
-          if (isDirty_salesTracker_3) {
-            tradingPosition_1.salesChange(salesTracker_3);
-          }
-          isDirty_stockTracker_2 = stockTracker_2.fxChange(typedEvent);
-          if (isDirty_stockTracker_2) {
-            tradingPosition_1.stockChange(stockTracker_2);
-          }
-          //event stack unwind callbacks
-          afterEvent();
-          return;
-      }
-    } else if (event
+    if (event
         instanceof
         com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0) {
       ExportFunctionTriggerEvent_0 typedEvent = (ExportFunctionTriggerEvent_0) event;
@@ -523,23 +450,14 @@ public class RealtimeCashMonitor
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
-    if (guardCheck_salesTracker_3()) {
-      isDirty_salesTracker_3 = salesTracker_3.triggered();
-      if (isDirty_salesTracker_3) {
-        tradingPosition_1.salesChange(salesTracker_3);
-      }
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
     }
-    if (guardCheck_stockTracker_2()) {
-      isDirty_stockTracker_2 = stockTracker_2.triggered();
-      if (isDirty_stockTracker_2) {
-        tradingPosition_1.stockChange(stockTracker_2);
-      }
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
     }
-    if (guardCheck_tradingPosition_1()) {
-      isDirty_tradingPosition_1 = tradingPosition_1.triggered();
-    }
-    if (guardCheck_bankAlert_0()) {
-      bankAlert_0.checkTradePosition();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     afterEvent();
   }
@@ -554,10 +472,10 @@ public class RealtimeCashMonitor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(bankAlert_0, "bankAlert_0");
-    auditor.nodeRegistered(salesTracker_3, "salesTracker_3");
-    auditor.nodeRegistered(stockTracker_2, "stockTracker_2");
-    auditor.nodeRegistered(tradingPosition_1, "tradingPosition_1");
+    auditor.nodeRegistered(accountBean, "accountBean");
+    auditor.nodeRegistered(transactionStore, "transactionStore");
+    auditor.nodeRegistered(creditCheck, "creditCheck");
+    auditor.nodeRegistered(transactionResponsePublisher, "transactionResponsePublisher");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(
         handlerExportFunctionTriggerEvent_0, "handlerExportFunctionTriggerEvent_0");
@@ -578,15 +496,14 @@ public class RealtimeCashMonitor
   private void afterEvent() {
 
     nodeNameLookup.processingComplete();
+    isDirty_accountBean = false;
+    isDirty_creditCheck = false;
     isDirty_handlerExportFunctionTriggerEvent_0 = false;
     isDirty_handlerExportFunctionTriggerEvent_1 = false;
     isDirty_handlerExportFunctionTriggerEvent_2 = false;
     isDirty_handlerExportFunctionTriggerEvent_3 = false;
     isDirty_handlerExportFunctionTriggerEvent_4 = false;
     isDirty_handlerExportFunctionTriggerEvent_5 = false;
-    isDirty_salesTracker_3 = false;
-    isDirty_stockTracker_2 = false;
-    isDirty_tradingPosition_1 = false;
   }
 
   @Override
@@ -595,11 +512,9 @@ public class RealtimeCashMonitor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     //initialise dirty lookup map
     isDirty("test");
-    salesTracker_3.initialise();
-    salesTracker_3.init();
-    stockTracker_2.initialise();
-    stockTracker_2.init();
-    tradingPosition_1.init();
+    accountBean.init();
+    creditCheck.init();
+    transactionStore.init();
     afterEvent();
   }
 
@@ -610,9 +525,9 @@ public class RealtimeCashMonitor
     }
     processing = true;
     auditEvent(Lifecycle.LifecycleEvent.Start);
-    salesTracker_3.start();
-    stockTracker_2.start();
-    tradingPosition_1.start();
+    accountBean.start();
+    creditCheck.start();
+    transactionStore.start();
     afterEvent();
     callbackDispatcher.dispatchQueuedCallbacks();
     processing = false;
@@ -667,6 +582,8 @@ public class RealtimeCashMonitor
 
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(accountBean, () -> isDirty_accountBean);
+      dirtyFlagSupplierMap.put(creditCheck, () -> isDirty_creditCheck);
       dirtyFlagSupplierMap.put(
           handlerExportFunctionTriggerEvent_0, () -> isDirty_handlerExportFunctionTriggerEvent_0);
       dirtyFlagSupplierMap.put(
@@ -679,9 +596,6 @@ public class RealtimeCashMonitor
           handlerExportFunctionTriggerEvent_4, () -> isDirty_handlerExportFunctionTriggerEvent_4);
       dirtyFlagSupplierMap.put(
           handlerExportFunctionTriggerEvent_5, () -> isDirty_handlerExportFunctionTriggerEvent_5);
-      dirtyFlagSupplierMap.put(salesTracker_3, () -> isDirty_salesTracker_3);
-      dirtyFlagSupplierMap.put(stockTracker_2, () -> isDirty_stockTracker_2);
-      dirtyFlagSupplierMap.put(tradingPosition_1, () -> isDirty_tradingPosition_1);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
@@ -689,6 +603,8 @@ public class RealtimeCashMonitor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(accountBean, (b) -> isDirty_accountBean = b);
+      dirtyFlagUpdateMap.put(creditCheck, (b) -> isDirty_creditCheck = b);
       dirtyFlagUpdateMap.put(
           handlerExportFunctionTriggerEvent_0,
           (b) -> isDirty_handlerExportFunctionTriggerEvent_0 = b);
@@ -707,33 +623,25 @@ public class RealtimeCashMonitor
       dirtyFlagUpdateMap.put(
           handlerExportFunctionTriggerEvent_5,
           (b) -> isDirty_handlerExportFunctionTriggerEvent_5 = b);
-      dirtyFlagUpdateMap.put(salesTracker_3, (b) -> isDirty_salesTracker_3 = b);
-      dirtyFlagUpdateMap.put(stockTracker_2, (b) -> isDirty_stockTracker_2 = b);
-      dirtyFlagUpdateMap.put(tradingPosition_1, (b) -> isDirty_tradingPosition_1 = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
-  private boolean guardCheck_bankAlert_0() {
-    return isDirty_tradingPosition_1;
+  private boolean guardCheck_accountBean() {
+    return isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1;
   }
 
-  private boolean guardCheck_salesTracker_3() {
-    return isDirty_handlerExportFunctionTriggerEvent_3;
-  }
-
-  private boolean guardCheck_stockTracker_2() {
-    return isDirty_handlerExportFunctionTriggerEvent_2
-        | isDirty_handlerExportFunctionTriggerEvent_3
+  private boolean guardCheck_transactionStore() {
+    return isDirty_creditCheck
         | isDirty_handlerExportFunctionTriggerEvent_4
         | isDirty_handlerExportFunctionTriggerEvent_5;
   }
 
-  private boolean guardCheck_tradingPosition_1() {
-    return isDirty_handlerExportFunctionTriggerEvent_0
-        | isDirty_handlerExportFunctionTriggerEvent_1
-        | isDirty_salesTracker_3
-        | isDirty_stockTracker_2;
+  private boolean guardCheck_creditCheck() {
+    return isDirty_accountBean
+        | isDirty_handlerExportFunctionTriggerEvent_2
+        | isDirty_handlerExportFunctionTriggerEvent_3;
   }
 
   @Override
@@ -758,13 +666,13 @@ public class RealtimeCashMonitor
   }
 
   @Override
-  public RealtimeCashMonitor newInstance() {
-    return new RealtimeCashMonitor();
+  public SpringBankEventProcessor newInstance() {
+    return new SpringBankEventProcessor();
   }
 
   @Override
-  public RealtimeCashMonitor newInstance(Map<Object, Object> contextMap) {
-    return new RealtimeCashMonitor();
+  public SpringBankEventProcessor newInstance(Map<Object, Object> contextMap) {
+    return new SpringBankEventProcessor();
   }
 
   @Override

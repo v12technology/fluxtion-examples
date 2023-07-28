@@ -13,7 +13,7 @@ import java.util.Date;
 
 public class Main {
 
-    private static final GenerationStrategy generationStrategy = GenerationStrategy.USE_AOT;
+    private static final GenerationStrategy generationStrategy = GenerationStrategy.GENERATE_AOT;
 
     public static void main(String[] args) {
         final CashMonitor realtimeCashMonitor = generateRealtimeProcessor();
@@ -41,11 +41,11 @@ public class Main {
     private static CashMonitor generateRealtimeProcessor() {
         return switch (generationStrategy) {
             case USE_AOT -> new RealtimeCashMonitor();
-            case INTERPRET -> Fluxtion.interpret(Main::buildGraph).asInterface();
-            case COMPILE -> Fluxtion.compile(Main::buildGraph).asInterface();
+            case INTERPRET -> Fluxtion.interpret(Main::buildGraph).getExportedService();
+            case COMPILE -> Fluxtion.compile(Main::buildGraph).getExportedService();
             case GENERATE_AOT -> Fluxtion.compileAot(Main::buildGraph,
                     "com.fluxtion.example.cookbook.exportfunction.generated",
-                    "RealtimeCashMonitor").asInterface();
+                    "RealtimeCashMonitor").getExportedService();
         };
     }
 
