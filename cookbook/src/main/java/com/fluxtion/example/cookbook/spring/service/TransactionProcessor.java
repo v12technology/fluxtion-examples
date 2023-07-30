@@ -6,7 +6,7 @@ import com.fluxtion.example.cookbook.spring.data.Transaction;
 public interface TransactionProcessor {
     Transaction currentTransactionRequest();
 
-    void clearTransaction();
+    void rollbackTransaction();
 
     void commitTransaction();
 }

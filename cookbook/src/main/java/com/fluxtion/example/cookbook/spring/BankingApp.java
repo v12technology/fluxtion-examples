@@ -10,12 +10,15 @@ import com.fluxtion.runtime.EventProcessor;
 import lombok.SneakyThrows;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.function.Consumer;
+
 public class BankingApp {
 
     private final EventProcessor<?> eventProcessor;
-    private Account bankAccount;
-    private CreditCheck creditCheck;
-    private BankingOperations bankingOperations;
+    private final Account bankAccount;
+    private final CreditCheck creditCheck;
+    private final BankingOperations bankingOperations;
+    private final Consumer eventConsumer;
 
     @SneakyThrows
     public BankingApp(GenerationStrategy generationStrategy) {
@@ -29,13 +32,15 @@ public class BankingApp {
                 c.setClassName("SpringBankEventProcessor");
             });
         };
-    }
-
-    public void start() {
         eventProcessor.init();
         bankAccount = eventProcessor.getExportedService();
         creditCheck = eventProcessor.getExportedService();
         bankingOperations = eventProcessor.getExportedService();
+        eventConsumer = eventProcessor::onEvent;
+    }
+
+    public void start() {
+        eventProcessor.start();
     }
 
     public Account getBankAccount() {
@@ -48,5 +53,9 @@ public class BankingApp {
 
     public BankingOperations getBankingOperations() {
         return bankingOperations;
+    }
+
+    public <T> Consumer<T> getEventConsumer() {
+        return eventConsumer;
     }
 }

@@ -4,4 +4,6 @@ public interface BankingOperations {
 
     void openForBusiness();
     void closedForBusiness();
+
+    void setDataStore(DataStore dataStore);
 }

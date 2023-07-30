@@ -6,20 +6,20 @@
     http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="accountBean" class="com.fluxtion.example.cookbook.spring.node.AccountNode">
-        <property name="transactionResponsePublisher" ref="transactionResponsePublisher" />
+        <property name="responsePublisher" ref="responsePublisher" />
     </bean>
 
     <bean id="creditCheck" class="com.fluxtion.example.cookbook.spring.node.CreditCheckNode">
         <property name="transactionSource" ref="accountBean"/>
-        <property name="transactionResponsePublisher" ref="transactionResponsePublisher" />
+        <property name="responsePublisher" ref="responsePublisher" />
     </bean>
 
-    <bean id="transactionStore" class="com.fluxtion.example.cookbook.spring.node.BankTransactionStore">
+    <bean id="transactionStore" class="com.fluxtion.example.cookbook.spring.node.CentralTransactionProcessor">
         <property name="transactionSource" ref="creditCheck"/>
-        <property name="transactionResponsePublisher" ref="transactionResponsePublisher" />
+        <property name="responsePublisher" ref="responsePublisher" />
     </bean>
 
-    <bean id="transactionResponsePublisher" class="com.fluxtion.example.cookbook.spring.node.TransactionResponsePublisher">
+    <bean id="responsePublisher" class="com.fluxtion.example.cookbook.spring.node.ResponsePublisher">
     </bean>
 
 </beans>

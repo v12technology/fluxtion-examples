@@ -18,19 +18,19 @@ public class CreditCheckNode extends ExportFunctionNode implements @ExportServic
 
     private transient Set<Integer> blackListedAccounts = new HashSet<>();
     private TransactionProcessor transactionSource;
-    private TransactionResponsePublisher transactionResponsePublisher;
+    private ResponsePublisher responsePublisher;
 
     @Override
     @NoPropagateFunction
     public void blackListAccount(int accountNumber) {
-        log.info("blacklisted:{}", accountNumber);
+        log.info("credit check blacklisted:{}", accountNumber);
         blackListedAccounts.add(accountNumber);
     }
 
     @Override
     @NoPropagateFunction
     public void whiteListAccount(int accountNumber) {
-        log.info("whitelisted:{}", accountNumber);
+        log.info("credit check whitelisted:{}", accountNumber);
         blackListedAccounts.remove(accountNumber);
     }
 
@@ -38,12 +38,12 @@ public class CreditCheckNode extends ExportFunctionNode implements @ExportServic
         Transaction transaction = transactionSource.currentTransactionRequest();
         int accountNumber = transaction.accountNumber();
         if(blackListedAccounts.contains(accountNumber)){
-            log.warn("FAILED CREDIT CHECK - {}", transaction);
-            transactionSource.clearTransaction();
-            transactionResponsePublisher.rejectTransaction(transaction);
+            log.warn("credit check failed");
+            transactionSource.rollbackTransaction();
+            responsePublisher.rejectTransaction(transaction);
             return false;
         }
-        log.info("passed credit check:{}", transaction);
+        log.info("credit check passed");
         return true;
     }
 
@@ -53,8 +53,8 @@ public class CreditCheckNode extends ExportFunctionNode implements @ExportServic
     }
 
     @Override
-    public void clearTransaction() {
-        transactionSource.clearTransaction();
+    public void rollbackTransaction() {
+        transactionSource.rollbackTransaction();
     }
 
     public void commitTransaction(){

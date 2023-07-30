@@ -1,29 +1,55 @@
 package com.fluxtion.example.cookbook.spring;
 
+import com.fluxtion.example.cookbook.spring.node.FileDataStore;
+import com.fluxtion.example.cookbook.spring.service.Account;
+import com.fluxtion.example.cookbook.spring.service.BankingOperations;
+import com.fluxtion.example.cookbook.spring.service.CreditCheck;
 import com.fluxtion.example.cookbook.util.GenerationStrategy;
+import lombok.extern.slf4j.Slf4j;
 
+import java.nio.file.Paths;
+
+@Slf4j
 public class Main {
 
     public static void main(String[] args) {
+//        BankingApp bankingApp = new BankingApp(GenerationStrategy.GENERATE_AOT);
         BankingApp bankingApp = new BankingApp(GenerationStrategy.USE_AOT);
+        //get services
+        Account accountService = bankingApp.getBankAccount();
+        BankingOperations bankControllerService = bankingApp.getBankingOperations();
+        CreditCheck creditCheckService = bankingApp.getCreditCheck();
+        //persistence
+        FileDataStore fileDataStore = new FileDataStore(Paths.get("data/spring/bank"));
+        bankControllerService.setDataStore(fileDataStore);
+        fileDataStore.replay(bankingApp.getEventConsumer());
+        //
         bankingApp.start();
-        //should reject bank not open
-        bankingApp.getBankAccount().credit(100, 250.12);
+
+        //should reject unknown account
+        accountService.deposit(999, 250.12);
+
+        //get opening balance for acc 100
+        accountService.publishBalance(100);
+
+        //should reject bank closed
+        accountService.openAccount(100);
+        accountService.deposit(100, 250.12);
 
         //open bank
-        bankingApp.getBankingOperations().openForBusiness();
-        bankingApp.getBankAccount().credit(100, 250.12);
+        bankControllerService.openForBusiness();
+        accountService.deposit(100, 250.12);
 
         //blacklist an account
-        bankingApp.getCreditCheck().blackListAccount(100);
-        bankingApp.getBankAccount().credit(100, 46.90);
+        creditCheckService.blackListAccount(100);
+        accountService.deposit(100, 46.90);
 
         //remove account from blacklist
-        bankingApp.getCreditCheck().whiteListAccount(100);
-        bankingApp.getBankAccount().credit(100, 46.90);
+        creditCheckService.whiteListAccount(100);
+        accountService.deposit(100, 46.90);
 
         //close bank
-        bankingApp.getBankingOperations().closedForBusiness();
-        bankingApp.getBankAccount().credit(100, 13);
+        bankControllerService.closedForBusiness();
+        accountService.deposit(100, 13);
     }
 }

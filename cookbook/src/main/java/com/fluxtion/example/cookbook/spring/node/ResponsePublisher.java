@@ -4,13 +4,17 @@ import com.fluxtion.example.cookbook.spring.data.Transaction;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TransactionResponsePublisher {
+public class ResponsePublisher {
 
     public void rejectTransaction(Transaction transaction){
-        log.info("PUBLISH REJECT - {}", transaction);
+        log.info("response reject:{}", transaction);
     }
 
     public void acceptTransaction(Transaction transaction){
-        log.info("PUBLISH ACCEPT - {}", transaction);
+        log.info("response accept:{}", transaction);
+    }
+
+    public void publishBalance(int accountNumber, double balance){
+        log.info("account:{}, balance:{}", accountNumber, balance);
     }
 }

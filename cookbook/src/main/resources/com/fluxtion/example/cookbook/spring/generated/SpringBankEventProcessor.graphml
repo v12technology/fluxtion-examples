@@ -6,8 +6,8 @@
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="accountBean:&#10;AccountNode"/>
-                    <jGraph:Style properties="NODE"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;accountBean:&#10;AccountNode"/>
+                    <jGraph:Style properties="EVENTHANDLER"/>
                 </jGraph:ShapeNode>
             </data>
         </node>
@@ -33,7 +33,7 @@
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="transactionStore:&#10;BankTransactionStore"/>
+                    <jGraph:label text="transactionStore:&#10;CentralTransactionProcessor"/>
                     <jGraph:Style properties="NODE"/>
                 </jGraph:ShapeNode>
             </data>
@@ -128,6 +128,51 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
+        <node id="handlerExportFunctionTriggerEvent_6">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;handlerExportFunctionTriggerEvent_6:&#10;ExportFunctionTrigger"/>
+                    <jGraph:Style properties="EVENTHANDLER"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="handlerExportFunctionTriggerEvent_7">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;handlerExportFunctionTriggerEvent_7:&#10;ExportFunctionTrigger"/>
+                    <jGraph:Style properties="EVENTHANDLER"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="handlerExportFunctionTriggerEvent_8">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;handlerExportFunctionTriggerEvent_8:&#10;ExportFunctionTrigger"/>
+                    <jGraph:Style properties="EVENTHANDLER"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="handlerExportFunctionTriggerEvent_9">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;handlerExportFunctionTriggerEvent_9:&#10;ExportFunctionTrigger"/>
+                    <jGraph:Style properties="EVENTHANDLER"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="Transaction">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;Transaction"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
         <node id="ExportFunctionTriggerEvent_0">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
@@ -182,6 +227,42 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
+        <node id="ExportFunctionTriggerEvent_6">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;ExportFunctionTriggerEvent_6"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="ExportFunctionTriggerEvent_7">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;ExportFunctionTriggerEvent_7"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="ExportFunctionTriggerEvent_8">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;ExportFunctionTriggerEvent_8"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="ExportFunctionTriggerEvent_9">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;ExportFunctionTriggerEvent_9"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
         <edge id="1" source="transactionResponsePublisher" target="accountBean">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
@@ -232,52 +313,97 @@
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="11" source="handlerExportFunctionTriggerEvent_2" target="creditCheck">
+        <edge id="11" source="handlerExportFunctionTriggerEvent_2" target="accountBean">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="12" source="handlerExportFunctionTriggerEvent_3" target="creditCheck">
+        <edge id="12" source="handlerExportFunctionTriggerEvent_3" target="accountBean">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="13" source="handlerExportFunctionTriggerEvent_4" target="transactionStore">
+        <edge id="13" source="handlerExportFunctionTriggerEvent_4" target="accountBean">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="14" source="handlerExportFunctionTriggerEvent_5" target="transactionStore">
+        <edge id="14" source="handlerExportFunctionTriggerEvent_5" target="creditCheck">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="15" source="ExportFunctionTriggerEvent_0" target="handlerExportFunctionTriggerEvent_0">
+        <edge id="15" source="handlerExportFunctionTriggerEvent_6" target="creditCheck">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="16" source="ExportFunctionTriggerEvent_1" target="handlerExportFunctionTriggerEvent_1">
+        <edge id="16" source="handlerExportFunctionTriggerEvent_7" target="transactionStore">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="17" source="ExportFunctionTriggerEvent_2" target="handlerExportFunctionTriggerEvent_2">
+        <edge id="17" source="handlerExportFunctionTriggerEvent_8" target="transactionStore">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="18" source="ExportFunctionTriggerEvent_3" target="handlerExportFunctionTriggerEvent_3">
+        <edge id="18" source="handlerExportFunctionTriggerEvent_9" target="transactionStore">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="19" source="ExportFunctionTriggerEvent_4" target="handlerExportFunctionTriggerEvent_4">
+        <edge id="19" source="Transaction" target="accountBean">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="20" source="ExportFunctionTriggerEvent_5" target="handlerExportFunctionTriggerEvent_5">
+        <edge id="20" source="ExportFunctionTriggerEvent_0" target="handlerExportFunctionTriggerEvent_0">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="21" source="ExportFunctionTriggerEvent_1" target="handlerExportFunctionTriggerEvent_1">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="22" source="ExportFunctionTriggerEvent_2" target="handlerExportFunctionTriggerEvent_2">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="23" source="ExportFunctionTriggerEvent_3" target="handlerExportFunctionTriggerEvent_3">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="24" source="ExportFunctionTriggerEvent_4" target="handlerExportFunctionTriggerEvent_4">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="25" source="ExportFunctionTriggerEvent_5" target="handlerExportFunctionTriggerEvent_5">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="26" source="ExportFunctionTriggerEvent_6" target="handlerExportFunctionTriggerEvent_6">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="27" source="ExportFunctionTriggerEvent_7" target="handlerExportFunctionTriggerEvent_7">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="28" source="ExportFunctionTriggerEvent_8" target="handlerExportFunctionTriggerEvent_8">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="29" source="ExportFunctionTriggerEvent_9" target="handlerExportFunctionTriggerEvent_9">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
