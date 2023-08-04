@@ -58,9 +58,9 @@ public class BankingApp {
         eventProcessor.injectNamedInstance(transactionWriter, Writer.class, TransactionStore.TRANSACTION_WRITER);
         eventProcessor.injectNamedInstance(categoryWriter, Writer.class, TransactionStore.CATEGORY_WRITER);
         eventProcessor.init();
-        this.bankAccount = eventProcessor.asInterface();
-        this.spendingMonitor = eventProcessor.asInterface();
-        this.statementPublisher = eventProcessor.asInterface();
+        this.bankAccount = eventProcessor.getExportedService();
+        this.spendingMonitor = eventProcessor.getExportedService();
+        this.statementPublisher = eventProcessor.getExportedService();
         eventProcessor.addSink("responseSink", (String s) -> System.out.println(s));
     }
 

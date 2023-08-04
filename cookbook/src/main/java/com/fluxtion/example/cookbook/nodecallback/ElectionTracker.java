@@ -2,13 +2,17 @@ package com.fluxtion.example.cookbook.nodecallback;
 
 import com.fluxtion.runtime.annotations.OnParentUpdate;
 import com.fluxtion.runtime.annotations.OnTrigger;
-import lombok.Value;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-
+/**
+ * Node class that is part of an {@link com.fluxtion.runtime.EventProcessor} graph.Methods
+ * annotated with {@link OnTrigger} and {@link OnParentUpdate} annotations receive callbacks during a graph cycle.
+ *
+ * @param candidateVoteHandlers
+ */
 public record ElectionTracker(List<CandidateVoteHandler> candidateVoteHandlers) {
     @OnParentUpdate
     public void updatedCandidateStatus(CandidateVoteHandler candidateVoteHandler) {

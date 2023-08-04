@@ -3,6 +3,7 @@ package com.fluxtion.example.cookbook.exportservice.node;
 import com.fluxtion.example.cookbook.exportservice.data.CategoryUpdate;
 import com.fluxtion.example.cookbook.exportservice.service.BankAccount;
 import com.fluxtion.example.cookbook.exportservice.data.Transaction;
+import com.fluxtion.example.cookbook.exportservice.service.DataStore;
 import com.fluxtion.example.cookbook.exportservice.service.ReplaySink;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.NoPropagateFunction;
@@ -14,23 +15,26 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BankAccountNode
         extends ExportFunctionNode
-        implements @ExportService BankAccount, @ExportService ReplaySink {
-    @Inject(singleton = true)
-    public TransactionStore transactionStore;
+        implements
+        @ExportService BankAccount,
+        @ExportService ReplaySink {
+
     @Inject(instanceName = "responseSink")
     public SinkPublisher<String> sinkPublisher;
+    private DataStore dataStore;
+
 
     @Override
     public void deposit(Transaction deposit) {
         log.info("deposit:{}", deposit);
-        transactionStore.commitTransaction(deposit);
+        dataStore.commitTransaction(deposit);
     }
 
     @Override
     public void debit(Transaction debit) {
         log.info("debit:{}", debit);
-        transactionStore.commitTransaction(debit);
-        sinkPublisher.publish(debit.toString());
+        dataStore.commitTransaction(debit);
+//        sinkPublisher.publish(debit.toString());
     }
 
     @Override
@@ -59,5 +63,9 @@ public class BankAccountNode
     @NoPropagateFunction
     public void transactionUpdate(Transaction transaction) {
 
+    }
+
+    public void setDataStore(DataStore dataStore){
+        this.dataStore = dataStore;
     }
 }

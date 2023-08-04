@@ -15,21 +15,21 @@
 *
 <http://www.mongodb.com/licensing/server-side-public-license>.
 */
-package com.fluxtion.example.cookbook.exportservice.generated;
+package com.fluxtion.example.cookbook.spring.generated;
 
 import com.fluxtion.runtime.StaticEventProcessor;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
-import com.fluxtion.example.cookbook.exportservice.node.BankAccountNode;
-import com.fluxtion.example.cookbook.exportservice.node.SpendingMonitorNode;
-import com.fluxtion.example.cookbook.exportservice.node.StatementPublisherNode;
-import com.fluxtion.example.cookbook.exportservice.service.BankAccount;
-import com.fluxtion.example.cookbook.exportservice.service.ReplaySink;
-import com.fluxtion.example.cookbook.exportservice.service.SpendingMonitor;
-import com.fluxtion.example.cookbook.exportservice.service.StatementPublisher;
-import com.fluxtion.runtime.EventProcessorContext;
+import com.fluxtion.example.cookbook.spring.data.Transaction;
+import com.fluxtion.example.cookbook.spring.node.AccountNode;
+import com.fluxtion.example.cookbook.spring.node.CentralTransactionProcessor;
+import com.fluxtion.example.cookbook.spring.node.CreditCheckNode;
+import com.fluxtion.example.cookbook.spring.node.ResponsePublisher;
+import com.fluxtion.example.cookbook.spring.service.Account;
+import com.fluxtion.example.cookbook.spring.service.BankingOperations;
+import com.fluxtion.example.cookbook.spring.service.CreditCheck;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -37,7 +37,6 @@ import com.fluxtion.runtime.callback.CallbackDispatcherImpl;
 import com.fluxtion.runtime.callback.ExportFunctionTrigger;
 import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0;
 import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_1;
-import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_10;
 import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_2;
 import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_3;
 import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_4;
@@ -47,16 +46,10 @@ import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTr
 import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_8;
 import com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_9;
 import com.fluxtion.runtime.event.Event;
-import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
-import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
-import com.fluxtion.runtime.node.MutableEventProcessorContext;
-import com.fluxtion.runtime.output.SinkDeregister;
-import com.fluxtion.runtime.output.SinkPublisher;
-import com.fluxtion.runtime.output.SinkRegistration;
-import java.io.File;
+
 import java.util.Arrays;
 import java.util.Map;
 
@@ -68,14 +61,15 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-07-27T11:33:06.918977
- * eventProcessorGenerator version : 9.0.23
- * api version                     : 9.0.23
+ * generation time                 : 2023-07-30T10:53:26.037821
+ * eventProcessorGenerator version : 9.0.24
+ * api version                     : 9.0.24
  * </pre>
  *
  * Event classes supported:
  *
  * <ul>
+ *   <li>com.fluxtion.example.cookbook.spring.data.Transaction
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_1
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_2
@@ -86,55 +80,36 @@ import java.util.function.Consumer;
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_7
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_8
  *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_9
- *   <li>com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_10
- *   <li>com.fluxtion.runtime.output.SinkDeregister
- *   <li>com.fluxtion.runtime.output.SinkRegistration
  * </ul>
  *
  * @author Greg Higgins
  */
 @SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
-public class BankEventProcessor
-    implements EventProcessor<BankEventProcessor>,
+public class SpringBankEventProcessor
+    implements EventProcessor<SpringBankEventProcessor>,
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
         Lifecycle,
-        ReplaySink,
-        SpendingMonitor,
-        StatementPublisher,
-        BankAccount {
+        CreditCheck,
+        BankingOperations,
+        Account {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final SinkPublisher responseSink = new SinkPublisher<>("responseSink");
-  private final BankAccountNode bankAccountNode_2 = new BankAccountNode();
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_5 =
+  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
+  private final MutableEventProcessorContext context =
+      new MutableEventProcessorContext(
+          nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
+  public final ResponsePublisher responsePublisher =
+      new ResponsePublisher();
+  public final AccountNode accountBean = new AccountNode();
+  public final CreditCheckNode creditCheck = new CreditCheckNode();
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_0 =
       new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_5
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0
               .class);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_6 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_6
-              .class);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_7 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_7
-              .class);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_8 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_8
-              .class);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_9 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_9
-              .class);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_10 =
-      new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_10
-              .class);
-  private final SpendingMonitorNode spendingMonitorNode_1 = new SpendingMonitorNode();
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_1 =
       new ExportFunctionTrigger(
           com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_1
@@ -151,16 +126,27 @@ public class BankEventProcessor
       new ExportFunctionTrigger(
           com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_4
               .class);
-  private final StatementPublisherNode statementPublisherNode_0 =
-      new StatementPublisherNode(spendingMonitorNode_1, bankAccountNode_2);
-  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_0 =
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_5 =
       new ExportFunctionTrigger(
-          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_5
               .class);
-  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
-  private final MutableEventProcessorContext context =
-      new MutableEventProcessorContext(
-          nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_6 =
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_6
+              .class);
+  public final CentralTransactionProcessor transactionStore = new CentralTransactionProcessor();
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_7 =
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_7
+              .class);
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_8 =
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_8
+              .class);
+  private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_9 =
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_9
+              .class);
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
@@ -170,6 +156,8 @@ public class BankEventProcessor
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(12);
 
+  private boolean isDirty_accountBean = false;
+  private boolean isDirty_creditCheck = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_0 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_1 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_2 = false;
@@ -180,49 +168,48 @@ public class BankEventProcessor
   private boolean isDirty_handlerExportFunctionTriggerEvent_7 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_8 = false;
   private boolean isDirty_handlerExportFunctionTriggerEvent_9 = false;
-  private boolean isDirty_handlerExportFunctionTriggerEvent_10 = false;
-  private boolean isDirty_responseSink = false;
   //Forked declarations
 
   //Filter constants
 
-  public BankEventProcessor(Map<Object, Object> contextMap) {
+  public SpringBankEventProcessor(Map<Object, Object> contextMap) {
     context.replaceMappings(contextMap);
-    bankAccountNode_2.setTriggered(false);
-    bankAccountNode_2.sinkPublisher = responseSink;
-    spendingMonitorNode_1.setTriggered(false);
-    statementPublisherNode_0.setTriggered(false);
-    statementPublisherNode_0.sinkPublisher = responseSink;
+    accountBean.setResponsePublisher(responsePublisher);
+    accountBean.setTriggered(false);
+    transactionStore.setOpenForBusiness(false);
+    transactionStore.setResponsePublisher(responsePublisher);
+    transactionStore.setTransactionSource(creditCheck);
+    transactionStore.setTriggered(false);
+    creditCheck.setResponsePublisher(responsePublisher);
+    creditCheck.setTransactionSource(accountBean);
+    creditCheck.setTriggered(false);
     handlerExportFunctionTriggerEvent_0.setFunctionPointerList(
-        Arrays.asList(statementPublisherNode_0, statementPublisherNode_0));
+        Arrays.asList(accountBean, accountBean));
     handlerExportFunctionTriggerEvent_1.setFunctionPointerList(
-        Arrays.asList(
-            spendingMonitorNode_1, spendingMonitorNode_1, bankAccountNode_2, bankAccountNode_2));
+        Arrays.asList(accountBean, accountBean));
     handlerExportFunctionTriggerEvent_2.setFunctionPointerList(
-        Arrays.asList(spendingMonitorNode_1, spendingMonitorNode_1));
+        Arrays.asList(accountBean, accountBean));
     handlerExportFunctionTriggerEvent_3.setFunctionPointerList(
-        Arrays.asList(spendingMonitorNode_1, spendingMonitorNode_1));
+        Arrays.asList(accountBean, accountBean));
     handlerExportFunctionTriggerEvent_4.setFunctionPointerList(
-        Arrays.asList(spendingMonitorNode_1, spendingMonitorNode_1));
+        Arrays.asList(accountBean, accountBean));
     handlerExportFunctionTriggerEvent_5.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
+        Arrays.asList(creditCheck, creditCheck));
     handlerExportFunctionTriggerEvent_6.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
+        Arrays.asList(creditCheck, creditCheck));
     handlerExportFunctionTriggerEvent_7.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
+        Arrays.asList(transactionStore, transactionStore));
     handlerExportFunctionTriggerEvent_8.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
+        Arrays.asList(transactionStore, transactionStore));
     handlerExportFunctionTriggerEvent_9.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
-    handlerExportFunctionTriggerEvent_10.setFunctionPointerList(
-        Arrays.asList(bankAccountNode_2, bankAccountNode_2));
+        Arrays.asList(transactionStore, transactionStore));
     //node auditors
     initialiseAuditor(nodeNameLookup);
     subscriptionManager.setSubscribingEventProcessor(this);
     context.setEventProcessorCallback(this);
   }
 
-  public BankEventProcessor() {
+  public SpringBankEventProcessor() {
     this(null);
   }
 
@@ -252,7 +239,10 @@ public class BankEventProcessor
   }
 
   public void onEventInternal(Object event) {
-    if (event
+    if (event instanceof com.fluxtion.example.cookbook.spring.data.Transaction) {
+      Transaction typedEvent = (Transaction) event;
+      handleEvent(typedEvent);
+    } else if (event
         instanceof
         com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0) {
       ExportFunctionTriggerEvent_0 typedEvent = (ExportFunctionTriggerEvent_0) event;
@@ -302,141 +292,132 @@ public class BankEventProcessor
         com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_9) {
       ExportFunctionTriggerEvent_9 typedEvent = (ExportFunctionTriggerEvent_9) event;
       handleEvent(typedEvent);
-    } else if (event
-        instanceof
-        com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_10) {
-      ExportFunctionTriggerEvent_10 typedEvent = (ExportFunctionTriggerEvent_10) event;
-      handleEvent(typedEvent);
-    } else if (event instanceof com.fluxtion.runtime.output.SinkDeregister) {
-      SinkDeregister typedEvent = (SinkDeregister) event;
-      handleEvent(typedEvent);
-    } else if (event instanceof com.fluxtion.runtime.output.SinkRegistration) {
-      SinkRegistration typedEvent = (SinkRegistration) event;
-      handleEvent(typedEvent);
     }
   }
 
-  public void addBucket(String arg0) {
+  public void blackListAccount(int arg0) {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    spendingMonitorNode_1.addBucket(arg0);
-    spendingMonitorNode_1.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_2) handlerExportFunctionTriggerEvent_2.getEvent());
-    processing = false;
-  }
-
-  public void assignToBucket(String arg0, String arg1, String arg2) {
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
-    spendingMonitorNode_1.assignToBucket(arg0, arg1, arg2);
-    spendingMonitorNode_1.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
-    processing = false;
-  }
-
-  public void categoryUpdate(com.fluxtion.example.cookbook.exportservice.data.CategoryUpdate arg0) {
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
-    bankAccountNode_2.categoryUpdate(arg0);
-    bankAccountNode_2.setTriggered(false);
-    handleEvent((ExportFunctionTriggerEvent_9) handlerExportFunctionTriggerEvent_9.getEvent());
-    processing = false;
-  }
-
-  public void debit(com.fluxtion.example.cookbook.exportservice.data.Transaction arg0) {
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
-    spendingMonitorNode_1.debit(arg0);
-    spendingMonitorNode_1.setTriggered(true);
-    bankAccountNode_2.debit(arg0);
-    bankAccountNode_2.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_1) handlerExportFunctionTriggerEvent_1.getEvent());
-    processing = false;
-  }
-
-  public void deposit(com.fluxtion.example.cookbook.exportservice.data.Transaction arg0) {
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
-    bankAccountNode_2.deposit(arg0);
-    bankAccountNode_2.setTriggered(true);
+    creditCheck.blackListAccount(arg0);
+    creditCheck.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_5) handlerExportFunctionTriggerEvent_5.getEvent());
     processing = false;
   }
 
-  public void publishStatement(java.util.function.Consumer<String> arg0) {
+  public void closeAccount(int arg0) {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    statementPublisherNode_0.publishStatement(arg0);
-    statementPublisherNode_0.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_0) handlerExportFunctionTriggerEvent_0.getEvent());
+    accountBean.closeAccount(arg0);
+    accountBean.setTriggered(false);
+    handleEvent((ExportFunctionTriggerEvent_2) handlerExportFunctionTriggerEvent_2.getEvent());
     processing = false;
   }
 
-  public void replayComplete() {
+  public void closedForBusiness() {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    bankAccountNode_2.replayComplete();
-    bankAccountNode_2.setTriggered(false);
+    transactionStore.closedForBusiness();
+    transactionStore.setTriggered(false);
+    handleEvent((ExportFunctionTriggerEvent_9) handlerExportFunctionTriggerEvent_9.getEvent());
+    processing = false;
+  }
+
+  public boolean debit(int arg0, double arg1) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
+    accountBean.setTriggered(accountBean.debit(arg0, arg1));
+    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
+    processing = false;
+    return true;
+  }
+
+  public boolean deposit(int arg0, double arg1) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
+    accountBean.setTriggered(accountBean.deposit(arg0, arg1));
+    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
+    processing = false;
+    return true;
+  }
+
+  public void openAccount(int arg0) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
+    accountBean.openAccount(arg0);
+    accountBean.setTriggered(false);
+    handleEvent((ExportFunctionTriggerEvent_1) handlerExportFunctionTriggerEvent_1.getEvent());
+    processing = false;
+  }
+
+  public void openForBusiness() {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
+    transactionStore.openForBusiness();
+    transactionStore.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_8) handlerExportFunctionTriggerEvent_8.getEvent());
     processing = false;
   }
 
-  public void replayStarted() {
+  public void publishBalance(int arg0) {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    bankAccountNode_2.replayStarted();
-    bankAccountNode_2.setTriggered(false);
+    accountBean.publishBalance(arg0);
+    accountBean.setTriggered(false);
+    handleEvent((ExportFunctionTriggerEvent_0) handlerExportFunctionTriggerEvent_0.getEvent());
+    processing = false;
+  }
+
+  public void setDataStore(com.fluxtion.example.cookbook.spring.service.DataStore arg0) {
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
+    transactionStore.setDataStore(arg0);
+    transactionStore.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_7) handlerExportFunctionTriggerEvent_7.getEvent());
     processing = false;
   }
 
-  public void resetBucket(String arg0) {
+  public void whiteListAccount(int arg0) {
     if (buffering) {
       triggerCalculation();
     }
     processing = true;
-    spendingMonitorNode_1.resetBucket(arg0);
-    spendingMonitorNode_1.setTriggered(true);
-    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
-    processing = false;
-  }
-
-  public void setSpendingLimit(double arg0) {
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
-    bankAccountNode_2.setSpendingLimit(arg0);
-    bankAccountNode_2.setTriggered(true);
+    creditCheck.whiteListAccount(arg0);
+    creditCheck.setTriggered(false);
     handleEvent((ExportFunctionTriggerEvent_6) handlerExportFunctionTriggerEvent_6.getEvent());
     processing = false;
   }
 
-  public void transactionUpdate(com.fluxtion.example.cookbook.exportservice.data.Transaction arg0) {
-    if (buffering) {
-      triggerCalculation();
+  public void handleEvent(Transaction typedEvent) {
+    auditEvent(typedEvent);
+    //Default, no filter methods
+    isDirty_accountBean = accountBean.replayTransaction(typedEvent);
+    //event stack unwind callbacks
+    if (isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1
+        | isDirty_handlerExportFunctionTriggerEvent_2
+        | isDirty_handlerExportFunctionTriggerEvent_3
+        | isDirty_handlerExportFunctionTriggerEvent_4) {
+      accountBean.afterEventRequest();
     }
-    processing = true;
-    bankAccountNode_2.transactionUpdate(arg0);
-    bankAccountNode_2.setTriggered(false);
-    handleEvent((ExportFunctionTriggerEvent_10) handlerExportFunctionTriggerEvent_10.getEvent());
-    processing = false;
+    afterEvent();
   }
 
   public void handleEvent(ExportFunctionTriggerEvent_0 typedEvent) {
@@ -444,10 +425,23 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_0 =
         handlerExportFunctionTriggerEvent_0.onEvent(typedEvent);
-    if (guardCheck_statementPublisherNode_0()) {
-      statementPublisherNode_0.triggered();
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
+    }
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
+    if (isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1
+        | isDirty_handlerExportFunctionTriggerEvent_2
+        | isDirty_handlerExportFunctionTriggerEvent_3
+        | isDirty_handlerExportFunctionTriggerEvent_4) {
+      accountBean.afterEventRequest();
+    }
     afterEvent();
   }
 
@@ -456,13 +450,23 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_1 =
         handlerExportFunctionTriggerEvent_1.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_2()) {
-      bankAccountNode_2.triggered();
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
     }
-    if (guardCheck_spendingMonitorNode_1()) {
-      spendingMonitorNode_1.triggered();
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
+    if (isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1
+        | isDirty_handlerExportFunctionTriggerEvent_2
+        | isDirty_handlerExportFunctionTriggerEvent_3
+        | isDirty_handlerExportFunctionTriggerEvent_4) {
+      accountBean.afterEventRequest();
+    }
     afterEvent();
   }
 
@@ -471,10 +475,23 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_2 =
         handlerExportFunctionTriggerEvent_2.onEvent(typedEvent);
-    if (guardCheck_spendingMonitorNode_1()) {
-      spendingMonitorNode_1.triggered();
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
+    }
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
+    if (isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1
+        | isDirty_handlerExportFunctionTriggerEvent_2
+        | isDirty_handlerExportFunctionTriggerEvent_3
+        | isDirty_handlerExportFunctionTriggerEvent_4) {
+      accountBean.afterEventRequest();
+    }
     afterEvent();
   }
 
@@ -483,10 +500,23 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_3 =
         handlerExportFunctionTriggerEvent_3.onEvent(typedEvent);
-    if (guardCheck_spendingMonitorNode_1()) {
-      spendingMonitorNode_1.triggered();
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
+    }
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
+    if (isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1
+        | isDirty_handlerExportFunctionTriggerEvent_2
+        | isDirty_handlerExportFunctionTriggerEvent_3
+        | isDirty_handlerExportFunctionTriggerEvent_4) {
+      accountBean.afterEventRequest();
+    }
     afterEvent();
   }
 
@@ -495,10 +525,23 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_4 =
         handlerExportFunctionTriggerEvent_4.onEvent(typedEvent);
-    if (guardCheck_spendingMonitorNode_1()) {
-      spendingMonitorNode_1.triggered();
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
+    }
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
+    if (isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1
+        | isDirty_handlerExportFunctionTriggerEvent_2
+        | isDirty_handlerExportFunctionTriggerEvent_3
+        | isDirty_handlerExportFunctionTriggerEvent_4) {
+      accountBean.afterEventRequest();
+    }
     afterEvent();
   }
 
@@ -507,8 +550,11 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_5 =
         handlerExportFunctionTriggerEvent_5.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_2()) {
-      bankAccountNode_2.triggered();
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -519,8 +565,11 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_6 =
         handlerExportFunctionTriggerEvent_6.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_2()) {
-      bankAccountNode_2.triggered();
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
+    }
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -531,8 +580,8 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_7 =
         handlerExportFunctionTriggerEvent_7.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_2()) {
-      bankAccountNode_2.triggered();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -543,8 +592,8 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_8 =
         handlerExportFunctionTriggerEvent_8.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_2()) {
-      bankAccountNode_2.triggered();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
     afterEvent();
@@ -555,54 +604,21 @@ public class BankEventProcessor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_9 =
         handlerExportFunctionTriggerEvent_9.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_2()) {
-      bankAccountNode_2.triggered();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
     }
     //event stack unwind callbacks
-    afterEvent();
-  }
-
-  public void handleEvent(ExportFunctionTriggerEvent_10 typedEvent) {
-    auditEvent(typedEvent);
-    //Default, no filter methods
-    isDirty_handlerExportFunctionTriggerEvent_10 =
-        handlerExportFunctionTriggerEvent_10.onEvent(typedEvent);
-    if (guardCheck_bankAccountNode_2()) {
-      bankAccountNode_2.triggered();
-    }
-    //event stack unwind callbacks
-    afterEvent();
-  }
-
-  public void handleEvent(SinkDeregister typedEvent) {
-    auditEvent(typedEvent);
-    switch (typedEvent.filterString()) {
-        //Event Class:[com.fluxtion.runtime.output.SinkDeregister] filterString:[responseSink]
-      case ("responseSink"):
-        isDirty_responseSink = true;
-        responseSink.unregisterSink(typedEvent);
-        afterEvent();
-        return;
-    }
-    afterEvent();
-  }
-
-  public void handleEvent(SinkRegistration typedEvent) {
-    auditEvent(typedEvent);
-    switch (typedEvent.filterString()) {
-        //Event Class:[com.fluxtion.runtime.output.SinkRegistration] filterString:[responseSink]
-      case ("responseSink"):
-        isDirty_responseSink = true;
-        responseSink.sinkRegistration(typedEvent);
-        afterEvent();
-        return;
-    }
     afterEvent();
   }
 
   public void bufferEvent(Object event) {
     buffering = true;
-    if (event
+    if (event instanceof com.fluxtion.example.cookbook.spring.data.Transaction) {
+      Transaction typedEvent = (Transaction) event;
+      auditEvent(typedEvent);
+      isDirty_accountBean = accountBean.replayTransaction(typedEvent);
+      //event stack unwind callbacks
+    } else if (event
         instanceof
         com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0) {
       ExportFunctionTriggerEvent_0 typedEvent = (ExportFunctionTriggerEvent_0) event;
@@ -682,52 +698,28 @@ public class BankEventProcessor
       isDirty_handlerExportFunctionTriggerEvent_9 =
           handlerExportFunctionTriggerEvent_9.onEvent(typedEvent);
       //event stack unwind callbacks
-    } else if (event
-        instanceof
-        com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_10) {
-      ExportFunctionTriggerEvent_10 typedEvent = (ExportFunctionTriggerEvent_10) event;
-      auditEvent(typedEvent);
-      isDirty_handlerExportFunctionTriggerEvent_10 =
-          handlerExportFunctionTriggerEvent_10.onEvent(typedEvent);
-      //event stack unwind callbacks
-    } else if (event instanceof com.fluxtion.runtime.output.SinkDeregister) {
-      SinkDeregister typedEvent = (SinkDeregister) event;
-      auditEvent(typedEvent);
-      switch (typedEvent.filterString()) {
-          //Event Class:[com.fluxtion.runtime.output.SinkDeregister] filterString:[responseSink]
-        case ("responseSink"):
-          isDirty_responseSink = true;
-          responseSink.unregisterSink(typedEvent);
-          //event stack unwind callbacks
-          afterEvent();
-          return;
-      }
-    } else if (event instanceof com.fluxtion.runtime.output.SinkRegistration) {
-      SinkRegistration typedEvent = (SinkRegistration) event;
-      auditEvent(typedEvent);
-      switch (typedEvent.filterString()) {
-          //Event Class:[com.fluxtion.runtime.output.SinkRegistration] filterString:[responseSink]
-        case ("responseSink"):
-          isDirty_responseSink = true;
-          responseSink.sinkRegistration(typedEvent);
-          //event stack unwind callbacks
-          afterEvent();
-          return;
-      }
     }
   }
 
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
-    if (guardCheck_bankAccountNode_2()) {
-      bankAccountNode_2.triggered();
+    if (guardCheck_accountBean()) {
+      isDirty_accountBean = accountBean.triggered();
     }
-    if (guardCheck_spendingMonitorNode_1()) {
-      spendingMonitorNode_1.triggered();
+    if (guardCheck_creditCheck()) {
+      isDirty_creditCheck = creditCheck.triggered();
     }
-    if (guardCheck_statementPublisherNode_0()) {
-      statementPublisherNode_0.triggered();
+    if (guardCheck_transactionStore()) {
+      transactionStore.triggered();
+    }
+    //event stack unwind callbacks
+    if (isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1
+        | isDirty_handlerExportFunctionTriggerEvent_2
+        | isDirty_handlerExportFunctionTriggerEvent_3
+        | isDirty_handlerExportFunctionTriggerEvent_4) {
+      accountBean.afterEventRequest();
     }
     afterEvent();
   }
@@ -742,9 +734,10 @@ public class BankEventProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(bankAccountNode_2, "bankAccountNode_2");
-    auditor.nodeRegistered(spendingMonitorNode_1, "spendingMonitorNode_1");
-    auditor.nodeRegistered(statementPublisherNode_0, "statementPublisherNode_0");
+    auditor.nodeRegistered(accountBean, "accountBean");
+    auditor.nodeRegistered(transactionStore, "transactionStore");
+    auditor.nodeRegistered(creditCheck, "creditCheck");
+    auditor.nodeRegistered(responsePublisher, "transactionResponsePublisher");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(
         handlerExportFunctionTriggerEvent_0, "handlerExportFunctionTriggerEvent_0");
@@ -766,19 +759,15 @@ public class BankEventProcessor
         handlerExportFunctionTriggerEvent_8, "handlerExportFunctionTriggerEvent_8");
     auditor.nodeRegistered(
         handlerExportFunctionTriggerEvent_9, "handlerExportFunctionTriggerEvent_9");
-    auditor.nodeRegistered(
-        handlerExportFunctionTriggerEvent_10, "handlerExportFunctionTriggerEvent_10");
     auditor.nodeRegistered(subscriptionManager, "subscriptionManager");
     auditor.nodeRegistered(context, "context");
-    auditor.nodeRegistered(responseSink, "responseSink");
   }
 
   private void afterEvent() {
-    statementPublisherNode_0.afterEvent();
-    spendingMonitorNode_1.afterEvent();
-    bankAccountNode_2.afterEvent();
 
     nodeNameLookup.processingComplete();
+    isDirty_accountBean = false;
+    isDirty_creditCheck = false;
     isDirty_handlerExportFunctionTriggerEvent_0 = false;
     isDirty_handlerExportFunctionTriggerEvent_1 = false;
     isDirty_handlerExportFunctionTriggerEvent_2 = false;
@@ -789,8 +778,6 @@ public class BankEventProcessor
     isDirty_handlerExportFunctionTriggerEvent_7 = false;
     isDirty_handlerExportFunctionTriggerEvent_8 = false;
     isDirty_handlerExportFunctionTriggerEvent_9 = false;
-    isDirty_handlerExportFunctionTriggerEvent_10 = false;
-    isDirty_responseSink = false;
   }
 
   @Override
@@ -799,9 +786,9 @@ public class BankEventProcessor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     //initialise dirty lookup map
     isDirty("test");
-    bankAccountNode_2.init();
-    spendingMonitorNode_1.init();
-    statementPublisherNode_0.init();
+    accountBean.init();
+    creditCheck.init();
+    transactionStore.init();
     afterEvent();
   }
 
@@ -812,9 +799,10 @@ public class BankEventProcessor
     }
     processing = true;
     auditEvent(Lifecycle.LifecycleEvent.Start);
-    bankAccountNode_2.start();
-    spendingMonitorNode_1.start();
-    statementPublisherNode_0.start();
+    accountBean.start();
+    creditCheck.start();
+    transactionStore.startProcessor();
+    transactionStore.start();
     afterEvent();
     callbackDispatcher.dispatchQueuedCallbacks();
     processing = false;
@@ -869,12 +857,12 @@ public class BankEventProcessor
 
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(accountBean, () -> isDirty_accountBean);
+      dirtyFlagSupplierMap.put(creditCheck, () -> isDirty_creditCheck);
       dirtyFlagSupplierMap.put(
           handlerExportFunctionTriggerEvent_0, () -> isDirty_handlerExportFunctionTriggerEvent_0);
       dirtyFlagSupplierMap.put(
           handlerExportFunctionTriggerEvent_1, () -> isDirty_handlerExportFunctionTriggerEvent_1);
-      dirtyFlagSupplierMap.put(
-          handlerExportFunctionTriggerEvent_10, () -> isDirty_handlerExportFunctionTriggerEvent_10);
       dirtyFlagSupplierMap.put(
           handlerExportFunctionTriggerEvent_2, () -> isDirty_handlerExportFunctionTriggerEvent_2);
       dirtyFlagSupplierMap.put(
@@ -891,7 +879,6 @@ public class BankEventProcessor
           handlerExportFunctionTriggerEvent_8, () -> isDirty_handlerExportFunctionTriggerEvent_8);
       dirtyFlagSupplierMap.put(
           handlerExportFunctionTriggerEvent_9, () -> isDirty_handlerExportFunctionTriggerEvent_9);
-      dirtyFlagSupplierMap.put(responseSink, () -> isDirty_responseSink);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
@@ -899,15 +886,14 @@ public class BankEventProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(accountBean, (b) -> isDirty_accountBean = b);
+      dirtyFlagUpdateMap.put(creditCheck, (b) -> isDirty_creditCheck = b);
       dirtyFlagUpdateMap.put(
           handlerExportFunctionTriggerEvent_0,
           (b) -> isDirty_handlerExportFunctionTriggerEvent_0 = b);
       dirtyFlagUpdateMap.put(
           handlerExportFunctionTriggerEvent_1,
           (b) -> isDirty_handlerExportFunctionTriggerEvent_1 = b);
-      dirtyFlagUpdateMap.put(
-          handlerExportFunctionTriggerEvent_10,
-          (b) -> isDirty_handlerExportFunctionTriggerEvent_10 = b);
       dirtyFlagUpdateMap.put(
           handlerExportFunctionTriggerEvent_2,
           (b) -> isDirty_handlerExportFunctionTriggerEvent_2 = b);
@@ -932,31 +918,29 @@ public class BankEventProcessor
       dirtyFlagUpdateMap.put(
           handlerExportFunctionTriggerEvent_9,
           (b) -> isDirty_handlerExportFunctionTriggerEvent_9 = b);
-      dirtyFlagUpdateMap.put(responseSink, (b) -> isDirty_responseSink = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
-  private boolean guardCheck_bankAccountNode_2() {
-    return isDirty_handlerExportFunctionTriggerEvent_1
-        | isDirty_handlerExportFunctionTriggerEvent_5
-        | isDirty_handlerExportFunctionTriggerEvent_6
-        | isDirty_handlerExportFunctionTriggerEvent_7
-        | isDirty_handlerExportFunctionTriggerEvent_8
-        | isDirty_handlerExportFunctionTriggerEvent_9
-        | isDirty_handlerExportFunctionTriggerEvent_10
-        | isDirty_responseSink;
-  }
-
-  private boolean guardCheck_spendingMonitorNode_1() {
-    return isDirty_handlerExportFunctionTriggerEvent_1
+  private boolean guardCheck_accountBean() {
+    return isDirty_handlerExportFunctionTriggerEvent_0
+        | isDirty_handlerExportFunctionTriggerEvent_1
         | isDirty_handlerExportFunctionTriggerEvent_2
         | isDirty_handlerExportFunctionTriggerEvent_3
         | isDirty_handlerExportFunctionTriggerEvent_4;
   }
 
-  private boolean guardCheck_statementPublisherNode_0() {
-    return isDirty_handlerExportFunctionTriggerEvent_0 | isDirty_responseSink;
+  private boolean guardCheck_transactionStore() {
+    return isDirty_creditCheck
+        | isDirty_handlerExportFunctionTriggerEvent_7
+        | isDirty_handlerExportFunctionTriggerEvent_8
+        | isDirty_handlerExportFunctionTriggerEvent_9;
+  }
+
+  private boolean guardCheck_creditCheck() {
+    return isDirty_accountBean
+        | isDirty_handlerExportFunctionTriggerEvent_5
+        | isDirty_handlerExportFunctionTriggerEvent_6;
   }
 
   @Override
@@ -981,13 +965,13 @@ public class BankEventProcessor
   }
 
   @Override
-  public BankEventProcessor newInstance() {
-    return new BankEventProcessor();
+  public SpringBankEventProcessor newInstance() {
+    return new SpringBankEventProcessor();
   }
 
   @Override
-  public BankEventProcessor newInstance(Map<Object, Object> contextMap) {
-    return new BankEventProcessor();
+  public SpringBankEventProcessor newInstance(Map<Object, Object> contextMap) {
+    return new SpringBankEventProcessor();
   }
 
   @Override

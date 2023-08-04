@@ -61,7 +61,7 @@ public class StockTracker extends ExportFunctionNode {
     }
 
     @Initialise
-    public void init() {
+    public void initialise() {
         totalQuantity = 0;
         stockValueUsd = 0;
         stockValueGbp = Double.NaN;

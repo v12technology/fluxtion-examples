@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public class RequestHandler {
 
-    private long startTime;
+    private transient long startTime;
     @OnEventHandler
     public boolean stringRequest(String in){
         log.debug("request received:{}", in);

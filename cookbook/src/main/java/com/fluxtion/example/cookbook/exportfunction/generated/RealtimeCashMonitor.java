@@ -47,6 +47,7 @@ import com.fluxtion.runtime.input.SubscriptionManagerNode;
 import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -58,9 +59,9 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-06-14T20:54:01.116988
- * eventProcessorGenerator version : 9.0.12
- * api version                     : 9.0.12
+ * generation time                 : 2023-07-28T15:59:21.893224
+ * eventProcessorGenerator version : 9.0.24
+ * api version                     : 9.0.24
  * </pre>
  *
  * Event classes supported:
@@ -92,13 +93,21 @@ public class RealtimeCashMonitor
   private final SalesTracker salesTracker_3 = new SalesTracker();
   private final StockTracker stockTracker_2 = new StockTracker();
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_2 =
-      new ExportFunctionTrigger(ExportFunctionTriggerEvent_2.class);
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_2
+              .class);
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_3 =
-      new ExportFunctionTrigger(ExportFunctionTriggerEvent_3.class);
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_3
+              .class);
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_4 =
-      new ExportFunctionTrigger(ExportFunctionTriggerEvent_4.class);
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_4
+              .class);
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_5 =
-      new ExportFunctionTrigger(ExportFunctionTriggerEvent_5.class);
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_5
+              .class);
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
@@ -107,9 +116,13 @@ public class RealtimeCashMonitor
       new TradingPosition(stockTracker_2, salesTracker_3);
   private final BankAlert bankAlert_0 = new BankAlert(tradingPosition_1);
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_0 =
-      new ExportFunctionTrigger(ExportFunctionTriggerEvent_0.class);
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_0
+              .class);
   private final ExportFunctionTrigger handlerExportFunctionTriggerEvent_1 =
-      new ExportFunctionTrigger(ExportFunctionTriggerEvent_1.class);
+      new ExportFunctionTrigger(
+          com.fluxtion.runtime.callback.ExportFunctionTriggerEvent.ExportFunctionTriggerEvent_1
+              .class);
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
@@ -142,9 +155,9 @@ public class RealtimeCashMonitor
     handlerExportFunctionTriggerEvent_1.setFunctionPointerList(
         Arrays.asList(tradingPosition_1, tradingPosition_1));
     handlerExportFunctionTriggerEvent_2.setFunctionPointerList(
-        Arrays.asList(stockTracker_2, stockTracker_2, salesTracker_3, salesTracker_3));
-    handlerExportFunctionTriggerEvent_3.setFunctionPointerList(
         Arrays.asList(stockTracker_2, stockTracker_2));
+    handlerExportFunctionTriggerEvent_3.setFunctionPointerList(
+        Arrays.asList(stockTracker_2, stockTracker_2, salesTracker_3, salesTracker_3));
     handlerExportFunctionTriggerEvent_4.setFunctionPointerList(
         Arrays.asList(stockTracker_2, stockTracker_2));
     handlerExportFunctionTriggerEvent_5.setFunctionPointerList(
@@ -240,7 +253,7 @@ public class RealtimeCashMonitor
     }
     processing = true;
     stockTracker_2.setTriggered(stockTracker_2.addStockElectronic(arg0));
-    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
     processing = false;
   }
 
@@ -253,7 +266,7 @@ public class RealtimeCashMonitor
     }
     processing = true;
     stockTracker_2.setTriggered(stockTracker_2.addStock(arg0));
-    handleEvent((ExportFunctionTriggerEvent_5) handlerExportFunctionTriggerEvent_5.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_2) handlerExportFunctionTriggerEvent_2.getEvent());
     processing = false;
   }
 
@@ -266,7 +279,7 @@ public class RealtimeCashMonitor
     }
     processing = true;
     stockTracker_2.setTriggered(stockTracker_2.addStockFurniture(arg0));
-    handleEvent((ExportFunctionTriggerEvent_4) handlerExportFunctionTriggerEvent_4.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_5) handlerExportFunctionTriggerEvent_5.getEvent());
     processing = false;
   }
 
@@ -287,7 +300,7 @@ public class RealtimeCashMonitor
     processing = true;
     stockTracker_2.setTriggered(stockTracker_2.updateStockLevels(arg0, arg1, arg2));
     salesTracker_3.setTriggered(salesTracker_3.updateSalesIncome(arg0, arg1, arg2));
-    handleEvent((ExportFunctionTriggerEvent_2) handlerExportFunctionTriggerEvent_2.getEvent());
+    handleEvent((ExportFunctionTriggerEvent_3) handlerExportFunctionTriggerEvent_3.getEvent());
     processing = false;
   }
 
@@ -351,12 +364,6 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_2 =
         handlerExportFunctionTriggerEvent_2.onEvent(typedEvent);
-    if (guardCheck_salesTracker_3()) {
-      isDirty_salesTracker_3 = salesTracker_3.triggered();
-      if (isDirty_salesTracker_3) {
-        tradingPosition_1.salesChange(salesTracker_3);
-      }
-    }
     if (guardCheck_stockTracker_2()) {
       isDirty_stockTracker_2 = stockTracker_2.triggered();
       if (isDirty_stockTracker_2) {
@@ -378,6 +385,12 @@ public class RealtimeCashMonitor
     //Default, no filter methods
     isDirty_handlerExportFunctionTriggerEvent_3 =
         handlerExportFunctionTriggerEvent_3.onEvent(typedEvent);
+    if (guardCheck_salesTracker_3()) {
+      isDirty_salesTracker_3 = salesTracker_3.triggered();
+      if (isDirty_salesTracker_3) {
+        tradingPosition_1.salesChange(salesTracker_3);
+      }
+    }
     if (guardCheck_stockTracker_2()) {
       isDirty_stockTracker_2 = stockTracker_2.triggered();
       if (isDirty_stockTracker_2) {
@@ -563,9 +576,6 @@ public class RealtimeCashMonitor
   }
 
   private void afterEvent() {
-    tradingPosition_1.afterEvent();
-    stockTracker_2.afterEvent();
-    salesTracker_3.afterEvent();
 
     nodeNameLookup.processingComplete();
     isDirty_handlerExportFunctionTriggerEvent_0 = false;
@@ -585,7 +595,9 @@ public class RealtimeCashMonitor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     //initialise dirty lookup map
     isDirty("test");
+    salesTracker_3.initialise();
     salesTracker_3.init();
+    stockTracker_2.initialise();
     stockTracker_2.init();
     tradingPosition_1.init();
     afterEvent();
@@ -707,7 +719,7 @@ public class RealtimeCashMonitor
   }
 
   private boolean guardCheck_salesTracker_3() {
-    return isDirty_handlerExportFunctionTriggerEvent_2;
+    return isDirty_handlerExportFunctionTriggerEvent_3;
   }
 
   private boolean guardCheck_stockTracker_2() {
