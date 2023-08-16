@@ -13,8 +13,8 @@ import java.nio.file.Paths;
 public class Main {
 
     public static void main(String[] args) {
-        BankingApp bankingApp = new BankingApp(GenerationStrategy.GENERATE_AOT);
-//        BankingApp bankingApp = new BankingApp(GenerationStrategy.USE_AOT);
+//        BankingApp bankingApp = new BankingApp(GenerationStrategy.GENERATE_AOT);
+        BankingApp bankingApp = new BankingApp(GenerationStrategy.USE_AOT);
         //get services
         Account accountService = bankingApp.getBankAccount();
         BankingOperations bankControllerService = bankingApp.getBankingOperations();
