@@ -5,7 +5,8 @@ import com.fluxtion.example.cookbook.spring.service.CreditCheck;
 import com.fluxtion.example.cookbook.spring.service.TransactionProcessor;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.NoPropagateFunction;
-import com.fluxtion.runtime.callback.ExportFunctionNode;
+import com.fluxtion.runtime.annotations.NoTriggerReference;
+import com.fluxtion.runtime.annotations.OnTrigger;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,10 +15,11 @@ import java.util.Set;
 
 @Data
 @Slf4j
-public class CreditCheckNode extends ExportFunctionNode implements @ExportService CreditCheck, TransactionProcessor {
+public class CreditCheckNode implements @ExportService CreditCheck, TransactionProcessor {
 
     private transient Set<Integer> blackListedAccounts = new HashSet<>();
     private TransactionProcessor transactionSource;
+    @NoTriggerReference
     private ResponsePublisher responsePublisher;
 
     @Override
@@ -34,7 +36,8 @@ public class CreditCheckNode extends ExportFunctionNode implements @ExportServic
         blackListedAccounts.remove(accountNumber);
     }
 
-    public boolean propagateParentNotification(){
+    @OnTrigger
+    public boolean checkCredit(){
         Transaction transaction = transactionSource.currentTransactionRequest();
         int accountNumber = transaction.accountNumber();
         if(blackListedAccounts.contains(accountNumber)){
