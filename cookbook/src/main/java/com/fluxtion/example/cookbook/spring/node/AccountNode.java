@@ -3,11 +3,7 @@ package com.fluxtion.example.cookbook.spring.node;
 import com.fluxtion.example.cookbook.spring.data.Transaction;
 import com.fluxtion.example.cookbook.spring.service.Account;
 import com.fluxtion.example.cookbook.spring.service.TransactionProcessor;
-import com.fluxtion.runtime.annotations.AfterTrigger;
-import com.fluxtion.runtime.annotations.ExportService;
-import com.fluxtion.runtime.annotations.NoPropagateFunction;
-import com.fluxtion.runtime.annotations.OnEventHandler;
-import com.fluxtion.runtime.callback.ExportFunctionNode;
+import com.fluxtion.runtime.annotations.*;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,11 +12,13 @@ import java.util.Map;
 
 @ToString
 @Slf4j
-public class AccountNode extends ExportFunctionNode implements @ExportService Account, TransactionProcessor {
+public class AccountNode implements @ExportService Account, TransactionProcessor {
 
     private transient Transaction currentTransaction;
+    @NoTriggerReference
     private ResponsePublisher responsePublisher;
     private transient final Map<Integer, Double> account2Balance = new HashMap<>();
+    private boolean replay;
 
     @Override
     public boolean debit(int accountNumber, double debitAmount) {
@@ -49,7 +47,7 @@ public class AccountNode extends ExportFunctionNode implements @ExportService Ac
     @NoPropagateFunction
     public void openAccount(int accountNumber) {
         log.info("------------------------------------------------------");
-        log.info("opened account:{}",accountNumber);
+        log.info("opened account:{}", accountNumber);
         account2Balance.putIfAbsent(accountNumber, 0d);
     }
 
@@ -57,22 +55,23 @@ public class AccountNode extends ExportFunctionNode implements @ExportService Ac
     @NoPropagateFunction
     public void closeAccount(int accountNumber) {
         log.info("------------------------------------------------------");
-        log.info("closed account:{}",accountNumber);
+        log.info("closed account:{}", accountNumber);
         account2Balance.remove(accountNumber);
     }
 
     @OnEventHandler(propagate = false)
-    public boolean replayTransaction(Transaction transactiontoAdd){
-        int accountNumber = transactiontoAdd.accountNumber();
+    public boolean replayTransaction(Transaction transactionToAdd) {
+        replay = true;
+        int accountNumber = transactionToAdd.accountNumber();
         account2Balance.putIfAbsent(accountNumber, 0d);
-        double balance  = account2Balance.get(accountNumber) + transactiontoAdd.signedAmount();
+        double balance = account2Balance.get(accountNumber) + transactionToAdd.signedAmount();
         account2Balance.put(accountNumber, balance);
         return false;
     }
 
-    private boolean processRequest(){
+    private boolean processRequest() {
         int accountNumber = currentTransaction.accountNumber();
-        if(!account2Balance.containsKey(accountNumber)){
+        if (!account2Balance.containsKey(accountNumber)) {
             log.info("reject unknown account:{}", accountNumber);
             responsePublisher.rejectTransaction(currentTransaction);
             return false;
@@ -82,9 +81,12 @@ public class AccountNode extends ExportFunctionNode implements @ExportService Ac
     }
 
     @AfterTrigger
-    public void afterEventRequest(){
-        log.info("request complete");
-        log.info("------------------------------------------------------\n");
+    public void afterEventRequest() {
+        if (!replay) {
+            log.info("request complete");
+            log.info("------------------------------------------------------\n");
+        }
+        replay = false;
     }
 
     @Override
@@ -98,7 +100,7 @@ public class AccountNode extends ExportFunctionNode implements @ExportService Ac
         currentTransaction = null;
     }
 
-    public void commitTransaction(){
+    public void commitTransaction() {
         int accountNumber = currentTransaction.accountNumber();
         log.info("updated balance:{} account:{}", account2Balance.get(accountNumber), accountNumber);
         currentTransaction = null;
