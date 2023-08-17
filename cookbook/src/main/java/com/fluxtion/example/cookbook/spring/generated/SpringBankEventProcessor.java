@@ -53,9 +53,9 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-08-16T21:13:41.984620
- * eventProcessorGenerator version : 9.1.3
- * api version                     : 9.1.3
+ * generation time                 : 2023-08-17T12:40:11.486503
+ * eventProcessorGenerator version : 9.1.4
+ * api version                     : 9.1.4
  * </pre>
  *
  * Event classes supported:
@@ -74,9 +74,9 @@ public class SpringBankEventProcessor
         InternalEventProcessor,
         BatchHandler,
         Lifecycle,
+        BankingOperations,
         CreditCheck,
-        Account,
-        BankingOperations {
+        Account {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
