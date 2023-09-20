@@ -37,12 +37,12 @@ import com.fluxtion.runtime.audit.NodeNameAuditor;
 import com.fluxtion.runtime.callback.CallbackDispatcherImpl;
 import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.event.Event;
-import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
 import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
-import com.fluxtion.runtime.node.MutableEventProcessorContext;
+import com.fluxtion.runtime.time.Clock;
+import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
 import java.util.Map;
 
 import java.util.IdentityHashMap;
@@ -53,9 +53,9 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-08-17T12:40:11.486503
- * eventProcessorGenerator version : 9.1.4
- * api version                     : 9.1.4
+ * generation time                 : 2023-09-20T20:39:07.407469
+ * eventProcessorGenerator version : 9.1.9
+ * api version                     : 9.1.9
  * </pre>
  *
  * Event classes supported:
@@ -63,6 +63,7 @@ import java.util.function.Consumer;
  * <ul>
  *   <li>com.fluxtion.compiler.generation.model.ExportFunctionMarker
  *   <li>com.fluxtion.example.cookbook.spring.data.Transaction
+ *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
  * </ul>
  *
  * @author Greg Higgins
@@ -74,9 +75,9 @@ public class SpringBankEventProcessor
         InternalEventProcessor,
         BatchHandler,
         Lifecycle,
+        Account,
         BankingOperations,
-        CreditCheck,
-        Account {
+        CreditCheck {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
@@ -89,6 +90,7 @@ public class SpringBankEventProcessor
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
   public final CentralTransactionProcessor transactionStore = new CentralTransactionProcessor();
+  public final Clock clock = new Clock();
   private ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
@@ -114,6 +116,7 @@ public class SpringBankEventProcessor
     creditCheck.setResponsePublisher(responsePublisher);
     creditCheck.setTransactionSource(accountBean);
     //node auditors
+    initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
     subscriptionManager.setSubscribingEventProcessor(this);
     context.setEventProcessorCallback(this);
@@ -129,7 +132,7 @@ public class SpringBankEventProcessor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     //initialise dirty lookup map
     isDirty("test");
-
+    clock.init();
     afterEvent();
   }
 
@@ -164,6 +167,7 @@ public class SpringBankEventProcessor
     initCalled = false;
     auditEvent(Lifecycle.LifecycleEvent.TearDown);
     nodeNameLookup.tearDown();
+    clock.tearDown();
     subscriptionManager.tearDown();
     afterEvent();
   }
@@ -199,6 +203,9 @@ public class SpringBankEventProcessor
     if (event instanceof com.fluxtion.example.cookbook.spring.data.Transaction) {
       Transaction typedEvent = (Transaction) event;
       handleEvent(typedEvent);
+    } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
+      ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
+      handleEvent(typedEvent);
     }
   }
 
@@ -210,20 +217,21 @@ public class SpringBankEventProcessor
     accountBean.afterEventRequest();
     afterEvent();
   }
+
+  public void handleEvent(ClockStrategyEvent typedEvent) {
+    auditEvent(typedEvent);
+    //Default, no filter methods
+    clock.setClockStrategy(typedEvent);
+    afterEvent();
+  }
   //EVENT DISPATCH - END
 
   //EXPORTED SERVICE FUNCTIONS - START
   @Override
   public boolean debit(int arg0, double arg1) {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public boolean com.fluxtion.example.cookbook.spring.node.AccountNode.debit(int,double)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     isDirty_accountBean = accountBean.debit(arg0, arg1);
     if (guardCheck_creditCheck()) {
       isDirty_creditCheck = creditCheck.checkCredit();
@@ -233,23 +241,15 @@ public class SpringBankEventProcessor
     }
     //event stack unwind callbacks
     accountBean.afterEventRequest();
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
     return true;
   }
 
   @Override
   public boolean deposit(int arg0, double arg1) {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public boolean com.fluxtion.example.cookbook.spring.node.AccountNode.deposit(int,double)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     isDirty_accountBean = accountBean.deposit(arg0, arg1);
     if (guardCheck_creditCheck()) {
       isDirty_creditCheck = creditCheck.checkCredit();
@@ -259,157 +259,91 @@ public class SpringBankEventProcessor
     }
     //event stack unwind callbacks
     accountBean.afterEventRequest();
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
     return true;
   }
 
   @Override
   public void blackListAccount(int arg0) {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public void com.fluxtion.example.cookbook.spring.node.CreditCheckNode.blackListAccount(int)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     isDirty_creditCheck = true;
     creditCheck.blackListAccount(arg0);
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
   }
 
   @Override
   public void closeAccount(int arg0) {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public void com.fluxtion.example.cookbook.spring.node.AccountNode.closeAccount(int)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     isDirty_accountBean = true;
     accountBean.closeAccount(arg0);
     //event stack unwind callbacks
     accountBean.afterEventRequest();
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
   }
 
   @Override
   public void closedForBusiness() {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public void com.fluxtion.example.cookbook.spring.node.CentralTransactionProcessor.closedForBusiness()");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     transactionStore.closedForBusiness();
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
   }
 
   @Override
   public void openAccount(int arg0) {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public void com.fluxtion.example.cookbook.spring.node.AccountNode.openAccount(int)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     isDirty_accountBean = true;
     accountBean.openAccount(arg0);
     //event stack unwind callbacks
     accountBean.afterEventRequest();
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
   }
 
   @Override
   public void openForBusiness() {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public void com.fluxtion.example.cookbook.spring.node.CentralTransactionProcessor.openForBusiness()");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     transactionStore.openForBusiness();
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
   }
 
   @Override
   public void publishBalance(int arg0) {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public void com.fluxtion.example.cookbook.spring.node.AccountNode.publishBalance(int)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     isDirty_accountBean = true;
     accountBean.publishBalance(arg0);
     //event stack unwind callbacks
     accountBean.afterEventRequest();
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
   }
 
   @Override
   public void setDataStore(com.fluxtion.example.cookbook.spring.service.DataStore arg0) {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public void com.fluxtion.example.cookbook.spring.node.CentralTransactionProcessor.setDataStore(com.fluxtion.example.cookbook.spring.service.DataStore)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     transactionStore.setDataStore(arg0);
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
   }
 
   @Override
   public void whiteListAccount(int arg0) {
-    //String typedEvent = "No event information - export function";
-    functionAudit.setFunctionDescription(
+    beforeServiceCall(
         "public void com.fluxtion.example.cookbook.spring.node.CreditCheckNode.whiteListAccount(int)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    auditEvent(functionAudit);
-    if (buffering) {
-      triggerCalculation();
-    }
-    processing = true;
     isDirty_creditCheck = true;
     creditCheck.whiteListAccount(arg0);
-    afterEvent();
-    callbackDispatcher.dispatchQueuedCallbacks();
-    processing = false;
+    afterServiceCall();
   }
   //EXPORTED SERVICE FUNCTIONS - END
 
@@ -420,6 +354,10 @@ public class SpringBankEventProcessor
       auditEvent(typedEvent);
       isDirty_accountBean = true;
       accountBean.replayTransaction(typedEvent);
+    } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
+      ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
+      auditEvent(typedEvent);
+      clock.setClockStrategy(typedEvent);
     }
   }
 
@@ -439,10 +377,12 @@ public class SpringBankEventProcessor
   }
 
   private void auditEvent(Object typedEvent) {
+    clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
   }
 
   private void auditEvent(Event typedEvent) {
+    clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
   }
 
@@ -457,8 +397,24 @@ public class SpringBankEventProcessor
     auditor.nodeRegistered(context, "context");
   }
 
+  private void beforeServiceCall(String functionDescription) {
+    functionAudit.setFunctionDescription(functionDescription);
+    auditEvent(functionAudit);
+    if (buffering) {
+      triggerCalculation();
+    }
+    processing = true;
+  }
+
+  private void afterServiceCall() {
+    afterEvent();
+    callbackDispatcher.dispatchQueuedCallbacks();
+    processing = false;
+  }
+
   private void afterEvent() {
 
+    clock.processingComplete();
     nodeNameLookup.processingComplete();
     isDirty_accountBean = false;
     isDirty_creditCheck = false;
