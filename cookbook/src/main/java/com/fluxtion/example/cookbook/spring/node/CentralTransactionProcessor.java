@@ -6,21 +6,21 @@ import com.fluxtion.example.cookbook.spring.service.DataStore;
 import com.fluxtion.example.cookbook.spring.service.TransactionProcessor;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.NoPropagateFunction;
+import com.fluxtion.runtime.annotations.OnTrigger;
 import com.fluxtion.runtime.annotations.Start;
-import com.fluxtion.runtime.callback.ExportFunctionNode;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Slf4j
-public class CentralTransactionProcessor extends ExportFunctionNode implements @ExportService BankingOperations {
+public class CentralTransactionProcessor implements @ExportService BankingOperations {
     private TransactionProcessor transactionSource;
     private boolean openForBusiness = false;
     private ResponsePublisher responsePublisher;
-    private DataStore dataStore = new InMemoryDataStore();
+    private transient DataStore dataStore = new InMemoryDataStore();
 
-    @Override
-    public boolean propagateParentNotification() {
+    @OnTrigger
+    public boolean tryCommit() {
         Transaction transaction = transactionSource.currentTransactionRequest();
         if(openForBusiness){
             log.info("accept bank open");
