@@ -1,36 +1,55 @@
 package com.fluxtion.example.cookbook.lottery.nodes;
 
-import com.fluxtion.example.cookbook.lottery.LotteryGame;
+import com.fluxtion.example.cookbook.lottery.api.Ticket;
+import com.fluxtion.example.cookbook.lottery.api.LotteryGame;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.OnTrigger;
+import com.fluxtion.runtime.annotations.Start;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public class LotteryGameNode implements  @ExportService LotteryGame {
+@Slf4j
+@RequiredArgsConstructor
+public class LotteryGameNode implements
+        @ExportService LotteryGame {
 
-    private final TicketStoreNode ticketStoreNode;
+    private final Supplier<Ticket> ticketSupplier;
+    private final transient List<Ticket> ticketsBought = new ArrayList<>();
     private Consumer<String> resultPublisher;
-
-    public LotteryGameNode(){
-        this(new TicketStoreNode());
-    }
-
-    public LotteryGameNode(TicketStoreNode ticketStoreNode) {
-        this.ticketStoreNode = ticketStoreNode;
-    }
 
     @Override
     public void setResultPublisher(Consumer<String> resultPublisher) {
         this.resultPublisher = resultPublisher;
     }
 
+    @Start
+    public void start(){
+        Objects.requireNonNull(resultPublisher, "must set a results publisher before starting the lottery game");
+        log.info("started");
+    }
+
     @OnTrigger
-    public boolean newTicketSale(){
+    public boolean processNewTicketSale() {
+        ticketsBought.add(ticketSupplier.get());
+        log.info("tickets sold:{}", ticketsBought.size());
         return false;
     }
 
     @Override
-    public void pickTicket() {
-
+    public void selectWinningTicket() {
+        if(ticketsBought.isEmpty()){
+            log.info("no tickets bought - no winning ticket");
+        }else {
+            Collections.shuffle(ticketsBought);
+            log.info("WINNING ticket {}", ticketsBought.get(0));
+        }
+        ticketsBought.clear();
     }
 }
