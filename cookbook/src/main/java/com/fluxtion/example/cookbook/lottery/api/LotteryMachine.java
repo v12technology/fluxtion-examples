@@ -4,9 +4,9 @@ import java.util.function.Consumer;
 
 /**
  * Service that runs the lottery, picks a ticket and publishes the results to a supplied Consumer.
- *  * If no resultPublisher is set the LotteryGame should fail with an exception at startup
+ * If no resultPublisher is set the LotteryGame should fail with an exception at startup
  */
-public interface LotteryGame {
+public interface LotteryMachine {
 
     void selectWinningTicket();
 

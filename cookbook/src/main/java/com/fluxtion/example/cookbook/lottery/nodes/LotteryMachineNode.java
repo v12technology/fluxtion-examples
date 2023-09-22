@@ -1,7 +1,7 @@
 package com.fluxtion.example.cookbook.lottery.nodes;
 
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
-import com.fluxtion.example.cookbook.lottery.api.LotteryGame;
+import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.OnTrigger;
 import com.fluxtion.runtime.annotations.Start;
@@ -17,8 +17,7 @@ import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
-public class LotteryGameNode implements
-        @ExportService LotteryGame {
+public class LotteryMachineNode implements @ExportService LotteryMachine {
 
     private final Supplier<Ticket> ticketSupplier;
     private final transient List<Ticket> ticketsBought = new ArrayList<>();

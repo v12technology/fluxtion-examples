@@ -1,7 +1,7 @@
 package com.fluxtion.example.cookbook.lottery;
 
 import com.fluxtion.compiler.extern.spring.FluxtionSpring;
-import com.fluxtion.example.cookbook.lottery.api.LotteryGame;
+import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 @Slf4j
 public class LotteryApp {
 
-    private static LotteryGame lotteryGame;
+    private static LotteryMachine lotteryMachine;
     private static TicketStore ticketStore;
 
     public static void main(String[] args) {
@@ -39,16 +39,16 @@ public class LotteryApp {
         ticketStore.buyTicket(new Ticket(12_65_56));
 
         //run the lottery
-        lotteryGame.selectWinningTicket();
+        lotteryMachine.selectWinningTicket();
     }
 
     public static void start(Consumer<String> ticketReceiptHandler, Consumer<String> resultsPublisher){
         var lotteryEventProcessor = FluxtionSpring.interpret(
                 new ClassPathXmlApplicationContext("com/fluxtion/example/cookbook/lottery/spring-lottery.xml"));
         lotteryEventProcessor.init();
-        lotteryGame = lotteryEventProcessor.getExportedService();
+        lotteryMachine = lotteryEventProcessor.getExportedService();
         ticketStore = lotteryEventProcessor.getExportedService();
-        lotteryGame.setResultPublisher(resultsPublisher);
+        lotteryMachine.setResultPublisher(resultsPublisher);
         ticketStore.setTicketSalesPublisher(ticketReceiptHandler);
         lotteryEventProcessor.start();
     }
