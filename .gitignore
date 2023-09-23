@@ -11,3 +11,5 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 /.idea/
 **/*.iml
+/getting-started/tutorial2-lottery-aot/src/main/resources/com/fluxtion/example/cookbook/lottery/aot/LotteryProcessor.graphml
+/getting-started/tutorial2-lottery-aot/src/main/resources/com/fluxtion/example/cookbook/lottery/aot/LotteryProcessor.png
