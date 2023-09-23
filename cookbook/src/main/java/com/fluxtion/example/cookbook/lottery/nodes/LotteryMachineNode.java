@@ -17,23 +17,23 @@ import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
-public class LotteryMachineNode implements @ExportService LotteryMachine {
 
-    private final Supplier<Ticket> ticketSupplier;
-    private final transient List<Ticket> ticketsBought = new ArrayList<>();
-    private Consumer<String> resultPublisher;
+    public class LotteryMachineNode implements @ExportService LotteryMachine {
 
-    @Override
-    public void setResultPublisher(Consumer<String> resultPublisher) {
-        this.resultPublisher = resultPublisher;
-    }
+        private final Supplier<Ticket> ticketSupplier;
+        private final transient List<Ticket> ticketsBought = new ArrayList<>();
+        private Consumer<String> resultPublisher;
 
-    @Start
-    public void start(){
-        Objects.requireNonNull(resultPublisher, "must set a results publisher before starting the lottery game");
-        log.info("started");
-    }
+        @Override
+        public void setResultPublisher(Consumer<String> resultPublisher) {
+            this.resultPublisher = resultPublisher;
+        }
 
+        @Start
+        public void start(){
+            Objects.requireNonNull(resultPublisher, "must set a results publisher before starting the lottery game");
+            log.info("started");
+        }
     @OnTrigger
     public boolean processNewTicketSale() {
         ticketsBought.add(ticketSupplier.get());
