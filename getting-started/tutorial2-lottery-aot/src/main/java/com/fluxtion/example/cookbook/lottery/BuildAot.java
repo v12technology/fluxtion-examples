@@ -5,12 +5,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class BuildAot {
     public static void main(String[] args) {
-        System.out.println("hello world");
         FluxtionSpring.compileAot(
                 new ClassPathXmlApplicationContext("/spring-lottery.xml"),
                 c -> {
                     c.setPackageName("com.fluxtion.example.cookbook.lottery.aot");
                     c.setClassName("LotteryProcessor");
+                    //required because maven does not pass the classpath properly
                     c.setCompileSource(false);
                 }
         );
