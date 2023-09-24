@@ -1,12 +1,10 @@
 package com.fluxtion.example.cookbook.lottery;
 
-import com.fluxtion.compiler.extern.spring.FluxtionSpring;
 import com.fluxtion.example.cookbook.lottery.aot.LotteryProcessor;
 import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.function.Consumer;
 
