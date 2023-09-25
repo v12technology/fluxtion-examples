@@ -34,6 +34,7 @@ along with this program.  If not, see
         <module>articles</module>
         <module>getting-started/tutorial1-lottery</module>
         <module>getting-started/tutorial2-lottery-aot</module>
+        <module>getting-started/tutorial3-lottery-auditlog</module>
     </modules>
 
     <properties>
