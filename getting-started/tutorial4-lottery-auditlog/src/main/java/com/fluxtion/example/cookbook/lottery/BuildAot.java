@@ -9,7 +9,7 @@ public class BuildAot {
         FluxtionSpring.compileAot(
                 new ClassPathXmlApplicationContext("/spring-lottery.xml"),
                 c ->{
-                    c.addEventAudit(EventLogControlEvent.LogLevel.DEBUG, true);
+                    c.addEventAudit(EventLogControlEvent.LogLevel.INFO, true);
                 },
                 c -> {
                     c.setPackageName("com.fluxtion.example.cookbook.lottery.aot");

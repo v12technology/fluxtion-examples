@@ -5,7 +5,6 @@ import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import com.fluxtion.example.cookbook.lottery.auditor.FluxtionSlf4jAuditor;
-import com.fluxtion.runtime.audit.EventLogControlEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Consumer;
@@ -50,7 +49,7 @@ public class LotteryApp {
     public static void start(Consumer<String> ticketReceiptHandler, Consumer<String> resultsPublisher){
         lotteryEventProcessor = new LotteryProcessor();
         lotteryEventProcessor.init();
-        lotteryEventProcessor.setAuditLogLevel(EventLogControlEvent.LogLevel.ERROR);
+//        lotteryEventProcessor.setAuditLogLevel(EventLogControlEvent.LogLevel.DEBUG);
         lotteryEventProcessor.setAuditLogProcessor(new FluxtionSlf4jAuditor());
         lotteryMachine = lotteryEventProcessor.getExportedService();
         ticketStore = lotteryEventProcessor.getExportedService();

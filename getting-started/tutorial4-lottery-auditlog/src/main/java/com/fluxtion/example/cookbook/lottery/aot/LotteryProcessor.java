@@ -50,7 +50,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-09-25T22:09:39.739689
+ * generation time                 : 2023-09-25T22:16:56.782435
  * eventProcessorGenerator version : 9.1.9
  * api version                     : 9.1.9
  * </pre>
