@@ -30,12 +30,14 @@
     </build>
 
     <dependencies>
+<!--        PROVIDED SCOPE-->
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>compiler</artifactId>
             <version>${fluxtion.version}</version>
             <scope>provided</scope>
         </dependency>
+<!--        RUNTIME -->
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>runtime</artifactId>
@@ -53,6 +55,7 @@
             <artifactId>spring-context</artifactId>
             <version>5.3.29</version>
         </dependency>
+<!--        EXPLICITLY SET DEPENDENCY - NO LONGER SUPPLIED BY COMPILER-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
