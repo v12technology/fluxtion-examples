@@ -1,7 +1,6 @@
 package com.fluxtion.example.cookbook.lottery;
 
 import com.fluxtion.compiler.extern.spring.FluxtionSpring;
-import com.fluxtion.example.cookbook.lottery.auditor.SystemStatisticsAuditor;
 import com.fluxtion.runtime.audit.EventLogControlEvent;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -10,8 +9,7 @@ public class BuildAot {
         FluxtionSpring.compileAot(
                 new ClassPathXmlApplicationContext("/spring-lottery.xml"),
                 c ->{
-//                    c.addEventAudit(EventLogControlEvent.LogLevel.INFO, true);
-                    c.addAuditor(new SystemStatisticsAuditor(), "systemAuditor");
+                    c.addEventAudit(EventLogControlEvent.LogLevel.DEBUG, true);
                 },
                 c -> {
                     c.setPackageName("com.fluxtion.example.cookbook.lottery.aot");

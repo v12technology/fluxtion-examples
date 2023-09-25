@@ -24,6 +24,7 @@
                 <version>3.1.0</version>
                 <configuration>
                     <mainClass>com.fluxtion.example.cookbook.lottery.BuildAot</mainClass>
+                    <classpathScope>compile</classpathScope>
                 </configuration>
             </plugin>
         </plugins>
@@ -62,6 +63,5 @@
             <scope>compile</scope>
             <version>2.0.7</version>
         </dependency>
-
     </dependencies>
 </project>

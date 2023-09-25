@@ -2,7 +2,6 @@ package com.fluxtion.example.cookbook.lottery;
 
 import com.fluxtion.example.cookbook.lottery.aot.LotteryProcessor;
 import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
-import com.fluxtion.example.cookbook.lottery.api.SystemMonitor;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import com.fluxtion.example.cookbook.lottery.auditor.FluxtionSlf4jAuditor;
@@ -51,14 +50,13 @@ public class LotteryApp {
     public static void start(Consumer<String> ticketReceiptHandler, Consumer<String> resultsPublisher){
         lotteryEventProcessor = new LotteryProcessor();
         lotteryEventProcessor.init();
-//        lotteryEventProcessor.setAuditLogLevel(EventLogControlEvent.LogLevel.ERROR);
-//        lotteryEventProcessor.setAuditLogProcessor(new FluxtionSlf4jAuditor());
+        lotteryEventProcessor.setAuditLogLevel(EventLogControlEvent.LogLevel.ERROR);
+        lotteryEventProcessor.setAuditLogProcessor(new FluxtionSlf4jAuditor());
         lotteryMachine = lotteryEventProcessor.getExportedService();
         ticketStore = lotteryEventProcessor.getExportedService();
         lotteryMachine.setResultPublisher(resultsPublisher);
         ticketStore.setTicketSalesPublisher(ticketReceiptHandler);
         lotteryEventProcessor.start();
-        lotteryEventProcessor.consumeServiceIfExported(SystemMonitor.class, SystemMonitor::publishStats);
     }
 
     public static void ticketReceipt(String receipt){
