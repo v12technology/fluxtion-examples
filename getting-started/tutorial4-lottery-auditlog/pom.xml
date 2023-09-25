@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.fluxtion.example</groupId>
-    <artifactId>getting-started-tutorial2</artifactId>
+    <artifactId>getting-started-tutorial4</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>getting-started :: tutorial 2 :: lottery aot</name>
+    <name>getting-started :: tutorial 4 :: lottery auditor</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -34,12 +34,6 @@
             <groupId>com.fluxtion</groupId>
             <artifactId>compiler</artifactId>
             <version>${fluxtion.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fluxtion</groupId>
-            <artifactId>runtime</artifactId>
-            <version>${fluxtion.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -53,12 +47,5 @@
             <artifactId>spring-context</artifactId>
             <version>5.3.29</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <scope>compile</scope>
-            <version>2.0.7</version>
-        </dependency>
-
     </dependencies>
 </project>

@@ -51,7 +51,7 @@ public class LotteryApp {
     public static void start(Consumer<String> ticketReceiptHandler, Consumer<String> resultsPublisher){
         lotteryEventProcessor = new LotteryProcessor();
         lotteryEventProcessor.init();
-        lotteryEventProcessor.setAuditLogLevel(EventLogControlEvent.LogLevel.ERROR);
+//        lotteryEventProcessor.setAuditLogLevel(EventLogControlEvent.LogLevel.ERROR);
 //        lotteryEventProcessor.setAuditLogProcessor(new FluxtionSlf4jAuditor());
         lotteryMachine = lotteryEventProcessor.getExportedService();
         ticketStore = lotteryEventProcessor.getExportedService();
