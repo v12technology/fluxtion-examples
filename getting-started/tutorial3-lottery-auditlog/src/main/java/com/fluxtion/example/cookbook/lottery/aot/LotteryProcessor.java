@@ -23,12 +23,13 @@ import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
 import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
+import com.fluxtion.example.cookbook.lottery.api.SystemMonitor;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
+import com.fluxtion.example.cookbook.lottery.auditor.SystemStatisticsAuditor;
 import com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode;
 import com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode;
 import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
-import com.fluxtion.runtime.audit.EventLogControlEvent;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
 import com.fluxtion.runtime.callback.CallbackDispatcherImpl;
@@ -50,7 +51,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-09-24T18:48:36.385104
+ * generation time                 : 2023-09-25T09:59:06.547808
  * eventProcessorGenerator version : 9.1.9
  * api version                     : 9.1.9
  * </pre>
@@ -59,7 +60,6 @@ import java.util.function.Consumer;
  *
  * <ul>
  *   <li>com.fluxtion.compiler.generation.model.ExportFunctionMarker
- *   <li>com.fluxtion.runtime.audit.EventLogControlEvent
  *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
  * </ul>
  *
@@ -73,12 +73,11 @@ public class LotteryProcessor
         BatchHandler,
         Lifecycle,
         LotteryMachine,
+        SystemMonitor,
         TicketStore {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  public final Clock clock = new Clock();
-  public final EventLogManager eventLogger = new EventLogManager();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
@@ -86,17 +85,18 @@ public class LotteryProcessor
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
   public final TicketStoreNode ticketStore = new TicketStoreNode();
   public final LotteryMachineNode lotteryMachine = new LotteryMachineNode(ticketStore);
+  public final SystemStatisticsAuditor systemAuditor = new SystemStatisticsAuditor();
+  public final Clock clock = new Clock();
   private ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(2);
+      new IdentityHashMap<>(1);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(2);
+      new IdentityHashMap<>(1);
 
-  private boolean isDirty_clock = false;
   private boolean isDirty_ticketStore = false;
   //Forked declarations
 
@@ -104,14 +104,9 @@ public class LotteryProcessor
 
   public LotteryProcessor(Map<Object, Object> contextMap) {
     context.replaceMappings(contextMap);
-    eventLogger.trace = (boolean) true;
-    eventLogger.printEventToString = (boolean) true;
-    eventLogger.printThreadName = (boolean) true;
-    eventLogger.traceLevel = com.fluxtion.runtime.audit.EventLogControlEvent.LogLevel.INFO;
-    eventLogger.clock = clock;
     //node auditors
     initialiseAuditor(clock);
-    initialiseAuditor(eventLogger);
+    initialiseAuditor(systemAuditor);
     initialiseAuditor(nodeNameLookup);
     subscriptionManager.setSubscribingEventProcessor(this);
     context.setEventProcessorCallback(this);
@@ -163,7 +158,7 @@ public class LotteryProcessor
     initCalled = false;
     auditEvent(Lifecycle.LifecycleEvent.TearDown);
     nodeNameLookup.tearDown();
-    eventLogger.tearDown();
+    systemAuditor.tearDown();
     clock.tearDown();
     subscriptionManager.tearDown();
     afterEvent();
@@ -197,28 +192,16 @@ public class LotteryProcessor
 
   @Override
   public void onEventInternal(Object event) {
-    if (event instanceof com.fluxtion.runtime.audit.EventLogControlEvent) {
-      EventLogControlEvent typedEvent = (EventLogControlEvent) event;
-      handleEvent(typedEvent);
-    } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
+    if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       handleEvent(typedEvent);
     }
-  }
-
-  public void handleEvent(EventLogControlEvent typedEvent) {
-    auditEvent(typedEvent);
-    //Default, no filter methods
-    auditInvocation(eventLogger, "eventLogger", "calculationLogConfig", typedEvent);
-    eventLogger.calculationLogConfig(typedEvent);
-    afterEvent();
   }
 
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
     auditInvocation(clock, "clock", "setClockStrategy", typedEvent);
-    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -263,6 +246,16 @@ public class LotteryProcessor
   }
 
   @Override
+  public void publishStats() {
+    beforeServiceCall(
+        "public void com.fluxtion.example.cookbook.lottery.auditor.SystemStatisticsAuditor.publishStats()");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    auditInvocation(systemAuditor, "systemAuditor", "publishStats", typedEvent);
+    systemAuditor.publishStats();
+    afterServiceCall();
+  }
+
+  @Override
   public void selectWinningTicket() {
     beforeServiceCall(
         "public void com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode.selectWinningTicket()");
@@ -296,16 +289,10 @@ public class LotteryProcessor
 
   public void bufferEvent(Object event) {
     buffering = true;
-    if (event instanceof com.fluxtion.runtime.audit.EventLogControlEvent) {
-      EventLogControlEvent typedEvent = (EventLogControlEvent) event;
-      auditEvent(typedEvent);
-      auditInvocation(eventLogger, "eventLogger", "calculationLogConfig", typedEvent);
-      eventLogger.calculationLogConfig(typedEvent);
-    } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
+    if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
       auditInvocation(clock, "clock", "setClockStrategy", typedEvent);
-      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     }
   }
@@ -322,18 +309,18 @@ public class LotteryProcessor
 
   private void auditEvent(Object typedEvent) {
     clock.eventReceived(typedEvent);
-    eventLogger.eventReceived(typedEvent);
+    systemAuditor.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
   }
 
   private void auditEvent(Event typedEvent) {
     clock.eventReceived(typedEvent);
-    eventLogger.eventReceived(typedEvent);
+    systemAuditor.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
   }
 
   private void auditInvocation(Object node, String nodeName, String methodName, Object typedEvent) {
-    eventLogger.nodeInvoked(node, nodeName, methodName, typedEvent);
+    systemAuditor.nodeInvoked(node, nodeName, methodName, typedEvent);
   }
 
   private void initialiseAuditor(Auditor auditor) {
@@ -363,9 +350,8 @@ public class LotteryProcessor
   private void afterEvent() {
 
     clock.processingComplete();
-    eventLogger.processingComplete();
+    systemAuditor.processingComplete();
     nodeNameLookup.processingComplete();
-    isDirty_clock = false;
     isDirty_ticketStore = false;
   }
 
@@ -397,7 +383,6 @@ public class LotteryProcessor
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
-      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(ticketStore, () -> isDirty_ticketStore);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
@@ -406,7 +391,6 @@ public class LotteryProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
-      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(ticketStore, (b) -> isDirty_ticketStore = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
@@ -414,10 +398,6 @@ public class LotteryProcessor
 
   private boolean guardCheck_lotteryMachine() {
     return isDirty_ticketStore;
-  }
-
-  private boolean guardCheck_eventLogger() {
-    return isDirty_clock;
   }
 
   @Override
