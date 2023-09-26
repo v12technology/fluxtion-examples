@@ -31,14 +31,20 @@
     </build>
 
     <dependencies>
-<!--        PROVIDED SCOPE-->
+        <!--        PROVIDED SCOPE-->
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>compiler</artifactId>
             <version>${fluxtion.version}</version>
             <scope>provided</scope>
         </dependency>
-<!--        RUNTIME -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.3.29</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--        RUNTIME -->
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>runtime</artifactId>
@@ -51,12 +57,7 @@
             <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.3.29</version>
-        </dependency>
-<!--        EXPLICITLY SET DEPENDENCY - NO LONGER SUPPLIED BY COMPILER-->
+        <!--        EXPLICITLY SET DEPENDENCY - NO LONGER SUPPLIED BY COMPILER-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
