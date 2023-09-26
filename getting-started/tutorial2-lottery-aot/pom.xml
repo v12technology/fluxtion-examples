@@ -7,7 +7,7 @@
     <artifactId>getting-started-tutorial2</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>getting-started :: tutorial 2 :: lottery aot</name>
+    <name>getting-started :: tutorial 2 :: aot</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -50,14 +50,13 @@
             <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
-        <!--        RUNTIME -->
+        <!--        RUNTIME SCOPE NO LONGER SUPPLIED BY FLUXTION COMPILER-->
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>runtime</artifactId>
             <version>${fluxtion.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!--        EXPLICITLY SET DEPENDENCY - NO LONGER SUPPLIED BY COMPILER-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>

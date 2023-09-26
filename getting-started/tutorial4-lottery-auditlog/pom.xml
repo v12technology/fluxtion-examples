@@ -7,7 +7,7 @@
     <artifactId>getting-started-tutorial4</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>getting-started :: tutorial 4 :: lottery auditor</name>
+    <name>getting-started :: tutorial 4 :: audit logging</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -38,12 +38,11 @@
             <version>${fluxtion.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!--        RUNTIME -->
         <dependency>
-            <groupId>com.fluxtion</groupId>
-            <artifactId>runtime</artifactId>
-            <version>${fluxtion.version}</version>
-            <scope>compile</scope>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.3.29</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -51,12 +50,13 @@
             <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
+        <!--        RUNTIME SCOPE NO LONGER SUPPLIED BY FLUXTION COMPILER-->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.3.29</version>
+            <groupId>com.fluxtion</groupId>
+            <artifactId>runtime</artifactId>
+            <version>${fluxtion.version}</version>
+            <scope>compile</scope>
         </dependency>
-        <!--        EXPLICITLY SET DEPENDENCY - NO LONGER SUPPLIED BY COMPILER-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
