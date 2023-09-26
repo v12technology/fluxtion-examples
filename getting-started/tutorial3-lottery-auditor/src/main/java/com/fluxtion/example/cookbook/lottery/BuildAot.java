@@ -10,7 +10,6 @@ public class BuildAot {
         FluxtionSpring.compileAot(
                 new ClassPathXmlApplicationContext("/spring-lottery.xml"),
                 c ->{
-//                    c.addEventAudit(EventLogControlEvent.LogLevel.INFO, true);
                     c.addAuditor(new SystemStatisticsAuditor(), "systemAuditor");
                 },
                 c -> {

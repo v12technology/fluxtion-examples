@@ -48,6 +48,7 @@ public class LotteryMachineNode implements @ExportService LotteryMachine {
         } else {
             Collections.shuffle(ticketsBought);
             log.info("WINNING ticket {}", ticketsBought.get(0));
+            resultPublisher.accept("winning numbers:" + ticketsBought.get(0).number());
         }
         ticketsBought.clear();
     }

@@ -6,7 +6,6 @@ import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.NoPropagateFunction;
 import com.fluxtion.runtime.annotations.Start;
 import com.fluxtion.runtime.audit.EventLogNode;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -37,19 +36,13 @@ public class TicketStoreNode extends EventLogNode implements
     @Override
     public boolean buyTicket(Ticket ticket) {
         if (ticket.number() < 9_99_99 | ticket.number() > 99_99_99) {
-            auditLog.info("rejectTicket", true)
-                    .info("badTicket", ticket)
-                    .info("invalidNumber", ticket.number());
             ticketSalesPublisher.accept("invalid numbers " + ticket);
             this.ticket = null;
         } else if (storeOpen) {
             ticketSalesPublisher.accept("good luck with " + ticket);
-            auditLog.info("ticketPurchased", ticket);
             this.ticket = ticket;
         } else {
             ticketSalesPublisher.accept("store shut - no tickets can be bought");
-            auditLog.info("rejectTicket", true)
-                    .info("storeOpen", storeOpen);
             this.ticket = null;
         }
         return this.ticket != null;
@@ -64,13 +57,11 @@ public class TicketStoreNode extends EventLogNode implements
     @NoPropagateFunction
     public void openStore() {
         storeOpen = true;
-        auditLog.info("storeOpen", storeOpen);
     }
 
     @Override
     @NoPropagateFunction
     public void closeStore() {
         storeOpen = false;
-        auditLog.info("storeOpen", storeOpen);
     }
 }
