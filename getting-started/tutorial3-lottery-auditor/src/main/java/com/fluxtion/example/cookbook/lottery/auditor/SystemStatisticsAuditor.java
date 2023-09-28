@@ -1,6 +1,6 @@
 package com.fluxtion.example.cookbook.lottery.auditor;
 
-import com.fluxtion.example.cookbook.lottery.api.SystemMonitor;
+import com.fluxtion.example.cookbook.lottery.api.LotterySystemMonitor;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
@@ -13,7 +13,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class SystemStatisticsAuditor implements Auditor, @ExportService SystemMonitor {
+public class SystemStatisticsAuditor implements Auditor, @ExportService LotterySystemMonitor {
     private transient final Map<Object, Stats> nodeStats = new IdentityHashMap<>();
     private transient final Map<String, Stats> eventStats = new HashMap<>();
     private transient final Map<String, Stats> methodStats = new HashMap<>();
@@ -34,11 +34,6 @@ public class SystemStatisticsAuditor implements Auditor, @ExportService SystemMo
     }
 
     @Override
-    public void tearDown() {
-        publishStats();
-    }
-
-    @Override
     public void nodeInvoked(Object node, String nodeName, String methodName, Object event) {
         nodeStats.computeIfPresent(node, (n, s) -> s.incrementCallCount());
         String name = nodeName + "#" + methodName;
@@ -50,12 +45,22 @@ public class SystemStatisticsAuditor implements Auditor, @ExportService SystemMo
     }
 
     @Override
+    public void tearDown() {
+        publishStats();
+    }
+
+    @Override
     public boolean auditInvocations() {
         return true;
     }
 
     @Override
     public void publishStats() {
+        System.out.println("""
+                
+                -------------------------------------------------------------------------------------------
+                NODE STATS START
+                -------------------------------------------------------------------------------------------""");
         System.out.println(
                 nodeStats.values().stream()
                         .sorted(Comparator.comparing(Stats::getCount))
@@ -71,9 +76,14 @@ public class SystemStatisticsAuditor implements Auditor, @ExportService SystemMo
         System.out.println(
                 methodStats.values().stream()
                         .sorted(Comparator.comparing(Stats::getCount))
-                        .map(Stats::eventReport)
+                        .map(Stats::methodReport)
                         .collect(Collectors.joining("\n\t", "Node method stats:\n\t", ""))
         );
+        System.out.println("""
+                -------------------------------------------------------------------------------------------
+                NODE STATS END
+                -------------------------------------------------------------------------------------------
+                """);
     }
 
     private void updateEventStats(Object event){
@@ -89,7 +99,7 @@ public class SystemStatisticsAuditor implements Auditor, @ExportService SystemMo
     }
 
     @Data
-    public static final class Stats {
+    private static final class Stats {
         private final String name;
         private int count;
 

@@ -2,6 +2,7 @@ package com.fluxtion.example.cookbook.lottery;
 
 import com.fluxtion.example.cookbook.lottery.aot.LotteryProcessor;
 import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
+import com.fluxtion.example.cookbook.lottery.api.LotterySystemMonitor;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,10 @@ public class LotteryApp {
         //open store and buy ticket
         ticketStore.openStore();
         ticketStore.buyTicket(new Ticket(12_65_56));
+        //print stats
+        lotteryEventProcessor.consumeServiceIfExported(LotterySystemMonitor.class, LotterySystemMonitor::publishStats);
+
+        //buy more tickets
         ticketStore.buyTicket(new Ticket(36_58_58));
         ticketStore.buyTicket(new Ticket(73_00_12));
 

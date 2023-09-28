@@ -1,6 +1,6 @@
 package com.fluxtion.example.cookbook.lottery.api;
 
-public interface SystemMonitor {
+public interface LotterySystemMonitor {
 
     void publishStats();
 }

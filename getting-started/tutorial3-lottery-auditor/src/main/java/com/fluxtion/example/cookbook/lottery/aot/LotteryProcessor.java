@@ -23,12 +23,11 @@ import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
 import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
-import com.fluxtion.example.cookbook.lottery.api.SystemMonitor;
+import com.fluxtion.example.cookbook.lottery.api.LotterySystemMonitor;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import com.fluxtion.example.cookbook.lottery.auditor.SystemStatisticsAuditor;
 import com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode;
 import com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode;
-import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -37,7 +36,6 @@ import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
-import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.time.Clock;
 import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
@@ -73,7 +71,7 @@ public class LotteryProcessor
         BatchHandler,
         Lifecycle,
         LotteryMachine,
-        SystemMonitor,
+        LotterySystemMonitor,
         TicketStore {
 
   //Node declarations
