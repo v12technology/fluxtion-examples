@@ -28,6 +28,7 @@ import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import com.fluxtion.example.cookbook.lottery.auditor.SystemStatisticsAuditor;
 import com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode;
 import com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode;
+import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -36,6 +37,7 @@ import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
+import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.time.Clock;
 import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
@@ -49,7 +51,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-09-26T17:03:18.120351
+ * generation time                 : 2023-09-28T08:00:27.899951
  * eventProcessorGenerator version : 9.1.9
  * api version                     : 9.1.9
  * </pre>

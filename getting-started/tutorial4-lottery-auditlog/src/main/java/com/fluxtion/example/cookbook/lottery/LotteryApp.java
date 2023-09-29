@@ -1,11 +1,14 @@
 package com.fluxtion.example.cookbook.lottery;
 
-import com.fluxtion.example.cookbook.lottery.aot.LotteryProcessor;
+import com.fluxtion.compiler.extern.spring.FluxtionSpring;
 import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import com.fluxtion.example.cookbook.lottery.auditor.FluxtionSlf4jAuditor;
+import com.fluxtion.runtime.EventProcessor;
+import com.fluxtion.runtime.audit.EventLogControlEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.function.Consumer;
 
@@ -17,7 +20,7 @@ public class LotteryApp {
 
     private static LotteryMachine lotteryMachine;
     private static TicketStore ticketStore;
-    private static LotteryProcessor lotteryEventProcessor;
+    private static EventProcessor<?> lotteryEventProcessor;
 
     public static void main(String[] args) {
         start(LotteryApp::ticketReceipt, LotteryApp::lotteryResult);
@@ -47,7 +50,9 @@ public class LotteryApp {
     }
 
     public static void start(Consumer<String> ticketReceiptHandler, Consumer<String> resultsPublisher){
-        lotteryEventProcessor = new LotteryProcessor();
+        lotteryEventProcessor = FluxtionSpring.interpret(
+                new ClassPathXmlApplicationContext("/spring-lottery.xml"),
+                c -> c.addEventAudit(EventLogControlEvent.LogLevel.DEBUG));
         lotteryEventProcessor.init();
 //        lotteryEventProcessor.setAuditLogLevel(EventLogControlEvent.LogLevel.DEBUG);
         lotteryEventProcessor.setAuditLogProcessor(new FluxtionSlf4jAuditor());

@@ -19,22 +19,23 @@ import java.util.function.Supplier;
 @Slf4j
 @RequiredArgsConstructor
 
-    public class LotteryMachineNode extends EventLogNode implements @ExportService LotteryMachine {
+public class LotteryMachineNode extends EventLogNode implements @ExportService LotteryMachine {
 
-        private final Supplier<Ticket> ticketSupplier;
-        private final transient List<Ticket> ticketsBought = new ArrayList<>();
-        private Consumer<String> resultPublisher;
+    private final Supplier<Ticket> ticketSupplier;
+    private final transient List<Ticket> ticketsBought = new ArrayList<>();
+    private Consumer<String> resultPublisher;
 
-        @Override
-        public void setResultPublisher(Consumer<String> resultPublisher) {
-            this.resultPublisher = resultPublisher;
-        }
+    @Override
+    public void setResultPublisher(Consumer<String> resultPublisher) {
+        this.resultPublisher = resultPublisher;
+    }
 
-        @Start
-        public void start(){
-            Objects.requireNonNull(resultPublisher, "must set a results publisher before starting the lottery game");
-            auditLog.info("resultPublisher", "valid");
-        }
+    @Start
+    public void start() {
+        Objects.requireNonNull(resultPublisher, "must set a results publisher before starting the lottery game");
+        auditLog.info("resultPublisher", "valid");
+    }
+
     @OnTrigger
     public boolean processNewTicketSale() {
         ticketsBought.add(ticketSupplier.get());
@@ -44,9 +45,9 @@ import java.util.function.Supplier;
 
     @Override
     public void selectWinningTicket() {
-        if(ticketsBought.isEmpty()){
+        if (ticketsBought.isEmpty()) {
             auditLog.info("failedLottery", "noTicketSales");
-        }else {
+        } else {
             Collections.shuffle(ticketsBought);
             auditLog.info("winningTicket", ticketsBought.get(0));
         }
