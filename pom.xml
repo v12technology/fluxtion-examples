@@ -36,6 +36,7 @@ along with this program.  If not, see
         <module>getting-started/tutorial2-lottery-aot</module>
         <module>getting-started/tutorial3-lottery-auditor</module>
         <module>getting-started/tutorial4-lottery-auditlog</module>
+        <module>getting-started/tutorial5-lottery-extended</module>
     </modules>
 
     <properties>
