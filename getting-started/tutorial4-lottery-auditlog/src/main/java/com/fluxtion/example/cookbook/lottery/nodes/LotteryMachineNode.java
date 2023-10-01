@@ -18,7 +18,6 @@ import java.util.function.Supplier;
 
 @Slf4j
 @RequiredArgsConstructor
-
 public class LotteryMachineNode extends EventLogNode implements @ExportService LotteryMachine {
 
     private final Supplier<Ticket> ticketSupplier;

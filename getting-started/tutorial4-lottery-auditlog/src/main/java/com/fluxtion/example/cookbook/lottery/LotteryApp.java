@@ -52,9 +52,8 @@ public class LotteryApp {
     public static void start(Consumer<String> ticketReceiptHandler, Consumer<String> resultsPublisher){
         lotteryEventProcessor = FluxtionSpring.interpret(
                 new ClassPathXmlApplicationContext("/spring-lottery.xml"),
-                c -> c.addEventAudit(EventLogControlEvent.LogLevel.DEBUG));
+                c -> c.addEventAudit(EventLogControlEvent.LogLevel.INFO));
         lotteryEventProcessor.init();
-//        lotteryEventProcessor.setAuditLogLevel(EventLogControlEvent.LogLevel.DEBUG);
         lotteryEventProcessor.setAuditLogProcessor(new FluxtionSlf4jAuditor());
         lotteryMachine = lotteryEventProcessor.getExportedService();
         ticketStore = lotteryEventProcessor.getExportedService();
