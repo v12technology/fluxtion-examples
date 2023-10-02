@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><graphml xmlns="http://graphml.graphdrawing.org/xmlns" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd" xmlns:jGraph="http://www.jgraph.com/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <key id="vertex_label" for="node" attr.name="nodeData" attr.type="string"/>
+    <key id="edge_label" for="edge" attr.name="edgeData" attr.type="string"/>
+    <graph edgedefault="undirected">
+        <node id="lotteryMachine">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="id:lotteryMachine&#10;class:LotteryMachineNode"/>
+                    <jGraph:Style properties="NODE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="ticketStore">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="id:ticketStore&#10;class:TicketStoreNode"/>
+                    <jGraph:Style properties="NODE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="context">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="id:context&#10;class:MutableEventProcessorContext"/>
+                    <jGraph:Style properties="NODE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="nodeNameLookup">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="id:nodeNameLookup&#10;class:NodeNameAuditor"/>
+                    <jGraph:Style properties="NODE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="callbackDispatcher">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="id:callbackDispatcher&#10;class:CallbackDispatcherImpl"/>
+                    <jGraph:Style properties="NODE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="subscriptionManager">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="id:subscriptionManager&#10;class:SubscriptionManagerNode"/>
+                    <jGraph:Style properties="NODE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="LotteryMachine">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;ExportService&gt;&gt;&#10;class:LotteryMachine&#10;"/>
+                    <jGraph:Style properties="EXPORTSERVICE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="TicketStore">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;ExportService&gt;&gt;&#10;class:TicketStore&#10;"/>
+                    <jGraph:Style properties="EXPORTSERVICE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <edge id="1" source="ticketStore" target="lotteryMachine">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="2" source="nodeNameLookup" target="context">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="3" source="callbackDispatcher" target="context">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="4" source="subscriptionManager" target="context">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="5" source="LotteryMachine" target="lotteryMachine">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="6" source="TicketStore" target="ticketStore">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+    </graph>
+</graphml>

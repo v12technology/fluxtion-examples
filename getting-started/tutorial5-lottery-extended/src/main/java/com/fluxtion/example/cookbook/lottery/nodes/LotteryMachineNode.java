@@ -5,6 +5,7 @@ import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.OnTrigger;
 import com.fluxtion.runtime.annotations.Start;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,9 +20,9 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class LotteryMachineNode implements @ExportService LotteryMachine {
 
-    private final Supplier<Ticket> ticketSupplier;
-    private final transient List<Ticket> ticketsBought = new ArrayList<>();
-    private Consumer<String> resultPublisher;
+    protected final Supplier<Ticket> ticketSupplier;
+    protected @Getter final transient List<Ticket> ticketsBought = new ArrayList<>();
+    protected Consumer<String> resultPublisher;
 
     @Override
     public void setResultPublisher(Consumer<String> resultPublisher) {
