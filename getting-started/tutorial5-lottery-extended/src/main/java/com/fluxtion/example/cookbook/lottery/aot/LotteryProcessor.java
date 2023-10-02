@@ -52,7 +52,7 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-10-02T08:02:55.573799
+ * generation time                 : 2023-10-02T08:14:22.541663
  * eventProcessorGenerator version : 9.1.10
  * api version                     : 9.1.10
  * </pre>

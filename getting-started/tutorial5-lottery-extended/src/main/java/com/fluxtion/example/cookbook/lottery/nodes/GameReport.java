@@ -5,7 +5,6 @@ import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.builder.AssignToField;
-import lombok.RequiredArgsConstructor;
 
 import java.util.function.Consumer;
 
