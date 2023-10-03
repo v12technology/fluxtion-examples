@@ -55,14 +55,12 @@ public class TicketStoreNode implements
     @Override
     @NoPropagateFunction
     public void openStore() {
-        log.info("store opened");
         storeOpen = true;
     }
 
     @Override
     @NoPropagateFunction
     public void closeStore() {
-        log.info("store closed");
         storeOpen = false;
     }
 }

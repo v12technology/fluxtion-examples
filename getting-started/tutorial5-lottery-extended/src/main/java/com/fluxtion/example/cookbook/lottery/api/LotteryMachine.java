@@ -10,5 +10,7 @@ public interface LotteryMachine {
 
     void selectWinningTicket();
 
+    void newGame();
+
     void setResultPublisher(Consumer<String> resultPublisher);
 }

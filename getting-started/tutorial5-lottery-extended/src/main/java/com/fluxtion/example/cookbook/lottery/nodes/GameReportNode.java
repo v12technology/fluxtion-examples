@@ -8,15 +8,16 @@ import com.fluxtion.runtime.annotations.builder.AssignToField;
 
 import java.util.function.Consumer;
 
-public class GameReport implements
+public class GameReportNode implements
         @ExportService GameResultStore,
-        @ExportService LotteryMachine
-{
+        @ExportService LotteryMachine {
 
     private final LotteryMachineNode lotteryMachine;
     private final PowerLotteryMachine powerLotteryMachine;
+    private Consumer<String> resultPublisher;
+    private int gameCount;
 
-    public GameReport(
+    public GameReportNode(
             @AssignToField("lotteryMachine") LotteryMachineNode lotteryMachine,
             @AssignToField("powerLotteryMachine") PowerLotteryMachine powerLotteryMachine) {
         this.lotteryMachine = lotteryMachine;
@@ -41,5 +42,10 @@ public class GameReport implements
     @Override
     public void setResultPublisher(Consumer<String> resultPublisher) {
         //publish report
+    }
+
+    @Override
+    public void newGame() {
+        gameCount++;
     }
 }

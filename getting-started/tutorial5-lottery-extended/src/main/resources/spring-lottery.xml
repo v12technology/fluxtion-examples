@@ -15,7 +15,7 @@
         <constructor-arg ref="ticketStore"/>
     </bean>
 
-    <bean id="gameReport" class="com.fluxtion.example.cookbook.lottery.nodes.GameReport">
+    <bean id="gameReport" class="com.fluxtion.example.cookbook.lottery.nodes.GameReportNode">
         <constructor-arg index="0" ref="lotteryMachine"/>
         <constructor-arg index="1" ref="powerMachine"/>
     </bean>

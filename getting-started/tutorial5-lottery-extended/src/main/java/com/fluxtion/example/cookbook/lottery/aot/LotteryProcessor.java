@@ -25,11 +25,10 @@ import com.fluxtion.runtime.callback.InternalEventProcessor;
 import com.fluxtion.example.cookbook.lottery.api.GameResultStore;
 import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
-import com.fluxtion.example.cookbook.lottery.nodes.GameReport;
+import com.fluxtion.example.cookbook.lottery.nodes.GameReportNode;
 import com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode;
 import com.fluxtion.example.cookbook.lottery.nodes.PowerLotteryMachine;
 import com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode;
-import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -38,7 +37,6 @@ import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
-import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.time.Clock;
 import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
@@ -87,7 +85,7 @@ public class LotteryProcessor
   public final TicketStoreNode ticketStore = new TicketStoreNode();
   public final LotteryMachineNode lotteryMachine = new LotteryMachineNode(ticketStore);
   public final PowerLotteryMachine powerMachine = new PowerLotteryMachine(ticketStore);
-  public final GameReport gameReport = new GameReport(lotteryMachine, powerMachine);
+  public final GameReportNode gameReportNode = new GameReportNode(lotteryMachine, powerMachine);
   public final Clock clock = new Clock();
   private ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
@@ -234,7 +232,7 @@ public class LotteryProcessor
     beforeServiceCall(
         "public boolean com.fluxtion.example.cookbook.lottery.nodes.GameReport.isTicketSuccessful(com.fluxtion.example.cookbook.lottery.api.Ticket,java.util.function.Consumer<java.lang.Boolean>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    gameReport.isTicketSuccessful(arg0, arg1);
+    gameReportNode.isTicketSuccessful(arg0, arg1);
     afterServiceCall();
     return true;
   }
@@ -244,7 +242,7 @@ public class LotteryProcessor
     beforeServiceCall(
         "public boolean com.fluxtion.example.cookbook.lottery.nodes.GameReport.publishReport(java.util.function.Consumer<java.lang.String>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    gameReport.publishReport(arg0);
+    gameReportNode.publishReport(arg0);
     afterServiceCall();
     return true;
   }
@@ -276,7 +274,7 @@ public class LotteryProcessor
     ExportFunctionAuditEvent typedEvent = functionAudit;
     isDirty_lotteryMachine = true;
     lotteryMachine.selectWinningTicket();
-    gameReport.selectWinningTicket();
+    gameReportNode.selectWinningTicket();
     afterServiceCall();
   }
 
@@ -287,7 +285,7 @@ public class LotteryProcessor
     ExportFunctionAuditEvent typedEvent = functionAudit;
     isDirty_lotteryMachine = true;
     lotteryMachine.setResultPublisher(arg0);
-    gameReport.setResultPublisher(arg0);
+    gameReportNode.setResultPublisher(arg0);
     afterServiceCall();
   }
 
@@ -300,6 +298,12 @@ public class LotteryProcessor
     ticketStore.setTicketSalesPublisher(arg0);
     afterServiceCall();
   }
+
+  @Override
+  public void newGame() {
+
+  }
+
   //EXPORTED SERVICE FUNCTIONS - END
 
   public void bufferEvent(Object event) {
@@ -336,7 +340,7 @@ public class LotteryProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(gameReport, "gameReport");
+    auditor.nodeRegistered(gameReportNode, "gameReport");
     auditor.nodeRegistered(lotteryMachine, "lotteryMachine");
     auditor.nodeRegistered(powerMachine, "powerMachine");
     auditor.nodeRegistered(ticketStore, "ticketStore");

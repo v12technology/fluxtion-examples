@@ -23,6 +23,7 @@ public class LotteryMachineNode implements @ExportService LotteryMachine {
     protected final Supplier<Ticket> ticketSupplier;
     protected @Getter final transient List<Ticket> ticketsBought = new ArrayList<>();
     protected Consumer<String> resultPublisher;
+    protected @Getter Ticket winningTicket;
 
     @Override
     public void setResultPublisher(Consumer<String> resultPublisher) {
@@ -32,25 +33,26 @@ public class LotteryMachineNode implements @ExportService LotteryMachine {
     @Start
     public void start() {
         Objects.requireNonNull(resultPublisher, "must set a results publisher before starting the lottery game");
-        log.info("started");
     }
 
     @OnTrigger
     public boolean processNewTicketSale() {
         ticketsBought.add(ticketSupplier.get());
-        log.info("tickets sold:{}", ticketsBought.size());
         return false;
     }
 
     @Override
     public void selectWinningTicket() {
         if (ticketsBought.isEmpty()) {
-            log.info("no tickets bought - no winning ticket");
+            resultPublisher.accept("no tickets bought - no winning ticket");
         } else {
             Collections.shuffle(ticketsBought);
-            log.info("WINNING ticket {}", ticketsBought.get(0));
-            resultPublisher.accept("winning numbers:" + ticketsBought.get(0).number());
+            winningTicket = ticketsBought.get(0);
+            resultPublisher.accept("winning numbers:" + winningTicket.number());
         }
+    }
+
+    public void newGame(){
         ticketsBought.clear();
     }
 }
