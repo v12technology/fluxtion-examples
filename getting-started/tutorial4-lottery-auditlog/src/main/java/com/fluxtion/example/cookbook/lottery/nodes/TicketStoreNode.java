@@ -35,6 +35,20 @@ public class TicketStoreNode extends EventLogNode implements
     }
 
     @Override
+    @NoPropagateFunction
+    public void openStore() {
+        storeOpen = true;
+        auditLog.info("storeOpen", storeOpen);
+    }
+
+    @Override
+    @NoPropagateFunction
+    public void closeStore() {
+        storeOpen = false;
+        auditLog.info("storeOpen", storeOpen);
+    }
+
+    @Override
     public boolean buyTicket(Ticket ticket) {
         if (ticket.number() < 9_99_99 | ticket.number() > 99_99_99) {
             auditLog.info("rejectTicket", true)
@@ -58,19 +72,5 @@ public class TicketStoreNode extends EventLogNode implements
     @Override
     public Ticket get() {
         return ticket;
-    }
-
-    @Override
-    @NoPropagateFunction
-    public void openStore() {
-        storeOpen = true;
-        auditLog.info("storeOpen", storeOpen);
-    }
-
-    @Override
-    @NoPropagateFunction
-    public void closeStore() {
-        storeOpen = false;
-        auditLog.info("storeOpen", storeOpen);
     }
 }
