@@ -13,19 +13,40 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <fluxtion.version>9.1.10</fluxtion.version>
+        <fluxtion.version>9.1.16</fluxtion.version>
     </properties>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <mainClass>com.fluxtion.example.cookbook.lottery.BuildAot</mainClass>
-                    <classpathScope>compile</classpathScope>
-                </configuration>
+                <groupId>com.fluxtion</groupId>
+                <artifactId>fluxtion-maven-plugin</artifactId>
+                <version>3.0.12</version>
+                <executions>
+                    <execution>
+                        <id>spring to fluxtion builder</id>
+                        <goals>
+                            <goal>springToFluxtion</goal>
+                        </goals>
+                        <configuration>
+                            <springFile>src/main/resources/spring-lottery.xml</springFile>
+                            <className>LotteryProcessor</className>
+                            <packageName>com.fluxtion.example.cookbook.lottery.aot</packageName>
+                        </configuration>
+                    </execution>
+<!--                    <execution>-->
+<!--                        <id>yaml to fluxtion builder</id>-->
+<!--                        <goals>-->
+<!--                            <goal>yamlToFluxtion</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <fluxtionConfigFiles>-->
+<!--                                <fluxtionConfigFile>src/main/resources/fluxtion-lottery.yml</fluxtionConfigFile>-->
+<!--                                <fluxtionConfigFile>src/main/resources/fluxtion-lottery2.yml</fluxtionConfigFile>-->
+<!--                            </fluxtionConfigFiles>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+                </executions>
             </plugin>
         </plugins>
     </build>

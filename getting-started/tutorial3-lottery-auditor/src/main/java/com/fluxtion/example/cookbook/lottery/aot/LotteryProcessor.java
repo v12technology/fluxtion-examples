@@ -51,9 +51,9 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-09-28T08:00:27.899951
- * eventProcessorGenerator version : 9.1.9
- * api version                     : 9.1.9
+ * generation time                 : Not available
+ * eventProcessorGenerator version : 9.1.16-SNAPSHOT
+ * api version                     : 9.1.16-SNAPSHOT
  * </pre>
  *
  * Event classes supported:

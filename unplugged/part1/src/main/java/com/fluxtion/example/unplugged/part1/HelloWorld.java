@@ -5,7 +5,8 @@ import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.TearDown;
 
-import static com.fluxtion.compiler.builder.stream.EventFlow.subscribe;
+import static com.fluxtion.compiler.builder.dataflow.DataFlow.subscribe;
+
 
 /**
  * Simple Fluxtion hello world stream example. Add two numbers and log when sum > 100
@@ -19,7 +20,7 @@ import static com.fluxtion.compiler.builder.stream.EventFlow.subscribe;
 public class HelloWorld {
     public static void main(String[] args) {
         //builds the EventProcessor
-        EventProcessor eventProcessor = Fluxtion.compile(cfg -> {
+        var eventProcessor = Fluxtion.interpret(cfg -> {
             var data1Stream = subscribe(Data1.class)
                     .console("rcvd -> {}")
                     .mapToDouble(Data1::value);
@@ -27,7 +28,7 @@ public class HelloWorld {
             subscribe(Data2.class)
                     .console("rcvd -> {}")
                     .mapToDouble(Data2::value)
-                    .map(Double::sum, data1Stream)
+                    .mapBiFunction(Double::sum, data1Stream)
 //                    .filter(d -> d > 100)
                     .console("OUT: sum {} > 100");
         });

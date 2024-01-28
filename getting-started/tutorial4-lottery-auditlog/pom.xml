@@ -13,9 +13,31 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <fluxtion.version>9.1.10</fluxtion.version>
+        <fluxtion.version>9.1.16</fluxtion.version>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.fluxtion</groupId>
+                <artifactId>fluxtion-maven-plugin</artifactId>
+                <version>3.0.12</version>
+                <executions>
+                    <execution>
+                        <id>spring to fluxtion builder</id>
+                        <goals>
+                            <goal>springToFluxtion</goal>
+                        </goals>
+                        <configuration>
+                            <springFile>src/main/resources/spring-lottery.xml</springFile>
+                            <className>LotteryProcessor</className>
+                            <packageName>com.fluxtion.example.cookbook.lottery.aot</packageName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>

@@ -1,13 +1,15 @@
 package com.fluxtion.example.cookbook.lottery.nodes;
 
+import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
+import com.fluxtion.runtime.annotations.ExportService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
 import java.util.function.Supplier;
 
 @Slf4j
-public class PowerLotteryMachine extends LotteryMachineNode {
+public class PowerLotteryMachine extends LotteryMachineNode implements @ExportService LotteryMachine {
 
     public PowerLotteryMachine(Supplier<Ticket> ticketSupplier) {
         super(ticketSupplier);

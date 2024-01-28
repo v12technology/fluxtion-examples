@@ -11,4 +11,8 @@
         <constructor-arg ref="ticketStore"/>
     </bean>
 
+    <bean class="com.fluxtion.compiler.extern.spring.FluxtionSpringConfig">
+        <property name="logLevel" value="DEBUG"/>
+    </bean>
+
 </beans>

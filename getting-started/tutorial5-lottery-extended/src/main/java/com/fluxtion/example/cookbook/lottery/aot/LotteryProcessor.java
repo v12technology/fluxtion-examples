@@ -29,6 +29,7 @@ import com.fluxtion.example.cookbook.lottery.nodes.GameReportNode;
 import com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode;
 import com.fluxtion.example.cookbook.lottery.nodes.PowerLotteryMachine;
 import com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode;
+import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -37,6 +38,7 @@ import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
+import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
 import com.fluxtion.runtime.time.Clock;
 import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
@@ -50,9 +52,9 @@ import java.util.function.Consumer;
  *
  *
  * <pre>
- * generation time                 : 2023-10-02T08:14:22.541663
- * eventProcessorGenerator version : 9.1.10
- * api version                     : 9.1.10
+ * generation time                 : Not available
+ * eventProcessorGenerator version : 9.1.16-SNAPSHOT
+ * api version                     : 9.1.16-SNAPSHOT
  * </pre>
  *
  * Event classes supported:
@@ -85,7 +87,7 @@ public class LotteryProcessor
   public final TicketStoreNode ticketStore = new TicketStoreNode();
   public final LotteryMachineNode lotteryMachine = new LotteryMachineNode(ticketStore);
   public final PowerLotteryMachine powerMachine = new PowerLotteryMachine(ticketStore);
-  public final GameReportNode gameReportNode = new GameReportNode(lotteryMachine, powerMachine);
+  public final GameReportNode gameReport = new GameReportNode(lotteryMachine, powerMachine);
   public final Clock clock = new Clock();
   private ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
@@ -219,7 +221,8 @@ public class LotteryProcessor
       lotteryMachine.processNewTicketSale();
     }
     if (guardCheck_powerMachine()) {
-      isDirty_powerMachine = powerMachine.processNewTicketSale();
+      isDirty_powerMachine = true;
+      powerMachine.processNewTicketSale();
     }
     afterServiceCall();
     return true;
@@ -230,9 +233,9 @@ public class LotteryProcessor
       com.fluxtion.example.cookbook.lottery.api.Ticket arg0,
       java.util.function.Consumer<Boolean> arg1) {
     beforeServiceCall(
-        "public boolean com.fluxtion.example.cookbook.lottery.nodes.GameReport.isTicketSuccessful(com.fluxtion.example.cookbook.lottery.api.Ticket,java.util.function.Consumer<java.lang.Boolean>)");
+        "public boolean com.fluxtion.example.cookbook.lottery.nodes.GameReportNode.isTicketSuccessful(com.fluxtion.example.cookbook.lottery.api.Ticket,java.util.function.Consumer<java.lang.Boolean>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    gameReportNode.isTicketSuccessful(arg0, arg1);
+    gameReport.isTicketSuccessful(arg0, arg1);
     afterServiceCall();
     return true;
   }
@@ -240,9 +243,9 @@ public class LotteryProcessor
   @Override
   public boolean publishReport(java.util.function.Consumer<String> arg0) {
     beforeServiceCall(
-        "public boolean com.fluxtion.example.cookbook.lottery.nodes.GameReport.publishReport(java.util.function.Consumer<java.lang.String>)");
+        "public boolean com.fluxtion.example.cookbook.lottery.nodes.GameReportNode.publishReport(java.util.function.Consumer<java.lang.String>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    gameReportNode.publishReport(arg0);
+    gameReport.publishReport(arg0);
     afterServiceCall();
     return true;
   }
@@ -254,6 +257,19 @@ public class LotteryProcessor
     ExportFunctionAuditEvent typedEvent = functionAudit;
     isDirty_ticketStore = true;
     ticketStore.closeStore();
+    afterServiceCall();
+  }
+
+  @Override
+  public void newGame() {
+    beforeServiceCall(
+        "public void com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode.newGame()");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    isDirty_lotteryMachine = true;
+    lotteryMachine.newGame();
+    isDirty_powerMachine = true;
+    powerMachine.newGame();
+    gameReport.newGame();
     afterServiceCall();
   }
 
@@ -274,7 +290,9 @@ public class LotteryProcessor
     ExportFunctionAuditEvent typedEvent = functionAudit;
     isDirty_lotteryMachine = true;
     lotteryMachine.selectWinningTicket();
-    gameReportNode.selectWinningTicket();
+    isDirty_powerMachine = true;
+    powerMachine.selectWinningTicket();
+    gameReport.selectWinningTicket();
     afterServiceCall();
   }
 
@@ -285,7 +303,9 @@ public class LotteryProcessor
     ExportFunctionAuditEvent typedEvent = functionAudit;
     isDirty_lotteryMachine = true;
     lotteryMachine.setResultPublisher(arg0);
-    gameReportNode.setResultPublisher(arg0);
+    isDirty_powerMachine = true;
+    powerMachine.setResultPublisher(arg0);
+    gameReport.setResultPublisher(arg0);
     afterServiceCall();
   }
 
@@ -298,12 +318,6 @@ public class LotteryProcessor
     ticketStore.setTicketSalesPublisher(arg0);
     afterServiceCall();
   }
-
-  @Override
-  public void newGame() {
-
-  }
-
   //EXPORTED SERVICE FUNCTIONS - END
 
   public void bufferEvent(Object event) {
@@ -323,7 +337,8 @@ public class LotteryProcessor
       lotteryMachine.processNewTicketSale();
     }
     if (guardCheck_powerMachine()) {
-      isDirty_powerMachine = powerMachine.processNewTicketSale();
+      isDirty_powerMachine = true;
+      powerMachine.processNewTicketSale();
     }
     afterEvent();
   }
@@ -340,7 +355,7 @@ public class LotteryProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(gameReportNode, "gameReport");
+    auditor.nodeRegistered(gameReport, "gameReport");
     auditor.nodeRegistered(lotteryMachine, "lotteryMachine");
     auditor.nodeRegistered(powerMachine, "powerMachine");
     auditor.nodeRegistered(ticketStore, "ticketStore");

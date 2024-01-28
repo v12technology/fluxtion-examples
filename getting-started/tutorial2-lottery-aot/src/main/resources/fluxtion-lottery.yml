@@ -1,0 +1,15 @@
+#enableAudit: true
+#auditMethodTraceLogLevel: INFO
+compilerConfig:
+  className: LotteryProcessorVVV
+  packageName: com.fluxtion.example.cookbook.lottery.aot
+#  outputDirectory: src/main/java
+#  resourcesOutputDirectory : src/strategy/resources
+#  generateDescription: true
+  writeSourceToFile: true
+  formatSource: true
+  compileSource: false
+nodes:
+  - &ticketStore !!com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode []
+  - !!com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode [*ticketStore]
+

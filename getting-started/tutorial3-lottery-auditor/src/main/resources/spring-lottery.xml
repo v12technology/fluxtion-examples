@@ -11,4 +11,13 @@
         <constructor-arg ref="ticketStore"/>
     </bean>
 
+    <!--AUDITORS-->
+    <bean id="systemAuditor" class="com.fluxtion.example.cookbook.lottery.auditor.SystemStatisticsAuditor"/>
+    <bean class="com.fluxtion.compiler.extern.spring.FluxtionSpringConfig">
+        <property name="auditors">
+            <list>
+                <ref bean="systemAuditor"/>
+            </list>
+        </property>
+    </bean>
 </beans>

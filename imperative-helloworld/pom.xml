@@ -12,4 +12,21 @@
     <artifactId>imperative-helloworld</artifactId>
     <name>imperative :: hello world</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.fluxtion</groupId>
+                <artifactId>fluxtion-maven-plugin</artifactId>
+                <version>3.0.12</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>scan</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
