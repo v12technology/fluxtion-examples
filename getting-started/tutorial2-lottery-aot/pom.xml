@@ -42,7 +42,6 @@
 <!--                        <configuration>-->
 <!--                            <fluxtionConfigFiles>-->
 <!--                                <fluxtionConfigFile>src/main/resources/fluxtion-lottery.yml</fluxtionConfigFile>-->
-<!--                                <fluxtionConfigFile>src/main/resources/fluxtion-lottery2.yml</fluxtionConfigFile>-->
 <!--                            </fluxtionConfigFiles>-->
 <!--                        </configuration>-->
 <!--                    </execution>-->

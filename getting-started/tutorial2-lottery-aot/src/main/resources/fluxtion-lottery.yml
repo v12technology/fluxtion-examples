@@ -1,11 +1,7 @@
-#enableAudit: true
-#auditMethodTraceLogLevel: INFO
+#Equivalent yaml builder file to spring-lottery.xml, see maven pom file and uncomment the fluxtion-maven-plugin execution section
 compilerConfig:
-  className: LotteryProcessorVVV
+  className: LotteryProcessorFromYaml
   packageName: com.fluxtion.example.cookbook.lottery.aot
-#  outputDirectory: src/main/java
-#  resourcesOutputDirectory : src/strategy/resources
-#  generateDescription: true
   writeSourceToFile: true
   formatSource: true
   compileSource: false
