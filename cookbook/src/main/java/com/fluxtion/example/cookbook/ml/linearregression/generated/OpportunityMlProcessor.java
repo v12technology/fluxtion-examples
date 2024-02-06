@@ -63,8 +63,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.2.2
- * api version                     : 9.2.2
+ * eventProcessorGenerator version : 9.2.3
+ * api version                     : 9.2.3
  * </pre>
  *
  * Event classes supported:
@@ -77,7 +77,7 @@ import java.util.function.Consumer;
  *
  * @author Greg Higgins
  */
-@SuppressWarnings({ "unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class OpportunityMlProcessor
     implements EventProcessor<OpportunityMlProcessor>,
         StaticEventProcessor,
@@ -115,7 +115,7 @@ public class OpportunityMlProcessor
   private final OpportunityNotifierNode opportunityNotifierNode_0 =
       new OpportunityNotifierNode(predictiveLinearRegressionModel_5);
   public final Clock clock = new Clock();
-  private ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
+  private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
