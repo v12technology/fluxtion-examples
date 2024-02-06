@@ -28,9 +28,11 @@ public class Main {
     private static EventProcessor<?> opportunityIdentifier;
 
     public static void main(String[] args) {
-        buildProcessor(false);
-        buildApp();
+        buildProcessingLogic(false);
+        exportAppServices();
+
         setCalibration(4, 3.6);
+
         //online processing
         registerHouseForSale(new HouseSaleDetails("A12",12.0, 3));
         registerHouseForSale(new HouseSaleDetails("A12",25, 6));
@@ -47,7 +49,7 @@ public class Main {
         registerHouseForSale(new HouseSaleDetails("A12",25, 6));
     }
 
-    public static void buildProcessor(boolean interpreted){
+    public static void buildProcessingLogic(boolean interpreted){
         opportunityIdentifier = interpreted ? Fluxtion.interpret(Main::buildLogic) : new OpportunityMlProcessor();
     }
 
@@ -62,7 +64,7 @@ public class Main {
         cfg.addNode(opportunityNotifier, new LiveHouseSalesCache());
     }
 
-    public static void buildApp() {
+    public static void exportAppServices() {
         opportunityIdentifier.init();
         calibrationProcessor = opportunityIdentifier.getExportedService();
         notifier = opportunityIdentifier.getExportedService();
