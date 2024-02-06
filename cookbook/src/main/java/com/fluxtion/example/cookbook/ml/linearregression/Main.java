@@ -3,6 +3,7 @@ package com.fluxtion.example.cookbook.ml.linearregression;
 import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
+import com.fluxtion.example.cookbook.ml.linearregression.generated.OpportunityMlProcessor;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.ml.Calibration;
 import com.fluxtion.runtime.ml.CalibrationProcessor;
@@ -17,8 +18,7 @@ public class Main {
     private static EventProcessor<?> opportunityIdentifier;
 
     public static void main(String[] args) {
-        interpreted();
-        //static
+        buildProcessor(false);
         buildApp();
         setCalibration(4, 3.6);
         //online processing
@@ -33,18 +33,21 @@ public class Main {
         runPredictions(new HouseDetails(6, 1));
         //update calibration
         setCalibration(2, 10);
+        runPredictions(new HouseDetails(12.0, 3));
+        runPredictions(new HouseDetails(25, 6));
     }
 
-    public static void interpreted(){
-        opportunityIdentifier = Fluxtion.interpret(Main::buildLogic);
+    public static void buildProcessor(boolean interpreted){
+        opportunityIdentifier = interpreted ? Fluxtion.interpret(Main::buildLogic) : new OpportunityMlProcessor();
     }
 
     public static void buildLogic(EventProcessorConfig cfg) {
-        var processedDouseDetails = DataFlow.subscribe(HouseDetails.class)
+        var preProcessHouseDetails = DataFlow.subscribe(HouseDetails.class)
                 .filter(HouseFilters::bedroomWithinRange)
-                .peek(Main::logValid)
+//                .console()
+//                .peek(Main::logValid)
                 .flowSupplier();
-        var predictor = new PredictiveLinearRegressionModel(new AreaFeature(processedDouseDetails));
+        var predictor = new PredictiveLinearRegressionModel(new AreaFeature(preProcessHouseDetails));
         var opportunityNotifier = new OpportunityNotifierNode(predictor);
         cfg.addNode(opportunityNotifier);
     }
