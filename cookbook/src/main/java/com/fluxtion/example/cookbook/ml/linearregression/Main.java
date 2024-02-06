@@ -3,7 +3,15 @@ package com.fluxtion.example.cookbook.ml.linearregression;
 import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
+import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSalesDetailsPostProcess;
+import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails;
+import com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache;
+import com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode;
+import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseTransformer;
+import com.fluxtion.example.cookbook.ml.linearregression.api.OpportunityNotifier;
 import com.fluxtion.example.cookbook.ml.linearregression.generated.OpportunityMlProcessor;
+import com.fluxtion.example.cookbook.ml.linearregression.pipeline.AreaFeature;
+import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseFilters;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.ml.Calibration;
 import com.fluxtion.runtime.ml.CalibrationProcessor;
@@ -22,19 +30,19 @@ public class Main {
         buildApp();
         setCalibration(4, 3.6);
         //online processing
-        runPredictions(new HouseDetails(12.0, 3));
-        runPredictions(new HouseDetails(25, 6));
-        runPredictions(new HouseDetails(250, 13));
+        registerHouuseForSale(new HouseSaleDetails("A12",12.0, 3));
+        registerHouuseForSale(new HouseSaleDetails("A12",25, 6));
+        registerHouuseForSale(new HouseSaleDetails("A12",250, 13));
         //turn publication off
         notifier.publishOn();
-        runPredictions(new HouseDetails(12.0, 3));
-        runPredictions(new HouseDetails(25, 6));
-        runPredictions(new HouseDetails(250, 13));
-        runPredictions(new HouseDetails(6, 1));
+        registerHouuseForSale(new HouseSaleDetails( "A12", 12.0, 3));
+        registerHouuseForSale(new HouseSaleDetails( "A12", 25, 6));
+        registerHouuseForSale(new HouseSaleDetails( "A12", 250, 13));
+        registerHouuseForSale(new HouseSaleDetails( "A12", 6, 1));
         //update calibration
         setCalibration(2, 10);
-        runPredictions(new HouseDetails(12.0, 3));
-        runPredictions(new HouseDetails(25, 6));
+        registerHouuseForSale(new HouseSaleDetails("A12",12.0, 3));
+        registerHouuseForSale(new HouseSaleDetails("A12",25, 6));
     }
 
     public static void buildProcessor(boolean interpreted){
@@ -42,14 +50,14 @@ public class Main {
     }
 
     public static void buildLogic(EventProcessorConfig cfg) {
-        var preProcessHouseDetails = DataFlow.subscribe(HouseDetails.class)
+        var preProcessHouseDetails = DataFlow.subscribe(HouseSaleDetails.class)
+                .map(HouseTransformer::asPostProcess)
                 .filter(HouseFilters::bedroomWithinRange)
-//                .console()
-//                .peek(Main::logValid)
+                .peek(Main::logValid)
                 .flowSupplier();
         var predictor = new PredictiveLinearRegressionModel(new AreaFeature(preProcessHouseDetails));
         var opportunityNotifier = new OpportunityNotifierNode(predictor);
-        cfg.addNode(opportunityNotifier);
+        cfg.addNode(opportunityNotifier, new LiveHouseSalesCache());
     }
 
     public static void buildApp() {
@@ -68,11 +76,11 @@ public class Main {
                                 .build()));
     }
 
-    private static void runPredictions(HouseDetails houseDetails) {
-        opportunityIdentifier.onEvent(houseDetails);
+    private static void registerHouuseForSale(HouseSaleDetails houseDetailsPostProcess) {
+        opportunityIdentifier.onEvent(houseDetailsPostProcess);
     }
 
-    public static void logValid(HouseDetails houseDetails){
-//        System.out.println("\tvalidated:" + houseDetails);
+    public static void logValid(HouseSalesDetailsPostProcess houseSalesDetailsPostProcess){
+        System.out.println("\tvalidated:" + houseSalesDetailsPostProcess);
     }
 }

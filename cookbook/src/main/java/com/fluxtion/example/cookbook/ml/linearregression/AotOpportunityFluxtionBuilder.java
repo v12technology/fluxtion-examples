@@ -4,6 +4,10 @@ import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.FluxtionCompilerConfig;
 import com.fluxtion.compiler.FluxtionGraphBuilder;
 
+/**
+ * Generates an event processor AOT for the production and processing of real time predictions
+ * of houses for sale
+ */
 public class AotOpportunityFluxtionBuilder implements FluxtionGraphBuilder {
     @Override
     public void buildGraph(EventProcessorConfig eventProcessorConfig) {

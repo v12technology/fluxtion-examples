@@ -1,8 +1,11 @@
-package com.fluxtion.example.cookbook.ml.linearregression;
+package com.fluxtion.example.cookbook.ml.linearregression.node;
 
+import com.fluxtion.example.cookbook.ml.linearregression.api.OpportunityNotifier;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.OnTrigger;
 import com.fluxtion.runtime.ml.PredictiveModel;
+
+import java.util.function.Consumer;
 
 public class OpportunityNotifierNode implements @ExportService OpportunityNotifier {
     private final PredictiveModel predictiveModel;
@@ -28,5 +31,10 @@ public class OpportunityNotifierNode implements @ExportService OpportunityNotifi
     @Override
     public void publishOff() {
         publishFlag = false;
+    }
+
+    @Override
+    public void setNotificationSink(Consumer<Object> notifierSink) {
+
     }
 }
