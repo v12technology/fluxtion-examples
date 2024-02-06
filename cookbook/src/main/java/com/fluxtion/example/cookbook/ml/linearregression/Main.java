@@ -52,6 +52,7 @@ public class Main {
 
     public static void buildProcessingLogic(boolean interpreted){
         opportunityIdentifier = interpreted ? Fluxtion.interpret(Main::buildLogic) : new OpportunityMlProcessor();
+        opportunityIdentifier.init();
     }
 
     public static void buildLogic(EventProcessorConfig cfg) {
@@ -67,7 +68,6 @@ public class Main {
     }
 
     public static void exportAppServices() {
-        opportunityIdentifier.init();
         calibrationProcessor = opportunityIdentifier.getExportedService();
         notifier = opportunityIdentifier.getExportedService();
         houseSalesMonitor = opportunityIdentifier.getExportedService();
