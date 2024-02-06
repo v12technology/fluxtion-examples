@@ -313,6 +313,7 @@ public class OpportunityMlProcessor
         "public void com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.houseSold(com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
     liveHouseSalesCache_1.houseSold(arg0);
+    opportunityNotifierNode_0.houseSold(arg0);
     afterServiceCall();
   }
 
@@ -322,6 +323,7 @@ public class OpportunityMlProcessor
         "public void com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.removeAllSales()");
     ExportFunctionAuditEvent typedEvent = functionAudit;
     liveHouseSalesCache_1.removeAllSales();
+    opportunityNotifierNode_0.removeAllSales();
     afterServiceCall();
   }
 
@@ -335,9 +337,12 @@ public class OpportunityMlProcessor
   }
 
   @Override
-  public void setNotificationSink(java.util.function.Consumer<Object> arg0) {
+  public void setNotificationSink(
+      java.util.function.Consumer<
+              com.fluxtion.example.cookbook.ml.linearregression.api.PotentialOpportunity>
+          arg0) {
     beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.setNotificationSink(java.util.function.Consumer<java.lang.Object>)");
+        "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.setNotificationSink(java.util.function.Consumer<com.fluxtion.example.cookbook.ml.linearregression.api.PotentialOpportunity>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
     opportunityNotifierNode_0.setNotificationSink(arg0);
     afterServiceCall();
