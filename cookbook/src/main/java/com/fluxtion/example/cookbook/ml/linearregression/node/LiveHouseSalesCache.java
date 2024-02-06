@@ -4,6 +4,7 @@ import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails;
 import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSalesMonitor;
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.NoPropagateFunction;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.builder.Inject;
 import com.fluxtion.runtime.callback.EventDispatcher;
 import com.fluxtion.runtime.ml.Calibration;
@@ -12,7 +13,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class LiveHouseSalesCache
@@ -21,14 +21,15 @@ public class LiveHouseSalesCache
         @ExportService HouseSalesMonitor {
 
     @Inject
-    @Getter @Setter
+    @Getter
+    @Setter
     private EventDispatcher dispatcher;
     private transient final List<HouseSaleDetails> liveSalesCache = new ArrayList<>();
 
     @Override
     @NoPropagateFunction
-    public void houseSold(HouseSaleDetails soldHouse){
-        liveSalesCache.add(soldHouse);
+    public void houseSold(HouseSaleDetails soldHouse) {
+        liveSalesCache.remove(soldHouse);
     }
 
     @Override
@@ -40,7 +41,18 @@ public class LiveHouseSalesCache
     @Override
     @NoPropagateFunction
     public boolean setCalibration(List<Calibration> calibration) {
-        dispatcher.processReentrantEvents(Collections.emptyList());
+        dispatcher.processReentrantEvents(new ArrayList<>(liveSalesCache));
+        dispatcher.processAsNewEventCycle(new ReCalibrationCompleteEvent());
         return false;
+    }
+
+    @OnEventHandler(propagate = false)
+    public boolean newHouseSale(HouseSaleDetails houseSaleDetails) {
+        liveSalesCache.add(houseSaleDetails);
+        return false;
+    }
+
+    public HouseSaleDetails getLatestSaleAdvert() {
+        return liveSalesCache.isEmpty() ? null : liveSalesCache.get(liveSalesCache.size() - 1);
     }
 }

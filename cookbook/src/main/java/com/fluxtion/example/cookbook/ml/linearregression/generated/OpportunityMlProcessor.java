@@ -22,15 +22,16 @@ import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
-import com.fluxtion.example.cookbook.ml.linearregression.Main;
 import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails;
 import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSalesMonitor;
 import com.fluxtion.example.cookbook.ml.linearregression.api.OpportunityNotifier;
 import com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache;
 import com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode;
+import com.fluxtion.example.cookbook.ml.linearregression.node.ReCalibrationCompleteEvent;
 import com.fluxtion.example.cookbook.ml.linearregression.pipeline.AreaFeature;
 import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseFilters;
 import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseTransformer;
+import com.fluxtion.example.cookbook.ml.linearregression.pipeline.PreProcessPipeline;
 import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
@@ -72,6 +73,7 @@ import java.util.function.Consumer;
  * <ul>
  *   <li>com.fluxtion.compiler.generation.model.ExportFunctionMarker
  *   <li>com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails
+ *   <li>com.fluxtion.example.cookbook.ml.linearregression.node.ReCalibrationCompleteEvent
  *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
  * </ul>
  *
@@ -90,7 +92,7 @@ public class OpportunityMlProcessor
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  private final LiveHouseSalesCache liveHouseSalesCache_1 = new LiveHouseSalesCache();
+  private final LiveHouseSalesCache liveHouseSalesCache_7 = new LiveHouseSalesCache();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
@@ -103,19 +105,21 @@ public class OpportunityMlProcessor
           com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails.class,
           "handlerHouseSaleDetails",
           context);
+  private final PeekFlowFunction peekFlowFunction_1 =
+      new PeekFlowFunction<>(handlerHouseSaleDetails, PreProcessPipeline::logIncoming);
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_2 =
-      new MapRef2RefFlowFunction<>(handlerHouseSaleDetails, HouseTransformer::asPostProcess);
+      new MapRef2RefFlowFunction<>(peekFlowFunction_1, HouseTransformer::asPostProcess);
   private final FilterFlowFunction filterFlowFunction_3 =
       new FilterFlowFunction<>(mapRef2RefFlowFunction_2, HouseFilters::bedroomWithinRange);
   private final FilterFlowFunction filterFlowFunction_4 =
       new FilterFlowFunction<>(filterFlowFunction_3, HouseFilters::correctLocation);
   private final PeekFlowFunction peekFlowFunction_5 =
-      new PeekFlowFunction<>(filterFlowFunction_4, Main::logValid);
+      new PeekFlowFunction<>(filterFlowFunction_4, PreProcessPipeline::logValid);
   private final AreaFeature AreaFeature_0 = new AreaFeature(peekFlowFunction_5);
   private final PredictiveLinearRegressionModel predictiveLinearRegressionModel_6 =
       new PredictiveLinearRegressionModel(new Feature[] {AreaFeature_0});
   private final OpportunityNotifierNode opportunityNotifierNode_0 =
-      new OpportunityNotifierNode(predictiveLinearRegressionModel_6);
+      new OpportunityNotifierNode(predictiveLinearRegressionModel_6, liveHouseSalesCache_7);
   public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
@@ -123,15 +127,16 @@ public class OpportunityMlProcessor
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(7);
+      new IdentityHashMap<>(8);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(7);
+      new IdentityHashMap<>(8);
 
   private boolean isDirty_AreaFeature_0 = false;
   private boolean isDirty_filterFlowFunction_3 = false;
   private boolean isDirty_filterFlowFunction_4 = false;
   private boolean isDirty_handlerHouseSaleDetails = false;
   private boolean isDirty_mapRef2RefFlowFunction_2 = false;
+  private boolean isDirty_peekFlowFunction_1 = false;
   private boolean isDirty_peekFlowFunction_5 = false;
   private boolean isDirty_predictiveLinearRegressionModel_6 = false;
   //Forked declarations
@@ -140,10 +145,11 @@ public class OpportunityMlProcessor
 
   public OpportunityMlProcessor(Map<Object, Object> contextMap) {
     context.replaceMappings(contextMap);
-    liveHouseSalesCache_1.setDispatcher(callbackDispatcher);
+    liveHouseSalesCache_7.setDispatcher(callbackDispatcher);
     filterFlowFunction_3.setEventProcessorContext(context);
     filterFlowFunction_4.setEventProcessorContext(context);
     mapRef2RefFlowFunction_2.setEventProcessorContext(context);
+    peekFlowFunction_1.setEventProcessorContext(context);
     peekFlowFunction_5.setEventProcessorContext(context);
     //node auditors
     initialiseAuditor(clock);
@@ -163,6 +169,7 @@ public class OpportunityMlProcessor
     //initialise dirty lookup map
     isDirty("test");
     handlerHouseSaleDetails.init();
+    peekFlowFunction_1.initialiseEventStream();
     mapRef2RefFlowFunction_2.initialiseEventStream();
     filterFlowFunction_3.initialiseEventStream();
     filterFlowFunction_4.initialiseEventStream();
@@ -241,6 +248,11 @@ public class OpportunityMlProcessor
     if (event instanceof com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails) {
       HouseSaleDetails typedEvent = (HouseSaleDetails) event;
       handleEvent(typedEvent);
+    } else if (event
+        instanceof
+        com.fluxtion.example.cookbook.ml.linearregression.node.ReCalibrationCompleteEvent) {
+      ReCalibrationCompleteEvent typedEvent = (ReCalibrationCompleteEvent) event;
+      handleEvent(typedEvent);
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       handleEvent(typedEvent);
@@ -250,9 +262,17 @@ public class OpportunityMlProcessor
   public void handleEvent(HouseSaleDetails typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
+    liveHouseSalesCache_7.newHouseSale(typedEvent);
     isDirty_handlerHouseSaleDetails = handlerHouseSaleDetails.onEvent(typedEvent);
     if (isDirty_handlerHouseSaleDetails) {
-      mapRef2RefFlowFunction_2.inputUpdated(handlerHouseSaleDetails);
+      peekFlowFunction_1.inputUpdated(handlerHouseSaleDetails);
+    }
+    if (guardCheck_peekFlowFunction_1()) {
+      isDirty_peekFlowFunction_1 = true;
+      peekFlowFunction_1.peek();
+      if (isDirty_peekFlowFunction_1) {
+        mapRef2RefFlowFunction_2.inputUpdated(peekFlowFunction_1);
+      }
     }
     if (guardCheck_mapRef2RefFlowFunction_2()) {
       isDirty_mapRef2RefFlowFunction_2 = mapRef2RefFlowFunction_2.map();
@@ -292,6 +312,13 @@ public class OpportunityMlProcessor
     afterEvent();
   }
 
+  public void handleEvent(ReCalibrationCompleteEvent typedEvent) {
+    auditEvent(typedEvent);
+    //Default, no filter methods
+    opportunityNotifierNode_0.recalibrationComplete(typedEvent);
+    afterEvent();
+  }
+
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
@@ -306,13 +333,14 @@ public class OpportunityMlProcessor
     beforeServiceCall(
         "public boolean com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.setCalibration(java.util.List<com.fluxtion.runtime.ml.Calibration>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    liveHouseSalesCache_1.setCalibration(arg0);
+    liveHouseSalesCache_7.setCalibration(arg0);
     isDirty_AreaFeature_0 = AreaFeature_0.setCalibration(arg0);
     if (isDirty_AreaFeature_0) {
       predictiveLinearRegressionModel_6.featureUpdated(AreaFeature_0);
     }
     isDirty_predictiveLinearRegressionModel_6 =
         predictiveLinearRegressionModel_6.setCalibration(arg0);
+    opportunityNotifierNode_0.setCalibration(arg0);
     afterServiceCall();
     return true;
   }
@@ -323,7 +351,7 @@ public class OpportunityMlProcessor
     beforeServiceCall(
         "public void com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.houseSold(com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    liveHouseSalesCache_1.houseSold(arg0);
+    liveHouseSalesCache_7.houseSold(arg0);
     opportunityNotifierNode_0.houseSold(arg0);
     afterServiceCall();
   }
@@ -333,7 +361,7 @@ public class OpportunityMlProcessor
     beforeServiceCall(
         "public void com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.removeAllSales()");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    liveHouseSalesCache_1.removeAllSales();
+    liveHouseSalesCache_7.removeAllSales();
     opportunityNotifierNode_0.removeAllSales();
     afterServiceCall();
   }
@@ -350,10 +378,11 @@ public class OpportunityMlProcessor
   @Override
   public void setNotificationSink(
       java.util.function.Consumer<
-              com.fluxtion.example.cookbook.ml.linearregression.api.PotentialOpportunity>
+              java.util.Collection<
+                  com.fluxtion.example.cookbook.ml.linearregression.api.PotentialOpportunity>>
           arg0) {
     beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.setNotificationSink(java.util.function.Consumer<com.fluxtion.example.cookbook.ml.linearregression.api.PotentialOpportunity>)");
+        "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.setNotificationSink(java.util.function.Consumer<java.util.Collection<com.fluxtion.example.cookbook.ml.linearregression.api.PotentialOpportunity>>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
     opportunityNotifierNode_0.setNotificationSink(arg0);
     afterServiceCall();
@@ -374,10 +403,17 @@ public class OpportunityMlProcessor
     if (event instanceof com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails) {
       HouseSaleDetails typedEvent = (HouseSaleDetails) event;
       auditEvent(typedEvent);
+      liveHouseSalesCache_7.newHouseSale(typedEvent);
       isDirty_handlerHouseSaleDetails = handlerHouseSaleDetails.onEvent(typedEvent);
       if (isDirty_handlerHouseSaleDetails) {
-        mapRef2RefFlowFunction_2.inputUpdated(handlerHouseSaleDetails);
+        peekFlowFunction_1.inputUpdated(handlerHouseSaleDetails);
       }
+    } else if (event
+        instanceof
+        com.fluxtion.example.cookbook.ml.linearregression.node.ReCalibrationCompleteEvent) {
+      ReCalibrationCompleteEvent typedEvent = (ReCalibrationCompleteEvent) event;
+      auditEvent(typedEvent);
+      opportunityNotifierNode_0.recalibrationComplete(typedEvent);
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
@@ -388,6 +424,13 @@ public class OpportunityMlProcessor
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
+    if (guardCheck_peekFlowFunction_1()) {
+      isDirty_peekFlowFunction_1 = true;
+      peekFlowFunction_1.peek();
+      if (isDirty_peekFlowFunction_1) {
+        mapRef2RefFlowFunction_2.inputUpdated(peekFlowFunction_1);
+      }
+    }
     if (guardCheck_mapRef2RefFlowFunction_2()) {
       isDirty_mapRef2RefFlowFunction_2 = mapRef2RefFlowFunction_2.map();
       if (isDirty_mapRef2RefFlowFunction_2) {
@@ -438,13 +481,14 @@ public class OpportunityMlProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(liveHouseSalesCache_1, "liveHouseSalesCache_1");
+    auditor.nodeRegistered(liveHouseSalesCache_7, "liveHouseSalesCache_7");
     auditor.nodeRegistered(opportunityNotifierNode_0, "opportunityNotifierNode_0");
     auditor.nodeRegistered(AreaFeature_0, "AreaFeature_0");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(filterFlowFunction_3, "filterFlowFunction_3");
     auditor.nodeRegistered(filterFlowFunction_4, "filterFlowFunction_4");
     auditor.nodeRegistered(mapRef2RefFlowFunction_2, "mapRef2RefFlowFunction_2");
+    auditor.nodeRegistered(peekFlowFunction_1, "peekFlowFunction_1");
     auditor.nodeRegistered(peekFlowFunction_5, "peekFlowFunction_5");
     auditor.nodeRegistered(subscriptionManager, "subscriptionManager");
     auditor.nodeRegistered(predictiveLinearRegressionModel_6, "predictiveLinearRegressionModel_6");
@@ -476,6 +520,7 @@ public class OpportunityMlProcessor
     isDirty_filterFlowFunction_4 = false;
     isDirty_handlerHouseSaleDetails = false;
     isDirty_mapRef2RefFlowFunction_2 = false;
+    isDirty_peekFlowFunction_1 = false;
     isDirty_peekFlowFunction_5 = false;
     isDirty_predictiveLinearRegressionModel_6 = false;
   }
@@ -513,6 +558,7 @@ public class OpportunityMlProcessor
       dirtyFlagSupplierMap.put(filterFlowFunction_4, () -> isDirty_filterFlowFunction_4);
       dirtyFlagSupplierMap.put(handlerHouseSaleDetails, () -> isDirty_handlerHouseSaleDetails);
       dirtyFlagSupplierMap.put(mapRef2RefFlowFunction_2, () -> isDirty_mapRef2RefFlowFunction_2);
+      dirtyFlagSupplierMap.put(peekFlowFunction_1, () -> isDirty_peekFlowFunction_1);
       dirtyFlagSupplierMap.put(peekFlowFunction_5, () -> isDirty_peekFlowFunction_5);
       dirtyFlagSupplierMap.put(
           predictiveLinearRegressionModel_6, () -> isDirty_predictiveLinearRegressionModel_6);
@@ -528,6 +574,7 @@ public class OpportunityMlProcessor
       dirtyFlagUpdateMap.put(filterFlowFunction_4, (b) -> isDirty_filterFlowFunction_4 = b);
       dirtyFlagUpdateMap.put(handlerHouseSaleDetails, (b) -> isDirty_handlerHouseSaleDetails = b);
       dirtyFlagUpdateMap.put(mapRef2RefFlowFunction_2, (b) -> isDirty_mapRef2RefFlowFunction_2 = b);
+      dirtyFlagUpdateMap.put(peekFlowFunction_1, (b) -> isDirty_peekFlowFunction_1 = b);
       dirtyFlagUpdateMap.put(peekFlowFunction_5, (b) -> isDirty_peekFlowFunction_5 = b);
       dirtyFlagUpdateMap.put(
           predictiveLinearRegressionModel_6, (b) -> isDirty_predictiveLinearRegressionModel_6 = b);
@@ -552,6 +599,10 @@ public class OpportunityMlProcessor
   }
 
   private boolean guardCheck_mapRef2RefFlowFunction_2() {
+    return isDirty_peekFlowFunction_1;
+  }
+
+  private boolean guardCheck_peekFlowFunction_1() {
     return isDirty_handlerHouseSaleDetails;
   }
 
