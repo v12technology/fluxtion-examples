@@ -8,7 +8,15 @@ public interface HouseFilters {
         if (houseSalesDetailsPostProcess.bedrooms() > 1 & houseSalesDetailsPostProcess.bedrooms() < 8) {
             return true;
         }
-        System.out.println("\tignoring:" + houseSalesDetailsPostProcess);
+        System.out.println("\tbedroom fail ignoring:" + houseSalesDetailsPostProcess);
+        return false;
+    }
+
+    static boolean correctLocation(HouseSalesDetailsPostProcess houseSalesDetailsPostProcess) {
+        if (houseSalesDetailsPostProcess.locationCategory() > 0) {
+            return true;
+        }
+        System.out.println("\tlocation fail ignoring:" + houseSalesDetailsPostProcess);
         return false;
     }
 }

@@ -39,8 +39,9 @@ public class Main {
         registerHouseForSale(new HouseSaleDetails("A12",250, 13));
         //turn publication off
         notifier.setEnableNotifications(true);
-        registerHouseForSale(new HouseSaleDetails( "A12", 12.0, 3));
-        registerHouseForSale(new HouseSaleDetails( "A12", 25, 6));
+        registerHouseForSale(new HouseSaleDetails( "A1", 12.0, 3));
+        registerHouseForSale(new HouseSaleDetails( "B2", 25, 6));
+        registerHouseForSale(new HouseSaleDetails( "UU1", 25, 6));
         registerHouseForSale(new HouseSaleDetails( "A12", 250, 13));
         registerHouseForSale(new HouseSaleDetails( "A12", 6, 1));
         //update calibration
@@ -57,6 +58,7 @@ public class Main {
         var preProcessHouseDetails = DataFlow.subscribe(HouseSaleDetails.class)
                 .map(HouseTransformer::asPostProcess)
                 .filter(HouseFilters::bedroomWithinRange)
+                .filter(HouseFilters::correctLocation)
                 .peek(Main::logValid)
                 .flowSupplier();
         var predictor = new PredictiveLinearRegressionModel(new AreaFeature(preProcessHouseDetails));

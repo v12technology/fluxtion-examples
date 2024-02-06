@@ -107,13 +107,15 @@ public class OpportunityMlProcessor
       new MapRef2RefFlowFunction<>(handlerHouseSaleDetails, HouseTransformer::asPostProcess);
   private final FilterFlowFunction filterFlowFunction_3 =
       new FilterFlowFunction<>(mapRef2RefFlowFunction_2, HouseFilters::bedroomWithinRange);
-  private final PeekFlowFunction peekFlowFunction_4 =
-      new PeekFlowFunction<>(filterFlowFunction_3, Main::logValid);
-  private final AreaFeature AreaFeature_0 = new AreaFeature(peekFlowFunction_4);
-  private final PredictiveLinearRegressionModel predictiveLinearRegressionModel_5 =
+  private final FilterFlowFunction filterFlowFunction_4 =
+      new FilterFlowFunction<>(filterFlowFunction_3, HouseFilters::correctLocation);
+  private final PeekFlowFunction peekFlowFunction_5 =
+      new PeekFlowFunction<>(filterFlowFunction_4, Main::logValid);
+  private final AreaFeature AreaFeature_0 = new AreaFeature(peekFlowFunction_5);
+  private final PredictiveLinearRegressionModel predictiveLinearRegressionModel_6 =
       new PredictiveLinearRegressionModel(new Feature[] {AreaFeature_0});
   private final OpportunityNotifierNode opportunityNotifierNode_0 =
-      new OpportunityNotifierNode(predictiveLinearRegressionModel_5);
+      new OpportunityNotifierNode(predictiveLinearRegressionModel_6);
   public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
@@ -121,16 +123,17 @@ public class OpportunityMlProcessor
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(6);
+      new IdentityHashMap<>(7);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(6);
+      new IdentityHashMap<>(7);
 
   private boolean isDirty_AreaFeature_0 = false;
   private boolean isDirty_filterFlowFunction_3 = false;
+  private boolean isDirty_filterFlowFunction_4 = false;
   private boolean isDirty_handlerHouseSaleDetails = false;
   private boolean isDirty_mapRef2RefFlowFunction_2 = false;
-  private boolean isDirty_peekFlowFunction_4 = false;
-  private boolean isDirty_predictiveLinearRegressionModel_5 = false;
+  private boolean isDirty_peekFlowFunction_5 = false;
+  private boolean isDirty_predictiveLinearRegressionModel_6 = false;
   //Forked declarations
 
   //Filter constants
@@ -139,8 +142,9 @@ public class OpportunityMlProcessor
     context.replaceMappings(contextMap);
     liveHouseSalesCache_1.setDispatcher(callbackDispatcher);
     filterFlowFunction_3.setEventProcessorContext(context);
+    filterFlowFunction_4.setEventProcessorContext(context);
     mapRef2RefFlowFunction_2.setEventProcessorContext(context);
-    peekFlowFunction_4.setEventProcessorContext(context);
+    peekFlowFunction_5.setEventProcessorContext(context);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -161,9 +165,10 @@ public class OpportunityMlProcessor
     handlerHouseSaleDetails.init();
     mapRef2RefFlowFunction_2.initialiseEventStream();
     filterFlowFunction_3.initialiseEventStream();
-    peekFlowFunction_4.initialiseEventStream();
+    filterFlowFunction_4.initialiseEventStream();
+    peekFlowFunction_5.initialiseEventStream();
     AreaFeature_0.init();
-    predictiveLinearRegressionModel_5.init();
+    predictiveLinearRegressionModel_6.init();
     clock.init();
     afterEvent();
   }
@@ -258,22 +263,28 @@ public class OpportunityMlProcessor
     if (guardCheck_filterFlowFunction_3()) {
       isDirty_filterFlowFunction_3 = filterFlowFunction_3.filter();
       if (isDirty_filterFlowFunction_3) {
-        peekFlowFunction_4.inputUpdated(filterFlowFunction_3);
+        filterFlowFunction_4.inputUpdated(filterFlowFunction_3);
       }
     }
-    if (guardCheck_peekFlowFunction_4()) {
-      isDirty_peekFlowFunction_4 = true;
-      peekFlowFunction_4.peek();
+    if (guardCheck_filterFlowFunction_4()) {
+      isDirty_filterFlowFunction_4 = filterFlowFunction_4.filter();
+      if (isDirty_filterFlowFunction_4) {
+        peekFlowFunction_5.inputUpdated(filterFlowFunction_4);
+      }
+    }
+    if (guardCheck_peekFlowFunction_5()) {
+      isDirty_peekFlowFunction_5 = true;
+      peekFlowFunction_5.peek();
     }
     if (guardCheck_AreaFeature_0()) {
       isDirty_AreaFeature_0 = AreaFeature_0.processRecord();
       if (isDirty_AreaFeature_0) {
-        predictiveLinearRegressionModel_5.featureUpdated(AreaFeature_0);
+        predictiveLinearRegressionModel_6.featureUpdated(AreaFeature_0);
       }
     }
-    if (guardCheck_predictiveLinearRegressionModel_5()) {
-      isDirty_predictiveLinearRegressionModel_5 =
-          predictiveLinearRegressionModel_5.calculateInference();
+    if (guardCheck_predictiveLinearRegressionModel_6()) {
+      isDirty_predictiveLinearRegressionModel_6 =
+          predictiveLinearRegressionModel_6.calculateInference();
     }
     if (guardCheck_opportunityNotifierNode_0()) {
       opportunityNotifierNode_0.predictionUpdated();
@@ -298,10 +309,10 @@ public class OpportunityMlProcessor
     liveHouseSalesCache_1.setCalibration(arg0);
     isDirty_AreaFeature_0 = AreaFeature_0.setCalibration(arg0);
     if (isDirty_AreaFeature_0) {
-      predictiveLinearRegressionModel_5.featureUpdated(AreaFeature_0);
+      predictiveLinearRegressionModel_6.featureUpdated(AreaFeature_0);
     }
-    isDirty_predictiveLinearRegressionModel_5 =
-        predictiveLinearRegressionModel_5.setCalibration(arg0);
+    isDirty_predictiveLinearRegressionModel_6 =
+        predictiveLinearRegressionModel_6.setCalibration(arg0);
     afterServiceCall();
     return true;
   }
@@ -386,22 +397,28 @@ public class OpportunityMlProcessor
     if (guardCheck_filterFlowFunction_3()) {
       isDirty_filterFlowFunction_3 = filterFlowFunction_3.filter();
       if (isDirty_filterFlowFunction_3) {
-        peekFlowFunction_4.inputUpdated(filterFlowFunction_3);
+        filterFlowFunction_4.inputUpdated(filterFlowFunction_3);
       }
     }
-    if (guardCheck_peekFlowFunction_4()) {
-      isDirty_peekFlowFunction_4 = true;
-      peekFlowFunction_4.peek();
+    if (guardCheck_filterFlowFunction_4()) {
+      isDirty_filterFlowFunction_4 = filterFlowFunction_4.filter();
+      if (isDirty_filterFlowFunction_4) {
+        peekFlowFunction_5.inputUpdated(filterFlowFunction_4);
+      }
+    }
+    if (guardCheck_peekFlowFunction_5()) {
+      isDirty_peekFlowFunction_5 = true;
+      peekFlowFunction_5.peek();
     }
     if (guardCheck_AreaFeature_0()) {
       isDirty_AreaFeature_0 = AreaFeature_0.processRecord();
       if (isDirty_AreaFeature_0) {
-        predictiveLinearRegressionModel_5.featureUpdated(AreaFeature_0);
+        predictiveLinearRegressionModel_6.featureUpdated(AreaFeature_0);
       }
     }
-    if (guardCheck_predictiveLinearRegressionModel_5()) {
-      isDirty_predictiveLinearRegressionModel_5 =
-          predictiveLinearRegressionModel_5.calculateInference();
+    if (guardCheck_predictiveLinearRegressionModel_6()) {
+      isDirty_predictiveLinearRegressionModel_6 =
+          predictiveLinearRegressionModel_6.calculateInference();
     }
     if (guardCheck_opportunityNotifierNode_0()) {
       opportunityNotifierNode_0.predictionUpdated();
@@ -426,10 +443,11 @@ public class OpportunityMlProcessor
     auditor.nodeRegistered(AreaFeature_0, "AreaFeature_0");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(filterFlowFunction_3, "filterFlowFunction_3");
+    auditor.nodeRegistered(filterFlowFunction_4, "filterFlowFunction_4");
     auditor.nodeRegistered(mapRef2RefFlowFunction_2, "mapRef2RefFlowFunction_2");
-    auditor.nodeRegistered(peekFlowFunction_4, "peekFlowFunction_4");
+    auditor.nodeRegistered(peekFlowFunction_5, "peekFlowFunction_5");
     auditor.nodeRegistered(subscriptionManager, "subscriptionManager");
-    auditor.nodeRegistered(predictiveLinearRegressionModel_5, "predictiveLinearRegressionModel_5");
+    auditor.nodeRegistered(predictiveLinearRegressionModel_6, "predictiveLinearRegressionModel_6");
     auditor.nodeRegistered(handlerHouseSaleDetails, "handlerHouseSaleDetails");
     auditor.nodeRegistered(context, "context");
   }
@@ -455,10 +473,11 @@ public class OpportunityMlProcessor
     nodeNameLookup.processingComplete();
     isDirty_AreaFeature_0 = false;
     isDirty_filterFlowFunction_3 = false;
+    isDirty_filterFlowFunction_4 = false;
     isDirty_handlerHouseSaleDetails = false;
     isDirty_mapRef2RefFlowFunction_2 = false;
-    isDirty_peekFlowFunction_4 = false;
-    isDirty_predictiveLinearRegressionModel_5 = false;
+    isDirty_peekFlowFunction_5 = false;
+    isDirty_predictiveLinearRegressionModel_6 = false;
   }
 
   @Override
@@ -491,11 +510,12 @@ public class OpportunityMlProcessor
     if (dirtyFlagSupplierMap.isEmpty()) {
       dirtyFlagSupplierMap.put(AreaFeature_0, () -> isDirty_AreaFeature_0);
       dirtyFlagSupplierMap.put(filterFlowFunction_3, () -> isDirty_filterFlowFunction_3);
+      dirtyFlagSupplierMap.put(filterFlowFunction_4, () -> isDirty_filterFlowFunction_4);
       dirtyFlagSupplierMap.put(handlerHouseSaleDetails, () -> isDirty_handlerHouseSaleDetails);
       dirtyFlagSupplierMap.put(mapRef2RefFlowFunction_2, () -> isDirty_mapRef2RefFlowFunction_2);
-      dirtyFlagSupplierMap.put(peekFlowFunction_4, () -> isDirty_peekFlowFunction_4);
+      dirtyFlagSupplierMap.put(peekFlowFunction_5, () -> isDirty_peekFlowFunction_5);
       dirtyFlagSupplierMap.put(
-          predictiveLinearRegressionModel_5, () -> isDirty_predictiveLinearRegressionModel_5);
+          predictiveLinearRegressionModel_6, () -> isDirty_predictiveLinearRegressionModel_6);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
@@ -505,36 +525,41 @@ public class OpportunityMlProcessor
     if (dirtyFlagUpdateMap.isEmpty()) {
       dirtyFlagUpdateMap.put(AreaFeature_0, (b) -> isDirty_AreaFeature_0 = b);
       dirtyFlagUpdateMap.put(filterFlowFunction_3, (b) -> isDirty_filterFlowFunction_3 = b);
+      dirtyFlagUpdateMap.put(filterFlowFunction_4, (b) -> isDirty_filterFlowFunction_4 = b);
       dirtyFlagUpdateMap.put(handlerHouseSaleDetails, (b) -> isDirty_handlerHouseSaleDetails = b);
       dirtyFlagUpdateMap.put(mapRef2RefFlowFunction_2, (b) -> isDirty_mapRef2RefFlowFunction_2 = b);
-      dirtyFlagUpdateMap.put(peekFlowFunction_4, (b) -> isDirty_peekFlowFunction_4 = b);
+      dirtyFlagUpdateMap.put(peekFlowFunction_5, (b) -> isDirty_peekFlowFunction_5 = b);
       dirtyFlagUpdateMap.put(
-          predictiveLinearRegressionModel_5, (b) -> isDirty_predictiveLinearRegressionModel_5 = b);
+          predictiveLinearRegressionModel_6, (b) -> isDirty_predictiveLinearRegressionModel_6 = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
   private boolean guardCheck_opportunityNotifierNode_0() {
-    return isDirty_predictiveLinearRegressionModel_5;
+    return isDirty_predictiveLinearRegressionModel_6;
   }
 
   private boolean guardCheck_AreaFeature_0() {
-    return isDirty_peekFlowFunction_4;
+    return isDirty_peekFlowFunction_5;
   }
 
   private boolean guardCheck_filterFlowFunction_3() {
     return isDirty_mapRef2RefFlowFunction_2;
   }
 
+  private boolean guardCheck_filterFlowFunction_4() {
+    return isDirty_filterFlowFunction_3;
+  }
+
   private boolean guardCheck_mapRef2RefFlowFunction_2() {
     return isDirty_handlerHouseSaleDetails;
   }
 
-  private boolean guardCheck_peekFlowFunction_4() {
-    return isDirty_filterFlowFunction_3;
+  private boolean guardCheck_peekFlowFunction_5() {
+    return isDirty_filterFlowFunction_4;
   }
 
-  private boolean guardCheck_predictiveLinearRegressionModel_5() {
+  private boolean guardCheck_predictiveLinearRegressionModel_6() {
     return isDirty_AreaFeature_0;
   }
 
