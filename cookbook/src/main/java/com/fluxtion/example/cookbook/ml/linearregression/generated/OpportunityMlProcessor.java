@@ -77,7 +77,7 @@ import java.util.function.Consumer;
  *
  * @author Greg Higgins
  */
-@SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes"})
 public class OpportunityMlProcessor
     implements EventProcessor<OpportunityMlProcessor>,
         StaticEventProcessor,
@@ -317,24 +317,6 @@ public class OpportunityMlProcessor
   }
 
   @Override
-  public void publishOff() {
-    beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.publishOff()");
-    ExportFunctionAuditEvent typedEvent = functionAudit;
-    opportunityNotifierNode_0.publishOff();
-    afterServiceCall();
-  }
-
-  @Override
-  public void publishOn() {
-    beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.publishOn()");
-    ExportFunctionAuditEvent typedEvent = functionAudit;
-    opportunityNotifierNode_0.publishOn();
-    afterServiceCall();
-  }
-
-  @Override
   public void removeAllSales() {
     beforeServiceCall(
         "public void com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.removeAllSales()");
@@ -344,11 +326,29 @@ public class OpportunityMlProcessor
   }
 
   @Override
+  public void setEnableNotifications(boolean arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.setEnableNotifications(boolean)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    opportunityNotifierNode_0.setEnableNotifications(arg0);
+    afterServiceCall();
+  }
+
+  @Override
   public void setNotificationSink(java.util.function.Consumer<Object> arg0) {
     beforeServiceCall(
         "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.setNotificationSink(java.util.function.Consumer<java.lang.Object>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
     opportunityNotifierNode_0.setNotificationSink(arg0);
+    afterServiceCall();
+  }
+
+  @Override
+  public void setProfitTrigger(double arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode.setProfitTrigger(double)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    opportunityNotifierNode_0.setProfitTrigger(arg0);
     afterServiceCall();
   }
   //EXPORTED SERVICE FUNCTIONS - END

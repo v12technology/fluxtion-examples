@@ -5,6 +5,7 @@ import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSalesDetailsPostProcess;
 import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails;
+import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSalesMonitor;
 import com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache;
 import com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode;
 import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseTransformer;
@@ -23,6 +24,7 @@ public class Main {
 
     private static CalibrationProcessor calibrationProcessor;
     private static OpportunityNotifier notifier;
+    private static HouseSalesMonitor houseSalesMonitor;
     private static EventProcessor<?> opportunityIdentifier;
 
     public static void main(String[] args) {
@@ -30,19 +32,19 @@ public class Main {
         buildApp();
         setCalibration(4, 3.6);
         //online processing
-        registerHouuseForSale(new HouseSaleDetails("A12",12.0, 3));
-        registerHouuseForSale(new HouseSaleDetails("A12",25, 6));
-        registerHouuseForSale(new HouseSaleDetails("A12",250, 13));
+        registerHouseForSale(new HouseSaleDetails("A12",12.0, 3));
+        registerHouseForSale(new HouseSaleDetails("A12",25, 6));
+        registerHouseForSale(new HouseSaleDetails("A12",250, 13));
         //turn publication off
-        notifier.publishOn();
-        registerHouuseForSale(new HouseSaleDetails( "A12", 12.0, 3));
-        registerHouuseForSale(new HouseSaleDetails( "A12", 25, 6));
-        registerHouuseForSale(new HouseSaleDetails( "A12", 250, 13));
-        registerHouuseForSale(new HouseSaleDetails( "A12", 6, 1));
+        notifier.setEnableNotifications(true);
+        registerHouseForSale(new HouseSaleDetails( "A12", 12.0, 3));
+        registerHouseForSale(new HouseSaleDetails( "A12", 25, 6));
+        registerHouseForSale(new HouseSaleDetails( "A12", 250, 13));
+        registerHouseForSale(new HouseSaleDetails( "A12", 6, 1));
         //update calibration
         setCalibration(2, 10);
-        registerHouuseForSale(new HouseSaleDetails("A12",12.0, 3));
-        registerHouuseForSale(new HouseSaleDetails("A12",25, 6));
+        registerHouseForSale(new HouseSaleDetails("A12",12.0, 3));
+        registerHouseForSale(new HouseSaleDetails("A12",25, 6));
     }
 
     public static void buildProcessor(boolean interpreted){
@@ -64,6 +66,7 @@ public class Main {
         opportunityIdentifier.init();
         calibrationProcessor = opportunityIdentifier.getExportedService();
         notifier = opportunityIdentifier.getExportedService();
+        houseSalesMonitor = opportunityIdentifier.getExportedService();
     }
 
     public static void setCalibration(double weight, double co_efficient) {
@@ -76,7 +79,7 @@ public class Main {
                                 .build()));
     }
 
-    private static void registerHouuseForSale(HouseSaleDetails houseDetailsPostProcess) {
+    private static void registerHouseForSale(HouseSaleDetails houseDetailsPostProcess) {
         opportunityIdentifier.onEvent(houseDetailsPostProcess);
     }
 
