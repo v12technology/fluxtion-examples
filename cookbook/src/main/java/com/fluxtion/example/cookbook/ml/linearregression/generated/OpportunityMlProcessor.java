@@ -262,7 +262,7 @@ public class OpportunityMlProcessor
   public void handleEvent(HouseSaleDetails typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
-    liveHouseSalesCache_7.newHouseSale(typedEvent);
+    liveHouseSalesCache_7.newHouseForSaleAdvert(typedEvent);
     isDirty_handlerHouseSaleDetails = handlerHouseSaleDetails.onEvent(typedEvent);
     if (isDirty_handlerHouseSaleDetails) {
       peekFlowFunction_1.inputUpdated(handlerHouseSaleDetails);
@@ -403,7 +403,7 @@ public class OpportunityMlProcessor
     if (event instanceof com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails) {
       HouseSaleDetails typedEvent = (HouseSaleDetails) event;
       auditEvent(typedEvent);
-      liveHouseSalesCache_7.newHouseSale(typedEvent);
+      liveHouseSalesCache_7.newHouseForSaleAdvert(typedEvent);
       isDirty_handlerHouseSaleDetails = handlerHouseSaleDetails.onEvent(typedEvent);
       if (isDirty_handlerHouseSaleDetails) {
         peekFlowFunction_1.inputUpdated(handlerHouseSaleDetails);

@@ -39,20 +39,20 @@ public class Main {
     public static void runSimulation(){
         setCalibration(4, 3.6);
         //online processing
-        registerHouseForSale(new HouseSaleDetails("A12",12.0, 3));
-        registerHouseForSale(new HouseSaleDetails("A12",25, 6));
-        registerHouseForSale(new HouseSaleDetails("A12",250, 13));
+        registerHouseForSale(new HouseSaleDetails("A12",12.0, 3, 23_000, "w1"));
+        registerHouseForSale(new HouseSaleDetails("A12",25, 6, 23_000, "w1"));
+        registerHouseForSale(new HouseSaleDetails("A12",250, 13, 23_000, "w1"));
         //turn publication on
         notifier.setEnableNotifications(true);
-        registerHouseForSale(new HouseSaleDetails( "A1", 12.0, 3));
-        registerHouseForSale(new HouseSaleDetails( "B2", 25, 6));
-        registerHouseForSale(new HouseSaleDetails( "UU1", 25, 6));
-        registerHouseForSale(new HouseSaleDetails( "A12", 250, 13));
-        registerHouseForSale(new HouseSaleDetails( "A12", 6, 1));
+        registerHouseForSale(new HouseSaleDetails( "A1", 12.0, 3, 23_000, "w1"));
+        registerHouseForSale(new HouseSaleDetails( "B2", 25, 6, 23_000, "w1"));
+        registerHouseForSale(new HouseSaleDetails( "UU1", 25, 6, 23_000, "w1"));
+        registerHouseForSale(new HouseSaleDetails( "A12", 250, 13, 23_000, "w1"));
+        registerHouseForSale(new HouseSaleDetails( "A12", 6, 1, 23_000, "w1"));
         //update calibration
         setCalibration(2, 10);
-        registerHouseForSale(new HouseSaleDetails("A12",12.0, 3));
-        registerHouseForSale(new HouseSaleDetails("A12",25, 6));
+        registerHouseForSale(new HouseSaleDetails("A12",12.0, 3, 23_000, "w1"));
+        registerHouseForSale(new HouseSaleDetails("A12",25, 6, 23_000, "w1"));
     }
 
     public static void buildProcessingLogic(boolean interpreted){

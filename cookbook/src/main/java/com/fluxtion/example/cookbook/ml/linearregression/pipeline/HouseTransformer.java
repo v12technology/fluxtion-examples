@@ -12,6 +12,6 @@ public interface HouseTransformer {
             case 'C', 'c' -> 3;
             default -> -1;
         };
-        return new HouseSalesDetailsPostProcess(details.area(), details.bedrooms(), locationCategory);
+        return new HouseSalesDetailsPostProcess(locationCategory, details);
     }
 }

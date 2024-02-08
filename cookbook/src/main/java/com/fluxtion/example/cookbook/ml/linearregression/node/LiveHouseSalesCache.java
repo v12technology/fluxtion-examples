@@ -47,7 +47,7 @@ public class LiveHouseSalesCache
     }
 
     @OnEventHandler(propagate = false)
-    public boolean newHouseSale(HouseSaleDetails houseSaleDetails) {
+    public boolean newHouseForSaleAdvert(HouseSaleDetails houseSaleDetails) {
         liveSalesCache.add(houseSaleDetails);
         return false;
     }
