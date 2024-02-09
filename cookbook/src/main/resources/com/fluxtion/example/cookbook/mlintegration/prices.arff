@@ -1,0 +1,23 @@
+% All comments have to start with '%' character
+
+% Relation name
+@relation prices
+
+% Fields order
+@attribute area numeric     % area, sqft
+@attribute Bedrooms numeric % bedrooms, bd
+@attribute distance numeric % distance to the center, mi
+@attribute price numeric    % price, $
+
+% Declaring examples
+@data
+% Area, sqft    Bedrooms    Distance, mi    Price, $
+3150            4           1.2             1349000
+2290            3           1.2             1050000
+2940            6           3.0             1850000
+1107            2           3.2             729950
+1122            2           6.6             599950
+1350            2           6.9             598000
+1390            3           12.2            449950
+1660            5           12.3            619950
+1540            4           12.9            1024900

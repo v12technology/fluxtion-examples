@@ -12,12 +12,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.2</version>
@@ -32,6 +26,22 @@
             <artifactId>slf4j-simple</artifactId>
             <scope>compile</scope>
             <version>2.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-stable</artifactId>
+            <version>3.8.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fluxtion.csv-compiler</groupId>
+            <artifactId>csv-compiler-processor</artifactId>
+            <version>0.1.12</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fluxtion.csv-compiler</groupId>
+            <artifactId>csv-compiler</artifactId>
+            <version>0.1.12</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.apache.commons</groupId>-->

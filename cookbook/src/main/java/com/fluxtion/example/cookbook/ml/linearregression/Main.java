@@ -2,22 +2,17 @@ package com.fluxtion.example.cookbook.ml.linearregression;
 
 import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.builder.dataflow.DataFlow;
-import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSalesDetailsPostProcess;
 import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails;
 import com.fluxtion.example.cookbook.ml.linearregression.api.HouseSalesMonitor;
 import com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache;
 import com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode;
-import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseTransformer;
 import com.fluxtion.example.cookbook.ml.linearregression.api.OpportunityNotifier;
 import com.fluxtion.example.cookbook.ml.linearregression.generated.OpportunityMlProcessor;
-import com.fluxtion.example.cookbook.ml.linearregression.pipeline.AreaFeature;
-import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseFilters;
 import com.fluxtion.example.cookbook.ml.linearregression.pipeline.PreProcessPipeline;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.ml.Calibration;
 import com.fluxtion.runtime.ml.CalibrationProcessor;
-import com.fluxtion.runtime.ml.PredictiveLinearRegressionModel;
+import com.fluxtion.runtime.ml.PredictiveModel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
@@ -61,8 +56,7 @@ public class Main {
     }
 
     public static void buildLogic(EventProcessorConfig cfg) {
-        var validHouseDetailsFlow = PreProcessPipeline.buildLogic(cfg);
-        var predictor = new PredictiveLinearRegressionModel(new AreaFeature(validHouseDetailsFlow));
+        PredictiveModel predictor = PreProcessPipeline.buildScoringPipeline(cfg);
         var opportunityNotifier = new OpportunityNotifierNode(predictor, new LiveHouseSalesCache());
         cfg.addNode(opportunityNotifier);
     }
@@ -77,7 +71,7 @@ public class Main {
         calibrationProcessor.setCalibration(
                 Collections.singletonList(
                         Calibration.builder()
-                                .featureClass(AreaFeature.class)
+                                .featureIdentifier("area")
                                 .weight(weight)
                                 .co_efficient(co_efficient)
                                 .featureVersion(0)

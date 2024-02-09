@@ -28,10 +28,8 @@ import com.fluxtion.example.cookbook.ml.linearregression.api.OpportunityNotifier
 import com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache;
 import com.fluxtion.example.cookbook.ml.linearregression.node.OpportunityNotifierNode;
 import com.fluxtion.example.cookbook.ml.linearregression.node.ReCalibrationCompleteEvent;
-import com.fluxtion.example.cookbook.ml.linearregression.pipeline.AreaFeature;
-import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseFilters;
-import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HouseTransformer;
-import com.fluxtion.example.cookbook.ml.linearregression.pipeline.PreProcessPipeline;
+import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HousePipelineFunctions;
+import com.fluxtion.example.cookbook.ml.linearregression.pipeline.LocationCategoryFeature;
 import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
@@ -39,14 +37,15 @@ import com.fluxtion.runtime.audit.NodeNameAuditor;
 import com.fluxtion.runtime.callback.CallbackDispatcherImpl;
 import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.dataflow.function.FilterFlowFunction;
-import com.fluxtion.runtime.dataflow.function.MapFlowFunction.MapRef2RefFlowFunction;
 import com.fluxtion.runtime.dataflow.function.PeekFlowFunction;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
 import com.fluxtion.runtime.ml.CalibrationProcessor;
 import com.fluxtion.runtime.ml.Feature;
+import com.fluxtion.runtime.ml.MapPropertyToFeature;
 import com.fluxtion.runtime.ml.PredictiveLinearRegressionModel;
+import com.fluxtion.runtime.ml.PropertyToFeature;
 import com.fluxtion.runtime.node.DefaultEventHandlerNode;
 import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
@@ -64,8 +63,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.2.3
- * api version                     : 9.2.3
+ * eventProcessorGenerator version : 9.2.5
+ * api version                     : 9.2.5
  * </pre>
  *
  * Event classes supported:
@@ -90,9 +89,9 @@ public class OpportunityMlProcessor
         HouseSalesMonitor,
         OpportunityNotifier {
 
-  //Node declarations
+  // Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  private final LiveHouseSalesCache liveHouseSalesCache_7 = new LiveHouseSalesCache();
+  private final LiveHouseSalesCache liveHouseSalesCache_6 = new LiveHouseSalesCache();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
@@ -106,52 +105,67 @@ public class OpportunityMlProcessor
           "handlerHouseSaleDetails",
           context);
   private final PeekFlowFunction peekFlowFunction_1 =
-      new PeekFlowFunction<>(handlerHouseSaleDetails, PreProcessPipeline::logIncoming);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_2 =
-      new MapRef2RefFlowFunction<>(peekFlowFunction_1, HouseTransformer::asPostProcess);
+      new PeekFlowFunction<>(handlerHouseSaleDetails, HousePipelineFunctions::logIncomingRecord);
+  private final FilterFlowFunction filterFlowFunction_2 =
+      new FilterFlowFunction<>(
+          peekFlowFunction_1, HousePipelineFunctions::bedroomWithinRangeFilter);
   private final FilterFlowFunction filterFlowFunction_3 =
-      new FilterFlowFunction<>(mapRef2RefFlowFunction_2, HouseFilters::bedroomWithinRange);
-  private final FilterFlowFunction filterFlowFunction_4 =
-      new FilterFlowFunction<>(filterFlowFunction_3, HouseFilters::correctLocation);
-  private final PeekFlowFunction peekFlowFunction_5 =
-      new PeekFlowFunction<>(filterFlowFunction_4, PreProcessPipeline::logValid);
-  private final AreaFeature AreaFeature_0 = new AreaFeature(peekFlowFunction_5);
-  private final PredictiveLinearRegressionModel predictiveLinearRegressionModel_6 =
-      new PredictiveLinearRegressionModel(new Feature[] {AreaFeature_0});
+      new FilterFlowFunction<>(filterFlowFunction_2, HousePipelineFunctions::correctLocationFilter);
+  private final PeekFlowFunction peekFlowFunction_4 =
+      new PeekFlowFunction<>(filterFlowFunction_3, HousePipelineFunctions::logValidRecord);
+  private final PropertyToFeature area =
+      new PropertyToFeature<>("area", peekFlowFunction_4, HouseSaleDetails::getArea);
+  private final MapPropertyToFeature areaSquared =
+      new MapPropertyToFeature<>(
+          "areaSquared",
+          peekFlowFunction_4,
+          HouseSaleDetails::getArea,
+          HousePipelineFunctions::squared);
+  private final PropertyToFeature bedroom =
+      new PropertyToFeature<>("bedroom", peekFlowFunction_4, HouseSaleDetails::getBedrooms);
+  private final LocationCategoryFeature locationCategoryFeature =
+      new LocationCategoryFeature(peekFlowFunction_4);
+  private final PropertyToFeature offerPrice =
+      new PropertyToFeature<>("offerPrice", peekFlowFunction_4, HouseSaleDetails::getOfferPrice);
+  private final PredictiveLinearRegressionModel predictiveLinearRegressionModel_5 =
+      new PredictiveLinearRegressionModel(
+          new Feature[] {offerPrice, area, areaSquared, locationCategoryFeature, bedroom});
   private final OpportunityNotifierNode opportunityNotifierNode_0 =
-      new OpportunityNotifierNode(predictiveLinearRegressionModel_6, liveHouseSalesCache_7);
+      new OpportunityNotifierNode(predictiveLinearRegressionModel_5, liveHouseSalesCache_6);
   public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
-  //Dirty flags
+  // Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(8);
+      new IdentityHashMap<>(11);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(8);
+      new IdentityHashMap<>(11);
 
-  private boolean isDirty_AreaFeature_0 = false;
+  private boolean isDirty_area = false;
+  private boolean isDirty_areaSquared = false;
+  private boolean isDirty_bedroom = false;
+  private boolean isDirty_filterFlowFunction_2 = false;
   private boolean isDirty_filterFlowFunction_3 = false;
-  private boolean isDirty_filterFlowFunction_4 = false;
   private boolean isDirty_handlerHouseSaleDetails = false;
-  private boolean isDirty_mapRef2RefFlowFunction_2 = false;
+  private boolean isDirty_locationCategoryFeature = false;
+  private boolean isDirty_offerPrice = false;
   private boolean isDirty_peekFlowFunction_1 = false;
-  private boolean isDirty_peekFlowFunction_5 = false;
-  private boolean isDirty_predictiveLinearRegressionModel_6 = false;
-  //Forked declarations
+  private boolean isDirty_peekFlowFunction_4 = false;
+  private boolean isDirty_predictiveLinearRegressionModel_5 = false;
+  // Forked declarations
 
-  //Filter constants
+  // Filter constants
 
   public OpportunityMlProcessor(Map<Object, Object> contextMap) {
     context.replaceMappings(contextMap);
-    liveHouseSalesCache_7.setDispatcher(callbackDispatcher);
+    liveHouseSalesCache_6.setDispatcher(callbackDispatcher);
+    filterFlowFunction_2.setEventProcessorContext(context);
     filterFlowFunction_3.setEventProcessorContext(context);
-    filterFlowFunction_4.setEventProcessorContext(context);
-    mapRef2RefFlowFunction_2.setEventProcessorContext(context);
     peekFlowFunction_1.setEventProcessorContext(context);
-    peekFlowFunction_5.setEventProcessorContext(context);
-    //node auditors
+    peekFlowFunction_4.setEventProcessorContext(context);
+    // node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
     subscriptionManager.setSubscribingEventProcessor(this);
@@ -166,16 +180,19 @@ public class OpportunityMlProcessor
   public void init() {
     initCalled = true;
     auditEvent(Lifecycle.LifecycleEvent.Init);
-    //initialise dirty lookup map
+    // initialise dirty lookup map
     isDirty("test");
     handlerHouseSaleDetails.init();
     peekFlowFunction_1.initialiseEventStream();
-    mapRef2RefFlowFunction_2.initialiseEventStream();
+    filterFlowFunction_2.initialiseEventStream();
     filterFlowFunction_3.initialiseEventStream();
-    filterFlowFunction_4.initialiseEventStream();
-    peekFlowFunction_5.initialiseEventStream();
-    AreaFeature_0.init();
-    predictiveLinearRegressionModel_6.init();
+    peekFlowFunction_4.initialiseEventStream();
+    area.init();
+    areaSquared.init();
+    bedroom.init();
+    locationCategoryFeature.init();
+    offerPrice.init();
+    predictiveLinearRegressionModel_5.init();
     clock.init();
     afterEvent();
   }
@@ -227,7 +244,7 @@ public class OpportunityMlProcessor
     context.addMapping(key, value);
   }
 
-  //EVENT DISPATCH - START
+  // EVENT DISPATCH - START
   @Override
   public void onEvent(Object event) {
     if (buffering) {
@@ -261,8 +278,8 @@ public class OpportunityMlProcessor
 
   public void handleEvent(HouseSaleDetails typedEvent) {
     auditEvent(typedEvent);
-    //Default, no filter methods
-    liveHouseSalesCache_7.newHouseForSaleAdvert(typedEvent);
+    // Default, no filter methods
+    liveHouseSalesCache_6.newHouseForSaleAdvert(typedEvent);
     isDirty_handlerHouseSaleDetails = handlerHouseSaleDetails.onEvent(typedEvent);
     if (isDirty_handlerHouseSaleDetails) {
       peekFlowFunction_1.inputUpdated(handlerHouseSaleDetails);
@@ -271,40 +288,43 @@ public class OpportunityMlProcessor
       isDirty_peekFlowFunction_1 = true;
       peekFlowFunction_1.peek();
       if (isDirty_peekFlowFunction_1) {
-        mapRef2RefFlowFunction_2.inputUpdated(peekFlowFunction_1);
+        filterFlowFunction_2.inputUpdated(peekFlowFunction_1);
       }
     }
-    if (guardCheck_mapRef2RefFlowFunction_2()) {
-      isDirty_mapRef2RefFlowFunction_2 = mapRef2RefFlowFunction_2.map();
-      if (isDirty_mapRef2RefFlowFunction_2) {
-        filterFlowFunction_3.inputUpdated(mapRef2RefFlowFunction_2);
+    if (guardCheck_filterFlowFunction_2()) {
+      isDirty_filterFlowFunction_2 = filterFlowFunction_2.filter();
+      if (isDirty_filterFlowFunction_2) {
+        filterFlowFunction_3.inputUpdated(filterFlowFunction_2);
       }
     }
     if (guardCheck_filterFlowFunction_3()) {
       isDirty_filterFlowFunction_3 = filterFlowFunction_3.filter();
       if (isDirty_filterFlowFunction_3) {
-        filterFlowFunction_4.inputUpdated(filterFlowFunction_3);
+        peekFlowFunction_4.inputUpdated(filterFlowFunction_3);
       }
     }
-    if (guardCheck_filterFlowFunction_4()) {
-      isDirty_filterFlowFunction_4 = filterFlowFunction_4.filter();
-      if (isDirty_filterFlowFunction_4) {
-        peekFlowFunction_5.inputUpdated(filterFlowFunction_4);
-      }
+    if (guardCheck_peekFlowFunction_4()) {
+      isDirty_peekFlowFunction_4 = true;
+      peekFlowFunction_4.peek();
     }
-    if (guardCheck_peekFlowFunction_5()) {
-      isDirty_peekFlowFunction_5 = true;
-      peekFlowFunction_5.peek();
+    if (guardCheck_area()) {
+      isDirty_area = area.calculateFeature();
     }
-    if (guardCheck_AreaFeature_0()) {
-      isDirty_AreaFeature_0 = AreaFeature_0.processRecord();
-      if (isDirty_AreaFeature_0) {
-        predictiveLinearRegressionModel_6.featureUpdated(AreaFeature_0);
-      }
+    if (guardCheck_areaSquared()) {
+      isDirty_areaSquared = areaSquared.calculateFeature();
     }
-    if (guardCheck_predictiveLinearRegressionModel_6()) {
-      isDirty_predictiveLinearRegressionModel_6 =
-          predictiveLinearRegressionModel_6.calculateInference();
+    if (guardCheck_bedroom()) {
+      isDirty_bedroom = bedroom.calculateFeature();
+    }
+    if (guardCheck_locationCategoryFeature()) {
+      isDirty_locationCategoryFeature = locationCategoryFeature.calculateFeature();
+    }
+    if (guardCheck_offerPrice()) {
+      isDirty_offerPrice = offerPrice.calculateFeature();
+    }
+    if (guardCheck_predictiveLinearRegressionModel_5()) {
+      isDirty_predictiveLinearRegressionModel_5 =
+          predictiveLinearRegressionModel_5.calculateInference();
     }
     if (guardCheck_opportunityNotifierNode_0()) {
       opportunityNotifierNode_0.predictionUpdated();
@@ -314,32 +334,67 @@ public class OpportunityMlProcessor
 
   public void handleEvent(ReCalibrationCompleteEvent typedEvent) {
     auditEvent(typedEvent);
-    //Default, no filter methods
+    // Default, no filter methods
     opportunityNotifierNode_0.recalibrationComplete(typedEvent);
     afterEvent();
   }
 
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
-    //Default, no filter methods
+    // Default, no filter methods
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
-  //EVENT DISPATCH - END
+  // EVENT DISPATCH - END
 
-  //EXPORTED SERVICE FUNCTIONS - START
+  // EXPORTED SERVICE FUNCTIONS - START
+  @Override
+  public boolean resetToOne() {
+    beforeServiceCall(
+        "public default boolean com.fluxtion.runtime.ml.CalibrationProcessor.resetToOne()");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    liveHouseSalesCache_6.resetToOne();
+    isDirty_area = area.resetToOne();
+    isDirty_areaSquared = areaSquared.resetToOne();
+    isDirty_bedroom = bedroom.resetToOne();
+    isDirty_locationCategoryFeature = locationCategoryFeature.resetToOne();
+    isDirty_offerPrice = offerPrice.resetToOne();
+    isDirty_predictiveLinearRegressionModel_5 = predictiveLinearRegressionModel_5.resetToOne();
+    opportunityNotifierNode_0.resetToOne();
+    afterServiceCall();
+    return true;
+  }
+
+  @Override
+  public boolean resetToZero() {
+    beforeServiceCall(
+        "public default boolean com.fluxtion.runtime.ml.CalibrationProcessor.resetToZero()");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    liveHouseSalesCache_6.resetToZero();
+    isDirty_area = area.resetToZero();
+    isDirty_areaSquared = areaSquared.resetToZero();
+    isDirty_bedroom = bedroom.resetToZero();
+    isDirty_locationCategoryFeature = locationCategoryFeature.resetToZero();
+    isDirty_offerPrice = offerPrice.resetToZero();
+    isDirty_predictiveLinearRegressionModel_5 = predictiveLinearRegressionModel_5.resetToZero();
+    opportunityNotifierNode_0.resetToZero();
+    afterServiceCall();
+    return true;
+  }
+
   @Override
   public boolean setCalibration(java.util.List<com.fluxtion.runtime.ml.Calibration> arg0) {
     beforeServiceCall(
         "public boolean com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.setCalibration(java.util.List<com.fluxtion.runtime.ml.Calibration>)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    liveHouseSalesCache_7.setCalibration(arg0);
-    isDirty_AreaFeature_0 = AreaFeature_0.setCalibration(arg0);
-    if (isDirty_AreaFeature_0) {
-      predictiveLinearRegressionModel_6.featureUpdated(AreaFeature_0);
-    }
-    isDirty_predictiveLinearRegressionModel_6 =
-        predictiveLinearRegressionModel_6.setCalibration(arg0);
+    liveHouseSalesCache_6.setCalibration(arg0);
+    isDirty_area = area.setCalibration(arg0);
+    isDirty_areaSquared = areaSquared.setCalibration(arg0);
+    isDirty_bedroom = bedroom.setCalibration(arg0);
+    isDirty_locationCategoryFeature = locationCategoryFeature.setCalibration(arg0);
+    isDirty_offerPrice = offerPrice.setCalibration(arg0);
+    isDirty_predictiveLinearRegressionModel_5 =
+        predictiveLinearRegressionModel_5.setCalibration(arg0);
     opportunityNotifierNode_0.setCalibration(arg0);
     afterServiceCall();
     return true;
@@ -351,7 +406,7 @@ public class OpportunityMlProcessor
     beforeServiceCall(
         "public void com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.houseSold(com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails)");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    liveHouseSalesCache_7.houseSold(arg0);
+    liveHouseSalesCache_6.houseSold(arg0);
     opportunityNotifierNode_0.houseSold(arg0);
     afterServiceCall();
   }
@@ -361,7 +416,7 @@ public class OpportunityMlProcessor
     beforeServiceCall(
         "public void com.fluxtion.example.cookbook.ml.linearregression.node.LiveHouseSalesCache.removeAllSales()");
     ExportFunctionAuditEvent typedEvent = functionAudit;
-    liveHouseSalesCache_7.removeAllSales();
+    liveHouseSalesCache_6.removeAllSales();
     opportunityNotifierNode_0.removeAllSales();
     afterServiceCall();
   }
@@ -396,14 +451,14 @@ public class OpportunityMlProcessor
     opportunityNotifierNode_0.setProfitTrigger(arg0);
     afterServiceCall();
   }
-  //EXPORTED SERVICE FUNCTIONS - END
+  // EXPORTED SERVICE FUNCTIONS - END
 
   public void bufferEvent(Object event) {
     buffering = true;
     if (event instanceof com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails) {
       HouseSaleDetails typedEvent = (HouseSaleDetails) event;
       auditEvent(typedEvent);
-      liveHouseSalesCache_7.newHouseForSaleAdvert(typedEvent);
+      liveHouseSalesCache_6.newHouseForSaleAdvert(typedEvent);
       isDirty_handlerHouseSaleDetails = handlerHouseSaleDetails.onEvent(typedEvent);
       if (isDirty_handlerHouseSaleDetails) {
         peekFlowFunction_1.inputUpdated(handlerHouseSaleDetails);
@@ -428,40 +483,43 @@ public class OpportunityMlProcessor
       isDirty_peekFlowFunction_1 = true;
       peekFlowFunction_1.peek();
       if (isDirty_peekFlowFunction_1) {
-        mapRef2RefFlowFunction_2.inputUpdated(peekFlowFunction_1);
+        filterFlowFunction_2.inputUpdated(peekFlowFunction_1);
       }
     }
-    if (guardCheck_mapRef2RefFlowFunction_2()) {
-      isDirty_mapRef2RefFlowFunction_2 = mapRef2RefFlowFunction_2.map();
-      if (isDirty_mapRef2RefFlowFunction_2) {
-        filterFlowFunction_3.inputUpdated(mapRef2RefFlowFunction_2);
+    if (guardCheck_filterFlowFunction_2()) {
+      isDirty_filterFlowFunction_2 = filterFlowFunction_2.filter();
+      if (isDirty_filterFlowFunction_2) {
+        filterFlowFunction_3.inputUpdated(filterFlowFunction_2);
       }
     }
     if (guardCheck_filterFlowFunction_3()) {
       isDirty_filterFlowFunction_3 = filterFlowFunction_3.filter();
       if (isDirty_filterFlowFunction_3) {
-        filterFlowFunction_4.inputUpdated(filterFlowFunction_3);
+        peekFlowFunction_4.inputUpdated(filterFlowFunction_3);
       }
     }
-    if (guardCheck_filterFlowFunction_4()) {
-      isDirty_filterFlowFunction_4 = filterFlowFunction_4.filter();
-      if (isDirty_filterFlowFunction_4) {
-        peekFlowFunction_5.inputUpdated(filterFlowFunction_4);
-      }
+    if (guardCheck_peekFlowFunction_4()) {
+      isDirty_peekFlowFunction_4 = true;
+      peekFlowFunction_4.peek();
     }
-    if (guardCheck_peekFlowFunction_5()) {
-      isDirty_peekFlowFunction_5 = true;
-      peekFlowFunction_5.peek();
+    if (guardCheck_area()) {
+      isDirty_area = area.calculateFeature();
     }
-    if (guardCheck_AreaFeature_0()) {
-      isDirty_AreaFeature_0 = AreaFeature_0.processRecord();
-      if (isDirty_AreaFeature_0) {
-        predictiveLinearRegressionModel_6.featureUpdated(AreaFeature_0);
-      }
+    if (guardCheck_areaSquared()) {
+      isDirty_areaSquared = areaSquared.calculateFeature();
     }
-    if (guardCheck_predictiveLinearRegressionModel_6()) {
-      isDirty_predictiveLinearRegressionModel_6 =
-          predictiveLinearRegressionModel_6.calculateInference();
+    if (guardCheck_bedroom()) {
+      isDirty_bedroom = bedroom.calculateFeature();
+    }
+    if (guardCheck_locationCategoryFeature()) {
+      isDirty_locationCategoryFeature = locationCategoryFeature.calculateFeature();
+    }
+    if (guardCheck_offerPrice()) {
+      isDirty_offerPrice = offerPrice.calculateFeature();
+    }
+    if (guardCheck_predictiveLinearRegressionModel_5()) {
+      isDirty_predictiveLinearRegressionModel_5 =
+          predictiveLinearRegressionModel_5.calculateInference();
     }
     if (guardCheck_opportunityNotifierNode_0()) {
       opportunityNotifierNode_0.predictionUpdated();
@@ -481,17 +539,20 @@ public class OpportunityMlProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(liveHouseSalesCache_7, "liveHouseSalesCache_7");
+    auditor.nodeRegistered(liveHouseSalesCache_6, "liveHouseSalesCache_6");
     auditor.nodeRegistered(opportunityNotifierNode_0, "opportunityNotifierNode_0");
-    auditor.nodeRegistered(AreaFeature_0, "AreaFeature_0");
+    auditor.nodeRegistered(locationCategoryFeature, "locationCategoryFeature");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
+    auditor.nodeRegistered(filterFlowFunction_2, "filterFlowFunction_2");
     auditor.nodeRegistered(filterFlowFunction_3, "filterFlowFunction_3");
-    auditor.nodeRegistered(filterFlowFunction_4, "filterFlowFunction_4");
-    auditor.nodeRegistered(mapRef2RefFlowFunction_2, "mapRef2RefFlowFunction_2");
     auditor.nodeRegistered(peekFlowFunction_1, "peekFlowFunction_1");
-    auditor.nodeRegistered(peekFlowFunction_5, "peekFlowFunction_5");
+    auditor.nodeRegistered(peekFlowFunction_4, "peekFlowFunction_4");
     auditor.nodeRegistered(subscriptionManager, "subscriptionManager");
-    auditor.nodeRegistered(predictiveLinearRegressionModel_6, "predictiveLinearRegressionModel_6");
+    auditor.nodeRegistered(areaSquared, "areaSquared");
+    auditor.nodeRegistered(predictiveLinearRegressionModel_5, "predictiveLinearRegressionModel_5");
+    auditor.nodeRegistered(area, "area");
+    auditor.nodeRegistered(bedroom, "bedroom");
+    auditor.nodeRegistered(offerPrice, "offerPrice");
     auditor.nodeRegistered(handlerHouseSaleDetails, "handlerHouseSaleDetails");
     auditor.nodeRegistered(context, "context");
   }
@@ -515,14 +576,17 @@ public class OpportunityMlProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
-    isDirty_AreaFeature_0 = false;
+    isDirty_area = false;
+    isDirty_areaSquared = false;
+    isDirty_bedroom = false;
+    isDirty_filterFlowFunction_2 = false;
     isDirty_filterFlowFunction_3 = false;
-    isDirty_filterFlowFunction_4 = false;
     isDirty_handlerHouseSaleDetails = false;
-    isDirty_mapRef2RefFlowFunction_2 = false;
+    isDirty_locationCategoryFeature = false;
+    isDirty_offerPrice = false;
     isDirty_peekFlowFunction_1 = false;
-    isDirty_peekFlowFunction_5 = false;
-    isDirty_predictiveLinearRegressionModel_6 = false;
+    isDirty_peekFlowFunction_4 = false;
+    isDirty_predictiveLinearRegressionModel_5 = false;
   }
 
   @Override
@@ -553,15 +617,18 @@ public class OpportunityMlProcessor
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
-      dirtyFlagSupplierMap.put(AreaFeature_0, () -> isDirty_AreaFeature_0);
+      dirtyFlagSupplierMap.put(area, () -> isDirty_area);
+      dirtyFlagSupplierMap.put(areaSquared, () -> isDirty_areaSquared);
+      dirtyFlagSupplierMap.put(bedroom, () -> isDirty_bedroom);
+      dirtyFlagSupplierMap.put(filterFlowFunction_2, () -> isDirty_filterFlowFunction_2);
       dirtyFlagSupplierMap.put(filterFlowFunction_3, () -> isDirty_filterFlowFunction_3);
-      dirtyFlagSupplierMap.put(filterFlowFunction_4, () -> isDirty_filterFlowFunction_4);
       dirtyFlagSupplierMap.put(handlerHouseSaleDetails, () -> isDirty_handlerHouseSaleDetails);
-      dirtyFlagSupplierMap.put(mapRef2RefFlowFunction_2, () -> isDirty_mapRef2RefFlowFunction_2);
+      dirtyFlagSupplierMap.put(locationCategoryFeature, () -> isDirty_locationCategoryFeature);
+      dirtyFlagSupplierMap.put(offerPrice, () -> isDirty_offerPrice);
       dirtyFlagSupplierMap.put(peekFlowFunction_1, () -> isDirty_peekFlowFunction_1);
-      dirtyFlagSupplierMap.put(peekFlowFunction_5, () -> isDirty_peekFlowFunction_5);
+      dirtyFlagSupplierMap.put(peekFlowFunction_4, () -> isDirty_peekFlowFunction_4);
       dirtyFlagSupplierMap.put(
-          predictiveLinearRegressionModel_6, () -> isDirty_predictiveLinearRegressionModel_6);
+          predictiveLinearRegressionModel_5, () -> isDirty_predictiveLinearRegressionModel_5);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
@@ -569,49 +636,68 @@ public class OpportunityMlProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
-      dirtyFlagUpdateMap.put(AreaFeature_0, (b) -> isDirty_AreaFeature_0 = b);
+      dirtyFlagUpdateMap.put(area, (b) -> isDirty_area = b);
+      dirtyFlagUpdateMap.put(areaSquared, (b) -> isDirty_areaSquared = b);
+      dirtyFlagUpdateMap.put(bedroom, (b) -> isDirty_bedroom = b);
+      dirtyFlagUpdateMap.put(filterFlowFunction_2, (b) -> isDirty_filterFlowFunction_2 = b);
       dirtyFlagUpdateMap.put(filterFlowFunction_3, (b) -> isDirty_filterFlowFunction_3 = b);
-      dirtyFlagUpdateMap.put(filterFlowFunction_4, (b) -> isDirty_filterFlowFunction_4 = b);
       dirtyFlagUpdateMap.put(handlerHouseSaleDetails, (b) -> isDirty_handlerHouseSaleDetails = b);
-      dirtyFlagUpdateMap.put(mapRef2RefFlowFunction_2, (b) -> isDirty_mapRef2RefFlowFunction_2 = b);
+      dirtyFlagUpdateMap.put(locationCategoryFeature, (b) -> isDirty_locationCategoryFeature = b);
+      dirtyFlagUpdateMap.put(offerPrice, (b) -> isDirty_offerPrice = b);
       dirtyFlagUpdateMap.put(peekFlowFunction_1, (b) -> isDirty_peekFlowFunction_1 = b);
-      dirtyFlagUpdateMap.put(peekFlowFunction_5, (b) -> isDirty_peekFlowFunction_5 = b);
+      dirtyFlagUpdateMap.put(peekFlowFunction_4, (b) -> isDirty_peekFlowFunction_4 = b);
       dirtyFlagUpdateMap.put(
-          predictiveLinearRegressionModel_6, (b) -> isDirty_predictiveLinearRegressionModel_6 = b);
+          predictiveLinearRegressionModel_5, (b) -> isDirty_predictiveLinearRegressionModel_5 = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
   private boolean guardCheck_opportunityNotifierNode_0() {
-    return isDirty_predictiveLinearRegressionModel_6;
+    return isDirty_predictiveLinearRegressionModel_5;
   }
 
-  private boolean guardCheck_AreaFeature_0() {
-    return isDirty_peekFlowFunction_5;
+  private boolean guardCheck_locationCategoryFeature() {
+    return isDirty_peekFlowFunction_4;
+  }
+
+  private boolean guardCheck_filterFlowFunction_2() {
+    return isDirty_peekFlowFunction_1;
   }
 
   private boolean guardCheck_filterFlowFunction_3() {
-    return isDirty_mapRef2RefFlowFunction_2;
-  }
-
-  private boolean guardCheck_filterFlowFunction_4() {
-    return isDirty_filterFlowFunction_3;
-  }
-
-  private boolean guardCheck_mapRef2RefFlowFunction_2() {
-    return isDirty_peekFlowFunction_1;
+    return isDirty_filterFlowFunction_2;
   }
 
   private boolean guardCheck_peekFlowFunction_1() {
     return isDirty_handlerHouseSaleDetails;
   }
 
-  private boolean guardCheck_peekFlowFunction_5() {
-    return isDirty_filterFlowFunction_4;
+  private boolean guardCheck_peekFlowFunction_4() {
+    return isDirty_filterFlowFunction_3;
   }
 
-  private boolean guardCheck_predictiveLinearRegressionModel_6() {
-    return isDirty_AreaFeature_0;
+  private boolean guardCheck_areaSquared() {
+    return isDirty_peekFlowFunction_4;
+  }
+
+  private boolean guardCheck_predictiveLinearRegressionModel_5() {
+    return isDirty_area
+        | isDirty_areaSquared
+        | isDirty_bedroom
+        | isDirty_locationCategoryFeature
+        | isDirty_offerPrice;
+  }
+
+  private boolean guardCheck_area() {
+    return isDirty_peekFlowFunction_4;
+  }
+
+  private boolean guardCheck_bedroom() {
+    return isDirty_peekFlowFunction_4;
+  }
+
+  private boolean guardCheck_offerPrice() {
+    return isDirty_peekFlowFunction_4;
   }
 
   @Override

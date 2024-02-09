@@ -1,22 +1,20 @@
 package com.fluxtion.example.cookbook.ml.linearregression.api;
 
-public record HouseSalesDetailsPostProcess(int locationCategory, HouseSaleDetails details) {
+import com.fluxtion.extension.csvcompiler.annotations.CsvMarshaller;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.Objects;
 
-
-    public double area() {
-        return details.area();
-    }
-
-    public int bedrooms() {
-        return details.bedrooms();
-    }
-
-    public double offerPrice() {
-        return details.offerPrice();
-    }
-
-    public String id() {
-        return details.id();
-    }
+@Data
+@CsvMarshaller
+@AllArgsConstructor
+@NoArgsConstructor
+public final class HouseSalesDetailsPostProcess {
+    private double area;
+    private double areaSquared;
+    private int bedrooms;
+    private int locationCategory;
+    private double salePrice;
 }
