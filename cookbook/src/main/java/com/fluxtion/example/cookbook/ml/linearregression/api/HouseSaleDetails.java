@@ -22,6 +22,7 @@ public final class HouseSaleDetails {
         this.area = area;
         this.bedrooms = bedrooms;
         this.offerPrice = offerPrice;
+        this.soldPrice = 0;
         this.id = id;
     }
 }
