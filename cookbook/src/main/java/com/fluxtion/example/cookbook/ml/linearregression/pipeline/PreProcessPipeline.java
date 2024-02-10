@@ -14,11 +14,11 @@ public class PreProcessPipeline {
     public static PredictiveModel buildScoringPipeline(EventProcessorConfig cfg){
         var houseDetailSupplier = DataFlow.subscribe(HouseSaleDetails.class)
                 //Uncomment below to see more log output
-                .peek(HousePipelineFunctions::logIncomingRecord)
+//                .peek(HousePipelineFunctions::logIncomingRecord)
                 .filter(HousePipelineFunctions::bedroomWithinRangeFilter)
                 .filter(HousePipelineFunctions::correctLocationFilter)
                 //Uncomment below to see more log output
-                .peek(HousePipelineFunctions::logValidRecord)
+//                .peek(HousePipelineFunctions::logValidRecord)
                 .flowSupplier();
         return new PredictiveLinearRegressionModel(
                 PropertyToFeature.build("offerPrice", houseDetailSupplier, HouseSaleDetails::getOfferPrice),

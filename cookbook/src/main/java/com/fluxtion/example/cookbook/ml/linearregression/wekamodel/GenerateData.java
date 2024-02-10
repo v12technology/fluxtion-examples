@@ -12,36 +12,45 @@ import com.fluxtion.runtime.ml.CalibrationProcessor;
 import com.fluxtion.runtime.ml.PredictiveModel;
 import lombok.SneakyThrows;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 import java.util.UUID;
 
 public class GenerateData {
 
-    private static FileWriter outputWriter;
+    public static final String dataDir = "data/ml/linear_regression/";
+    public static final Path dataDirPath = Paths.get(dataDir);
+    private static Writer outputWriter;
     //CSV marshalling
     private static final RowMarshaller<HouseSaleDetails> marshallerInput = RowMarshaller.load(HouseSaleDetails.class);
     //CSV marshalling
     private static final RowMarshaller<HouseSalesDetailsPostProcess> marshallerOutput = RowMarshaller.load(HouseSalesDetailsPostProcess.class);
     private static EventProcessor<?> preProcessPipeline;
-    private static final String resourcesDir = "src/main/resources/data/ml/linear_regression/";
     private static final Random random = new Random(123);
 
     public static void main(String[] args) throws Exception {
-        preProcessPipeline = Fluxtion.interpret(c -> DataFlow.subscribeToNode(PreProcessPipeline.buildScoringPipeline(c))
-                        .push(GenerateData::writeRow));
-        preProcessPipeline.init();
-        preProcessPipeline.getExportedService(CalibrationProcessor.class).resetToOne();
-        generateInputCsv("input1.csv", 100);
-        generateInputCsv("input2.csv", 45);
-        generateOutput("input1.csv", "output1.csv");
-        generateOutput("input2.csv", "output2.csv");
+        buildPreProcessPipeline();
+        generatePreProcessInputCsv("inputHouseSales_1.csv", 100);
+        generatePreProcessInputCsv("inputHouseSales_2.csv", 45);
+        generatePostProcessCsvOutput("inputHouseSales_1.csv", "postProcessHouseSales_1.csv");
+        generatePostProcessCsvOutput("inputHouseSales_2.csv", "postProcessHouseSales_2.csv");
     }
 
-    private static void generateInputCsv(String file, int count) throws IOException {
-        try (FileWriter writer = new FileWriter(resourcesDir + file)) {
+    @SneakyThrows
+    private static void buildPreProcessPipeline() {
+        preProcessPipeline = Fluxtion.interpret(c ->
+                DataFlow.subscribeToNode(PreProcessPipeline.buildScoringPipeline(c))
+                        .push(GenerateData::writePostProcessRow));
+        preProcessPipeline.init();
+        preProcessPipeline.getExportedService(CalibrationProcessor.class).resetToOne();
+        Files.createDirectories(dataDirPath);
+    }
+
+    private static void generatePreProcessInputCsv(String file, int count) throws IOException {
+        try (Writer writer = Files.newBufferedWriter(dataDirPath.resolve(file))) {
             marshallerInput.writeHeaders(writer);
             for (int i = 0; i < count; i++) {
                 marshallerInput.writeRow(randomHouseForSaleAdvert(), writer);
@@ -49,16 +58,18 @@ public class GenerateData {
         }
     }
 
-    private static void generateOutput(String inFile, String outFile) throws IOException {
-        try (FileWriter sw = new FileWriter(resourcesDir + outFile)) {
-            outputWriter = sw;
-            marshallerOutput.writeHeaders(sw);
-            marshallerInput.stream(new FileReader(resourcesDir + inFile)).forEach(preProcessPipeline::onEvent);
+    private static void generatePostProcessCsvOutput(String inFile, String outFile) throws IOException {
+        try (Writer writer = Files.newBufferedWriter(dataDirPath.resolve(outFile))) {
+            outputWriter = writer;
+            marshallerOutput.writeHeaders(writer);
+            BufferedReader reader = Files.newBufferedReader(dataDirPath.resolve(inFile));
+            marshallerInput.stream(reader).forEach(preProcessPipeline::onEvent);
+            reader.close();
         }
     }
 
     @SneakyThrows
-    public static void writeRow(PredictiveModel model) {
+    public static void writePostProcessRow(PredictiveModel model) {
         HouseSalesDetailsPostProcess postProcess = new HouseSalesDetailsPostProcess();
         model.features().forEach(f -> {
             switch (f) {
