@@ -35,13 +35,13 @@
         <dependency>
             <groupId>com.fluxtion.csv-compiler</groupId>
             <artifactId>csv-compiler-processor</artifactId>
-            <version>0.1.14</version>
+            <version>0.1.15</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fluxtion.csv-compiler</groupId>
             <artifactId>csv-compiler</artifactId>
-            <version>0.1.14</version>
+            <version>0.1.15</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.apache.commons</groupId>-->
