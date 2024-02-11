@@ -16,16 +16,17 @@ public class PredictiveService {
     private final Instances data;
     private final LinearRegression classifier;
 
-    private final Instance instance;
+//    private final Instance instance;
 
     public static void main(String[] args) throws Exception {
-        ConverterUtils.DataSource source = new ConverterUtils.DataSource("src/main/resources/data/ml/linear_regression/input1.csv");
-        source.getDataSet().forEach(System.out::println);
+//        ConverterUtils.DataSource source = new ConverterUtils.DataSource(GenerateData.dataDirPath.resolve("postProcessHouseSales_1.csv").toString());
+//        source.getDataSet().forEach(System.out::println);
+        new PredictiveService();
     }
 
     public PredictiveService() throws Exception {
         // Loading Albuquerque real estate prices
-        ConverterUtils.DataSource source = new ConverterUtils.DataSource("com/fluxtion/example/cookbook/mlintegration/prices.arff");
+        ConverterUtils.DataSource source = new ConverterUtils.DataSource(GenerateData.dataDirPath.resolve("postProcessHouseSales_1.csv").toString());
         data = source.getDataSet();
         // Setting the last attribute (price) to the class index
         data.setClassIndex(data.numAttributes() - 1);
@@ -48,8 +49,8 @@ public class PredictiveService {
 //        classifier.
 
         // Creating an Instance for predictions
-        instance = new DenseInstance(data.numAttributes());
-        instance.setDataset(data);
+//        instance = new DenseInstance(data.numAttributes());
+//        instance.setDataset(data);
 
 //        for(int i = 0; i < instance.numAttributes(); i++){
 //            var attribute = instance.attribute(i);
