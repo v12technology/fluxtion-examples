@@ -17,7 +17,7 @@
             <plugin>
                 <groupId>com.fluxtion</groupId>
                 <artifactId>fluxtion-maven-plugin</artifactId>
-                <version>3.0.12</version>
+                <version>3.0.13</version>
                 <executions>
                     <execution>
                         <goals>

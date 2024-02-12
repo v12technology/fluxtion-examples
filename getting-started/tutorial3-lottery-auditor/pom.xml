@@ -13,7 +13,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <fluxtion.version>9.2.3</fluxtion.version>
+        <fluxtion.version>9.2.11</fluxtion.version>
     </properties>
 
     <build>
@@ -21,7 +21,7 @@
             <plugin>
                 <groupId>com.fluxtion</groupId>
                 <artifactId>fluxtion-maven-plugin</artifactId>
-                <version>3.0.12</version>
+                <version>3.0.13</version>
                 <executions>
                     <execution>
                         <id>spring to fluxtion builder</id>
