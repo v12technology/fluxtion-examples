@@ -14,3 +14,9 @@ buildNumber.properties
 /getting-started/tutorial2-lottery-aot/src/main/resources/com/fluxtion/example/cookbook/lottery/aot/LotteryProcessor.graphml
 /getting-started/tutorial2-lottery-aot/src/main/resources/com/fluxtion/example/cookbook/lottery/aot/LotteryProcessor.png
 /logs/**/*.log
+/cookbook/logs/
+/getting-started/tutorial4-lottery-auditlog/src/main/resources/com/fluxtion/example/cookbook/lottery/aot/
+/getting-started/tutorial3-lottery-auditor/src/main/resources/com/fluxtion/example/cookbook/lottery/aot/
+/getting-started/tutorial5-lottery-extended/src/main/resources/com/fluxtion/example/cookbook/lottery/aot/
+/getting-started/tutorial6-lottery-nospring/src/main/resources/com/fluxtion/example/cookbook/lottery/aot/
+/imperative-helloworld/src/main/resources/com/fluxtion/example/imperative/helloworld/generated/
