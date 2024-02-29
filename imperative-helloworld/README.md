@@ -2,26 +2,26 @@
 
 This example creates a Fluxtion event processor imperatively. The goal is to extract double values from two different 
 events streams, calculate the sum and print a message to console if the sum is greater than 100. The values are stored and
-updated independently by the different event types. The stream of events can be infinitely long, calculations are run
+updated independently by the different event type/stream. The stream of events can be infinitely long, calculations are run
 whenever a new event is received.
 
-The event processor is constructed [imperatively](src/main/java/com/fluxtion/example/Main.java#L20) using Fluxtion builder api's supplied with user classes. The resulting 
+The event processor is constructed imperatively using Fluxtion builder api's supplied with user classes. The resulting 
 event processor instance is fed the event streams. All dispatch and change notification is handled by Fluxtion when an
-event is received, the business logic resides in the user functions.
+event is received. Business logic resides in the user functions/classes.
 
 # Building
 The process for building an event processor with Fluxtion are quite simple:
 
 - Create user classes with business logic
 - Annotate callback methods
-   - @OnEventHandler annotation declares the [entry point](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A_Handler.java) of an execution path, triggered by an external event.
-   - @OnTrigger annotated methods indicate call back methods to be invoked if a parent propagates a change.
-   - The return flag from the DataAddition [@OnTrigger](src/main/java/com/fluxtion/example/Main.java#L93) method, calculate,
+   - **@OnEventHandler** annotation declares the [entry point](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A_Handler.java) of an execution path, triggered by an external event.
+   - **@OnTrigger** annotated methods indicate call back methods to be invoked if a parent propagates a change.
+   - The return flag from the DataAddition [@OnTrigger](src/main/java/com/fluxtion/example/imperative/helloworld/DataSumCalculator.java) method, calculate,
      indicates if the event should be propagated. In this case the event is only propagated if the sum > 100
 - Add the user classes to a [fluxtion builder](src/main/java/com/fluxtion/example/imperative/helloworld/AotBuilder.java) 
-- Add the Fluxtion maven plugin to your build, the event processor will be generated AOT
+- Add the Fluxtion maven plugin to your build [pom.xml](pom.xml), the event processor will be generated ahead of time (AOT)
 - Instantiate the generated event processor and call init 
-- Invoke onEvent [main example](src/main/java/com/fluxtion/example/imperative/helloworld/Main.java) to trigger a calculation cycle
+- Invoke onEvent to trigger a calculation cycle when a user event is received, see [main example](src/main/java/com/fluxtion/example/imperative/helloworld/Main.java)
 
 ## Interpreted mode
 Fluxtion can run in an interpreted mode, no AOT compilation takes place and the event processor is created on demand 
@@ -29,8 +29,8 @@ while executing the program. Steps for interpreted mode
 
 - Create user classes with business logic
 - Annotate callback methods
-    - @OnEventHandler annotation declares the [entry point](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A_Handler.java) of an execution path, triggered by an external event.
-    - @OnTrigger annotated methods indicate call back methods to be invoked if a parent propagates a change.
+    - **@OnEventHandler** annotation declares the [entry point](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A_Handler.java) of an execution path, triggered by an external event.
+    - **@OnTrigger** annotated methods indicate call back methods to be invoked if a parent propagates a change.
     - The return flag from the DataAddition [@OnTrigger](src/main/java/com/fluxtion/example/imperative/helloworld/DataSumCalculator.java) method, calculate,
       indicates if the event should be propagated. In this case the event is only propagated if the sum > 100
 - Call Fluxtion.interpret with the user classes to be managed ```Fluxtion.interpret(new BreachNotifier())```
