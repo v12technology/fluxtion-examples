@@ -1,5 +1,4 @@
 /*
-* Copyright (C) 2018 V12 Technology Ltd.
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the Server Side Public License, version 1,
@@ -53,8 +52,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.1.16
- * api version                     : 9.1.16
+ * eventProcessorGenerator version : 9.2.17
+ * api version                     : 9.2.17
  * </pre>
  *
  * Event classes supported:
@@ -66,7 +65,7 @@ import java.util.function.Consumer;
  *
  * @author Greg Higgins
  */
-@SuppressWarnings({"deprecation", "unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class LotteryProcessor
     implements EventProcessor<LotteryProcessor>,
         StaticEventProcessor,
@@ -89,7 +88,7 @@ public class LotteryProcessor
   public final PowerLotteryMachine powerMachine = new PowerLotteryMachine(ticketStore);
   public final GameReportNode gameReport = new GameReportNode(lotteryMachine, powerMachine);
   public final Clock clock = new Clock();
-  private ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
+  private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;

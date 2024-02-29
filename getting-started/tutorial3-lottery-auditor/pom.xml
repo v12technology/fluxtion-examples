@@ -13,7 +13,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <fluxtion.version>9.2.3</fluxtion.version>
+        <fluxtion.version>9.2.17</fluxtion.version>
     </properties>
 
     <build>
@@ -21,7 +21,7 @@
             <plugin>
                 <groupId>com.fluxtion</groupId>
                 <artifactId>fluxtion-maven-plugin</artifactId>
-                <version>3.0.12</version>
+                <version>3.0.14</version>
                 <executions>
                     <execution>
                         <id>spring to fluxtion builder</id>
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
+            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
         <!--        RUNTIME SCOPE NO LONGER SUPPLIED BY FLUXTION COMPILER-->

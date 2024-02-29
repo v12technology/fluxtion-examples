@@ -14,17 +14,19 @@
 *
 <http://www.mongodb.com/licensing/server-side-public-license>.
 */
-package com.fluxtion.example.cookbook.lottery.aot;
+package com.fluxtion.example.imperative.helloworld.generated;
 
 import com.fluxtion.runtime.StaticEventProcessor;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
-import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
-import com.fluxtion.example.cookbook.lottery.api.TicketStore;
-import com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode;
-import com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode;
+import com.fluxtion.example.imperative.helloworld.BreachNotifier;
+import com.fluxtion.example.imperative.helloworld.DataSumCalculator;
+import com.fluxtion.example.imperative.helloworld.Event_A;
+import com.fluxtion.example.imperative.helloworld.Event_A_Handler;
+import com.fluxtion.example.imperative.helloworld.Event_B;
+import com.fluxtion.example.imperative.helloworld.Event_B_Handler;
 import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
@@ -56,31 +58,33 @@ import java.util.function.Consumer;
  * Event classes supported:
  *
  * <ul>
- *   <li>com.fluxtion.compiler.generation.model.ExportFunctionMarker
+ *   <li>com.fluxtion.example.imperative.helloworld.Event_A
+ *   <li>com.fluxtion.example.imperative.helloworld.Event_B
  *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
  * </ul>
  *
  * @author Greg Higgins
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class LotteryProcessor
-    implements EventProcessor<LotteryProcessor>,
+public class BreachNotifierProcessor
+    implements EventProcessor<BreachNotifierProcessor>,
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
-        Lifecycle,
-        LotteryMachine,
-        TicketStore {
+        Lifecycle {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  private final Event_A_Handler event_A_Handler_2 = new Event_A_Handler();
+  private final Event_B_Handler event_B_Handler_3 = new Event_B_Handler();
+  private final DataSumCalculator dataSumCalculator_1 =
+      new DataSumCalculator(event_A_Handler_2, event_B_Handler_3);
+  private final BreachNotifier breachNotifier_0 = new BreachNotifier(dataSumCalculator_1);
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  public final TicketStoreNode ticketStore = new TicketStoreNode();
-  public final LotteryMachineNode lotteryMachine = new LotteryMachineNode(ticketStore);
   public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
@@ -88,16 +92,18 @@ public class LotteryProcessor
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(1);
+      new IdentityHashMap<>(3);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(1);
+      new IdentityHashMap<>(3);
 
-  private boolean isDirty_ticketStore = false;
+  private boolean isDirty_dataSumCalculator_1 = false;
+  private boolean isDirty_event_A_Handler_2 = false;
+  private boolean isDirty_event_B_Handler_3 = false;
   //Forked declarations
 
   //Filter constants
 
-  public LotteryProcessor(Map<Object, Object> contextMap) {
+  public BreachNotifierProcessor(Map<Object, Object> contextMap) {
     context.replaceMappings(contextMap);
     //node auditors
     initialiseAuditor(clock);
@@ -106,7 +112,7 @@ public class LotteryProcessor
     context.setEventProcessorCallback(this);
   }
 
-  public LotteryProcessor() {
+  public BreachNotifierProcessor() {
     this(null);
   }
 
@@ -127,8 +133,7 @@ public class LotteryProcessor
     }
     processing = true;
     auditEvent(Lifecycle.LifecycleEvent.Start);
-    ticketStore.start();
-    lotteryMachine.start();
+
     afterEvent();
     callbackDispatcher.dispatchQueuedCallbacks();
     processing = false;
@@ -185,10 +190,42 @@ public class LotteryProcessor
 
   @Override
   public void onEventInternal(Object event) {
-    if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
+    if (event instanceof com.fluxtion.example.imperative.helloworld.Event_A) {
+      Event_A typedEvent = (Event_A) event;
+      handleEvent(typedEvent);
+    } else if (event instanceof com.fluxtion.example.imperative.helloworld.Event_B) {
+      Event_B typedEvent = (Event_B) event;
+      handleEvent(typedEvent);
+    } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       handleEvent(typedEvent);
     }
+  }
+
+  public void handleEvent(Event_A typedEvent) {
+    auditEvent(typedEvent);
+    //Default, no filter methods
+    isDirty_event_A_Handler_2 = event_A_Handler_2.data1Update(typedEvent);
+    if (guardCheck_dataSumCalculator_1()) {
+      isDirty_dataSumCalculator_1 = dataSumCalculator_1.calculate();
+    }
+    if (guardCheck_breachNotifier_0()) {
+      breachNotifier_0.printWarning();
+    }
+    afterEvent();
+  }
+
+  public void handleEvent(Event_B typedEvent) {
+    auditEvent(typedEvent);
+    //Default, no filter methods
+    isDirty_event_B_Handler_3 = event_B_Handler_3.data1Update(typedEvent);
+    if (guardCheck_dataSumCalculator_1()) {
+      isDirty_dataSumCalculator_1 = dataSumCalculator_1.calculate();
+    }
+    if (guardCheck_breachNotifier_0()) {
+      breachNotifier_0.printWarning();
+    }
+    afterEvent();
   }
 
   public void handleEvent(ClockStrategyEvent typedEvent) {
@@ -199,72 +236,17 @@ public class LotteryProcessor
   }
   //EVENT DISPATCH - END
 
-  //EXPORTED SERVICE FUNCTIONS - START
-  @Override
-  public boolean buyTicket(com.fluxtion.example.cookbook.lottery.api.Ticket arg0) {
-    beforeServiceCall(
-        "public boolean com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode.buyTicket(com.fluxtion.example.cookbook.lottery.api.Ticket)");
-    ExportFunctionAuditEvent typedEvent = functionAudit;
-    isDirty_ticketStore = ticketStore.buyTicket(arg0);
-    if (guardCheck_lotteryMachine()) {
-      lotteryMachine.processNewTicketSale();
-    }
-    afterServiceCall();
-    return true;
-  }
-
-  @Override
-  public void closeStore() {
-    beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode.closeStore()");
-    ExportFunctionAuditEvent typedEvent = functionAudit;
-    isDirty_ticketStore = true;
-    ticketStore.closeStore();
-    afterServiceCall();
-  }
-
-  @Override
-  public void openStore() {
-    beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode.openStore()");
-    ExportFunctionAuditEvent typedEvent = functionAudit;
-    isDirty_ticketStore = true;
-    ticketStore.openStore();
-    afterServiceCall();
-  }
-
-  @Override
-  public void selectWinningTicket() {
-    beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode.selectWinningTicket()");
-    ExportFunctionAuditEvent typedEvent = functionAudit;
-    lotteryMachine.selectWinningTicket();
-    afterServiceCall();
-  }
-
-  @Override
-  public void setResultPublisher(java.util.function.Consumer<String> arg0) {
-    beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.lottery.nodes.LotteryMachineNode.setResultPublisher(java.util.function.Consumer<java.lang.String>)");
-    ExportFunctionAuditEvent typedEvent = functionAudit;
-    lotteryMachine.setResultPublisher(arg0);
-    afterServiceCall();
-  }
-
-  @Override
-  public void setTicketSalesPublisher(java.util.function.Consumer<String> arg0) {
-    beforeServiceCall(
-        "public void com.fluxtion.example.cookbook.lottery.nodes.TicketStoreNode.setTicketSalesPublisher(java.util.function.Consumer<java.lang.String>)");
-    ExportFunctionAuditEvent typedEvent = functionAudit;
-    isDirty_ticketStore = true;
-    ticketStore.setTicketSalesPublisher(arg0);
-    afterServiceCall();
-  }
-  //EXPORTED SERVICE FUNCTIONS - END
-
   public void bufferEvent(Object event) {
     buffering = true;
-    if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
+    if (event instanceof com.fluxtion.example.imperative.helloworld.Event_A) {
+      Event_A typedEvent = (Event_A) event;
+      auditEvent(typedEvent);
+      isDirty_event_A_Handler_2 = event_A_Handler_2.data1Update(typedEvent);
+    } else if (event instanceof com.fluxtion.example.imperative.helloworld.Event_B) {
+      Event_B typedEvent = (Event_B) event;
+      auditEvent(typedEvent);
+      isDirty_event_B_Handler_3 = event_B_Handler_3.data1Update(typedEvent);
+    } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
       clock.setClockStrategy(typedEvent);
@@ -274,8 +256,11 @@ public class LotteryProcessor
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
-    if (guardCheck_lotteryMachine()) {
-      lotteryMachine.processNewTicketSale();
+    if (guardCheck_dataSumCalculator_1()) {
+      isDirty_dataSumCalculator_1 = dataSumCalculator_1.calculate();
+    }
+    if (guardCheck_breachNotifier_0()) {
+      breachNotifier_0.printWarning();
     }
     afterEvent();
   }
@@ -292,8 +277,10 @@ public class LotteryProcessor
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(lotteryMachine, "lotteryMachine");
-    auditor.nodeRegistered(ticketStore, "ticketStore");
+    auditor.nodeRegistered(breachNotifier_0, "breachNotifier_0");
+    auditor.nodeRegistered(dataSumCalculator_1, "dataSumCalculator_1");
+    auditor.nodeRegistered(event_A_Handler_2, "event_A_Handler_2");
+    auditor.nodeRegistered(event_B_Handler_3, "event_B_Handler_3");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(subscriptionManager, "subscriptionManager");
     auditor.nodeRegistered(context, "context");
@@ -318,7 +305,9 @@ public class LotteryProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
-    isDirty_ticketStore = false;
+    isDirty_dataSumCalculator_1 = false;
+    isDirty_event_A_Handler_2 = false;
+    isDirty_event_B_Handler_3 = false;
   }
 
   @Override
@@ -349,7 +338,9 @@ public class LotteryProcessor
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
-      dirtyFlagSupplierMap.put(ticketStore, () -> isDirty_ticketStore);
+      dirtyFlagSupplierMap.put(dataSumCalculator_1, () -> isDirty_dataSumCalculator_1);
+      dirtyFlagSupplierMap.put(event_A_Handler_2, () -> isDirty_event_A_Handler_2);
+      dirtyFlagSupplierMap.put(event_B_Handler_3, () -> isDirty_event_B_Handler_3);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
@@ -357,13 +348,19 @@ public class LotteryProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
-      dirtyFlagUpdateMap.put(ticketStore, (b) -> isDirty_ticketStore = b);
+      dirtyFlagUpdateMap.put(dataSumCalculator_1, (b) -> isDirty_dataSumCalculator_1 = b);
+      dirtyFlagUpdateMap.put(event_A_Handler_2, (b) -> isDirty_event_A_Handler_2 = b);
+      dirtyFlagUpdateMap.put(event_B_Handler_3, (b) -> isDirty_event_B_Handler_3 = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
-  private boolean guardCheck_lotteryMachine() {
-    return isDirty_ticketStore;
+  private boolean guardCheck_breachNotifier_0() {
+    return isDirty_dataSumCalculator_1;
+  }
+
+  private boolean guardCheck_dataSumCalculator_1() {
+    return isDirty_event_A_Handler_2 | isDirty_event_B_Handler_3;
   }
 
   @Override
@@ -388,13 +385,13 @@ public class LotteryProcessor
   }
 
   @Override
-  public LotteryProcessor newInstance() {
-    return new LotteryProcessor();
+  public BreachNotifierProcessor newInstance() {
+    return new BreachNotifierProcessor();
   }
 
   @Override
-  public LotteryProcessor newInstance(Map<Object, Object> contextMap) {
-    return new LotteryProcessor();
+  public BreachNotifierProcessor newInstance(Map<Object, Object> contextMap) {
+    return new BreachNotifierProcessor();
   }
 
   @Override

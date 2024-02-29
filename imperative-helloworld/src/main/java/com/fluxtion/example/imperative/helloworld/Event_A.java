@@ -1,4 +1,4 @@
 package com.fluxtion.example.imperative.helloworld;
 
-public record InputDataEvent_2(double value) {
+public record Event_A(double value) {
 }
