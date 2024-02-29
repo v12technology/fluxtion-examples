@@ -27,12 +27,8 @@ Fluxtion can run in an interpreted mode, no AOT compilation takes place and the 
 while executing the program. Steps for interpreted mode
 
 - Create user classes with business logic
-- Annotate callback methods
-    - **@OnEventHandler** annotation declares the [entry point](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A_Handler.java) of an execution path, triggered by an external event.
-    - **@OnTrigger** annotated methods indicate call back methods to be invoked if a parent propagates a change.
-    - The return flag from the DataAddition [@OnTrigger](src/main/java/com/fluxtion/example/imperative/helloworld/DataSumCalculator.java) method, calculate,
-      indicates if the event should be propagated. In this case the event is only propagated if the sum > 100
-- Call Fluxtion.interpret with the user classes to be managed ```Fluxtion.interpret(new BreachNotifier())```
+- Annotate callback methods - as described above
+- Call **Fluxtion.interpret** with user classes to be included in the event processor ```Fluxtion.interpret(new BreachNotifier())```
 - Call init on the interpreted processor
 - Invoke onEvent [main example](src/main/java/com/fluxtion/example/imperative/helloworld/Main.java) to trigger a calculation cycle
 
@@ -59,8 +55,8 @@ sum:64.5
 The application has the following classes:
 
 * Event classes: [Event_B](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A.java) [Event_B](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A.java)
-* Event Handlers: [Event_B_Handler](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A_Handler.java) [Event_B_Handler](src/main/java/com/fluxtion/example/imperative/helloworld/Event_B_Handler.java)
-* Calculation: [DataSumCalculator](src/main/java/com/fluxtion/example/imperative/helloworld/DataSumCalculator.java) Calculates the sum when its annotate trigger method is called. Returns true if the sum > 100 to indicate a propagation notification is required
+* Event Handlers: [Event_B_Handler](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A_Handler.java) [Event_B_Handler](src/main/java/com/fluxtion/example/imperative/helloworld/Event_B_Handler.java) contain @OnEventHandler annotated methods
+* Calculation: [DataSumCalculator](src/main/java/com/fluxtion/example/imperative/helloworld/DataSumCalculator.java) Calculates the sum when its annotated @OnTrigger method is called. Returns true if the sum > 100 to indicate a propagation notification is required
 * Output: [BreachNotifier](src/main/java/com/fluxtion/example/imperative/helloworld/BreachNotifier.java) prints to console when its trigger method is invoked
 
 User classes are arranged in a normal object graph, the annotations indicate the callback methods. The event propagation
