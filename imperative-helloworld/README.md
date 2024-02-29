@@ -2,7 +2,7 @@
 
 This example creates a Fluxtion event processor imperatively. The goal is to extract double values from two different 
 events streams, calculate the sum and print a message to console if the sum is greater than 100. The values are stored and
-updated independently by the different event type/stream. The stream of events can be infinitely long, calculations are run
+updated independently partitioned by event type. The stream of events can be infinitely long, calculations are run
 whenever a new event is received.
 
 The event processor is constructed imperatively using Fluxtion builder api's supplied with user classes. The resulting 
@@ -15,9 +15,8 @@ The process for building an event processor with Fluxtion are quite simple:
 - Create user classes with business logic
 - Annotate callback methods
    - **@OnEventHandler** annotation declares the [entry point](src/main/java/com/fluxtion/example/imperative/helloworld/Event_A_Handler.java) of an execution path, triggered by an external event.
-   - **@OnTrigger** annotated methods indicate call back methods to be invoked if a parent propagates a change.
-   - The return flag from the DataAddition [@OnTrigger](src/main/java/com/fluxtion/example/imperative/helloworld/DataSumCalculator.java) method, calculate,
-     indicates if the event should be propagated. In this case the event is only propagated if the sum > 100
+   - **@OnTrigger** annotated [methods](src/main/java/com/fluxtion/example/imperative/helloworld/DataSumCalculator.java) indicate call back methods to be invoked if a parent propagates a change.
+     The return boolean flag from a trigger method indicates if event notification should be propagated.
 - Add the user classes to a [fluxtion builder](src/main/java/com/fluxtion/example/imperative/helloworld/AotBuilder.java) 
 - Add the Fluxtion maven plugin to your build [pom.xml](pom.xml), the event processor will be generated ahead of time (AOT)
 - Instantiate the generated event processor and call init 
