@@ -1,15 +1,12 @@
 package com.fluxtion.example.cookbook.lottery;
 
-import com.fluxtion.compiler.extern.spring.FluxtionSpring;
 import com.fluxtion.example.cookbook.lottery.aot.LotteryProcessor;
 import com.fluxtion.example.cookbook.lottery.api.LotteryMachine;
 import com.fluxtion.example.cookbook.lottery.api.Ticket;
 import com.fluxtion.example.cookbook.lottery.api.TicketStore;
 import com.fluxtion.example.cookbook.lottery.auditor.FluxtionSlf4jAuditor;
 import com.fluxtion.runtime.EventProcessor;
-import com.fluxtion.runtime.audit.EventLogControlEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.function.Consumer;
 
@@ -60,13 +57,4 @@ public class LotteryApp {
         ticketStore.setTicketSalesPublisher(ticketReceiptHandler);
         lotteryEventProcessor.start();
     }
-
-    public static void ticketReceipt(String receipt){
-        log.info(receipt);
-    }
-
-    public static void lotteryResult(String receipt){
-        log.info(receipt);
-    }
-
 }
