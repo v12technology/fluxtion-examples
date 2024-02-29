@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.fluxtion.example</groupId>
-    <artifactId>getting-started-tutorial3</artifactId>
+    <artifactId>getting-started-tutorial6</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>getting-started :: tutorial 3 :: custom auditor</name>
+    <name>getting-started :: tutorial 6 :: no spring</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -24,15 +24,9 @@
                 <version>3.0.14</version>
                 <executions>
                     <execution>
-                        <id>spring to fluxtion builder</id>
                         <goals>
-                            <goal>springToFluxtion</goal>
+                            <goal>scan</goal>
                         </goals>
-                        <configuration>
-                            <springFile>src/main/resources/spring-lottery.xml</springFile>
-                            <className>LotteryProcessor</className>
-                            <packageName>com.fluxtion.example.cookbook.lottery.aot</packageName>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -45,25 +39,12 @@
             <groupId>com.fluxtion</groupId>
             <artifactId>runtime</artifactId>
             <version>${fluxtion.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <scope>compile</scope>
-            <version>2.0.7</version>
         </dependency>
         <!--        PROVIDED SCOPE-->
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>compiler</artifactId>
             <version>${fluxtion.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.3.29</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

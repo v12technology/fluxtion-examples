@@ -37,13 +37,14 @@ along with this program.  If not, see
         <module>getting-started/tutorial3-lottery-auditor</module>
         <module>getting-started/tutorial4-lottery-auditlog</module>
         <module>getting-started/tutorial5-lottery-extended</module>
+        <module>getting-started/tutorial6-lottery-nospring</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <fluxtion.version>9.2.11</fluxtion.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <fluxtion.version>9.2.17</fluxtion.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

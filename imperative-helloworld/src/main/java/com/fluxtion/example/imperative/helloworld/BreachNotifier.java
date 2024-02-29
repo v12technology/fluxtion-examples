@@ -2,6 +2,9 @@ package com.fluxtion.example.imperative.helloworld;
 
 import com.fluxtion.runtime.annotations.OnTrigger;
 
+/**
+ * The trigger method, printWarning on this class is invoked when a change is propagated from the parent node
+ */
 public class BreachNotifier {
     private final DataSumCalculator dataAddition;
 

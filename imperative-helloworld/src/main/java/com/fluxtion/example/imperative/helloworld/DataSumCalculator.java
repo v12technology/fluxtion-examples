@@ -1,20 +1,26 @@
 package com.fluxtion.example.imperative.helloworld;
 
 import com.fluxtion.runtime.annotations.OnTrigger;
+import lombok.Getter;
 
+/**
+ * Aggregates two event sources and calculates the sum of their values, whenever either changes. The calculate method
+ * notifies a propagation of a change when the sum is > 100
+ */
 public class DataSumCalculator {
 
-    private final Data1handler data1handler;
-    private final Data2handler data2handler;
+    private final Event_A_Handler eventAHandler;
+    private final Event_B_Handler eventBHandler;
+    @Getter
     private double sum;
 
-    public DataSumCalculator(Data1handler data1handler, Data2handler data2handler) {
-        this.data1handler = data1handler;
-        this.data2handler = data2handler;
+    public DataSumCalculator(Event_A_Handler eventAHandler, Event_B_Handler eventBHandler) {
+        this.eventAHandler = eventAHandler;
+        this.eventBHandler = eventBHandler;
     }
 
     public DataSumCalculator() {
-        this(new Data1handler(), new Data2handler());
+        this(new Event_A_Handler(), new Event_B_Handler());
     }
 
     /**
@@ -24,12 +30,9 @@ public class DataSumCalculator {
      */
     @OnTrigger
     public boolean calculate() {
-        sum = data1handler.getValue() + data2handler.getValue();
+        sum = eventAHandler.getValue() + eventBHandler.getValue();
         System.out.println("sum:" + sum);
         return sum > 100;
     }
 
-    public double getSum() {
-        return sum;
-    }
 }
