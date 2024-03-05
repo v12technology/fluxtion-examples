@@ -21,7 +21,8 @@ public class PowerLotteryMachine extends LotteryMachineNode implements @ExportSe
             resultPublisher.accept("no tickets bought - no winning ticket");
         } else {
             Collections.shuffle(ticketsBought);
-            resultPublisher.accept("winning numbers:" + ticketsBought.get(0));
+            winningTicket = ticketsBought.get(1);
+            resultPublisher.accept("POWER-LOTTERY winning numbers:" + winningTicket.number());
         }
         ticketsBought.clear();
     }
