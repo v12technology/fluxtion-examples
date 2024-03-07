@@ -19,6 +19,7 @@ public class LotteryApp {
     private static TicketStore ticketStore;
 
     public static void main(String[] args) {
+        long now = System.nanoTime();
         start(LotteryApp::ticketReceipt, LotteryApp::lotteryResult);
         //try and buy a ticket - store is closed
         ticketStore.buyTicket(new Ticket(12_65_56));
@@ -40,6 +41,7 @@ public class LotteryApp {
 
         //run the lottery
         lotteryMachine.selectWinningTicket();
+        System.out.println("exec time:" + (System.nanoTime() - now)/1_000_000);
     }
 
     public static void start(Consumer<String> ticketReceiptHandler, Consumer<String> resultsPublisher){
