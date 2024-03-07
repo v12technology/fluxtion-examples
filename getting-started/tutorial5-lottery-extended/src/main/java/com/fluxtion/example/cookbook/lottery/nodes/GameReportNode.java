@@ -26,11 +26,20 @@ public class GameReportNode implements
 
     @Override
     public boolean isTicketSuccessful(Ticket ticket, Consumer<Boolean> responseReceiver) {
+        responseReceiver.accept(
+                lotteryMachine.winningTicket.equals(ticket)
+                        | powerLotteryMachine.getWinningTicket().equals(ticket)
+        );
         return false;
     }
 
     @Override
     public boolean publishReport(Consumer<String> reportReceiver) {
+        reportReceiver.accept(
+                "GAME REPORT gameNumber:" + gameCount + "\n" +
+                        "lottery winner:" + lotteryMachine.getWinningTicket() + "\n" +
+                        "POWER-LOTTERY  winner:" + powerLotteryMachine.getWinningTicket()
+        );
         return false;
     }
 
