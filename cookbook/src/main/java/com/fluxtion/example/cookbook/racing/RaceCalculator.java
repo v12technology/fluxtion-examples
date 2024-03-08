@@ -2,6 +2,7 @@ package com.fluxtion.example.cookbook.racing;
 
 import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.annotations.OnEventHandler;
+import com.fluxtion.runtime.annotations.OnTrigger;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -28,9 +29,9 @@ public class RaceCalculator {
         void publishAllResults();
     }
 
-    private record RunningRecord(Instant startTime, Instant finishTime) {
-        RunningRecord(Instant startTime) {
-            this(startTime, startTime);
+    private record RunningRecord(long runnerId, Instant startTime, Instant finishTime) {
+        RunningRecord(long runnerId, Instant startTime) {
+            this(runnerId, startTime, startTime);
         }
 
         public String runDuration() {
@@ -43,18 +44,20 @@ public class RaceCalculator {
     public static class RaceTimeTracker {
 
         private final transient Map<Long, RunningRecord> raceTimeMap = new HashMap<>();
+        private RunningRecord latestFinisher;
 
         @OnEventHandler(propagate = false)
         public boolean runnerStarted(RunnerStarted runnerStarted) {
-            raceTimeMap.put(runnerStarted.runnerId(), new RunningRecord(runnerStarted.startTime()));
+            long runnerId = runnerStarted.runnerId();
+            raceTimeMap.put(runnerId, new RunningRecord(runnerId, runnerStarted.startTime()));
             return false;
         }
 
         @OnEventHandler
         public boolean runnerFinished(RunnerFinished runner) {
-            raceTimeMap.computeIfPresent(
+            latestFinisher = raceTimeMap.computeIfPresent(
                     runner.runnerId(),
-                    (id, startRecord) -> new RunningRecord(startRecord.startTime(), runner.finishTime()));
+                    (id, startRecord) -> new RunningRecord(id, startRecord.startTime(), runner.finishTime()));
             return true;
         }
     }
@@ -64,18 +67,18 @@ public class RaceCalculator {
 
         private final RaceTimeTracker raceTimeTracker;
 
-        @OnEventHandler(propagate = false)
-        public boolean runnerFinished(RunnerFinished runner) {
-            var raceTime = raceTimeTracker.getRaceTimeMap().get(runner.runnerId());
-            System.out.format("Crossed the line runner:%d time:%s%n", runner.runnerId(), raceTime.runDuration());
+        @OnTrigger
+        public boolean sendIndividualRunnerResult(){
+            var raceRecord = raceTimeTracker.getLatestFinisher();
+            System.out.format("Crossed the line runner:%d time [%s]%n", raceRecord.runnerId(), raceRecord.runDuration());
             return false;
         }
 
         @Override
         public void publishAllResults() {
-            System.out.println("FINAL RESULTS");
+            System.out.println("\nFINAL RESULTS");
             raceTimeTracker.getRaceTimeMap().forEach((l, r) ->
-                    System.out.println("id:" + l + " final time:" + r.runDuration()));
+                    System.out.println("id:" + l + " time [" + r.runDuration() + "]"));
         }
     }
 }

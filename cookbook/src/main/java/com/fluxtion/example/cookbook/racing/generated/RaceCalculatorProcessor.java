@@ -202,7 +202,9 @@ public class RaceCalculatorProcessor
     auditEvent(typedEvent);
     // Default, no filter methods
     isDirty_raceCalculator = raceCalculator.runnerFinished(typedEvent);
-    resultsPublisher.runnerFinished(typedEvent);
+    if (guardCheck_resultsPublisher()) {
+      resultsPublisher.sendIndividualRunnerResult();
+    }
     afterEvent();
   }
 
@@ -238,7 +240,6 @@ public class RaceCalculatorProcessor
       RunnerFinished typedEvent = (RunnerFinished) event;
       auditEvent(typedEvent);
       isDirty_raceCalculator = raceCalculator.runnerFinished(typedEvent);
-      resultsPublisher.runnerFinished(typedEvent);
     } else if (event instanceof com.fluxtion.example.cookbook.racing.RaceCalculator.RunnerStarted) {
       RunnerStarted typedEvent = (RunnerStarted) event;
       auditEvent(typedEvent);
@@ -253,6 +254,9 @@ public class RaceCalculatorProcessor
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
+    if (guardCheck_resultsPublisher()) {
+      resultsPublisher.sendIndividualRunnerResult();
+    }
     afterEvent();
   }
 
