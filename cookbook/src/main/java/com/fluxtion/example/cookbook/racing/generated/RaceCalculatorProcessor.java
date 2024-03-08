@@ -118,6 +118,7 @@ public class RaceCalculatorProcessor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     // initialise dirty lookup map
     isDirty("test");
+    raceCalculator.init();
     clock.init();
     afterEvent();
   }

@@ -1,6 +1,7 @@
 package com.fluxtion.example.cookbook.racing;
 
 import com.fluxtion.runtime.annotations.ExportService;
+import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnTrigger;
 import lombok.Getter;
@@ -45,6 +46,11 @@ public class RaceCalculator {
 
         private final transient Map<Long, RunningRecord> raceTimeMap = new HashMap<>();
         private RunningRecord latestFinisher;
+
+        @Initialise
+        public void init(){
+            raceTimeMap.clear();
+        }
 
         @OnEventHandler(propagate = false)
         public boolean runnerStarted(RunnerStarted runnerStarted) {
