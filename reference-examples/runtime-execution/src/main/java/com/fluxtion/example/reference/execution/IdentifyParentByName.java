@@ -5,7 +5,7 @@ import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnParentUpdate;
 import com.fluxtion.runtime.annotations.OnTrigger;
 
-public class SimpleIdentifyParentByName {
+public class IdentifyParentByName {
 
     public static class MyNode {
         private final String name;

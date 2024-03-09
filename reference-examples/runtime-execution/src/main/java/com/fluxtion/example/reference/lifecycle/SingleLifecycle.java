@@ -1,4 +1,4 @@
-package com.fluxtion.example.reference.execution;
+package com.fluxtion.example.reference.lifecycle;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.Initialise;
@@ -6,7 +6,7 @@ import com.fluxtion.runtime.annotations.Start;
 import com.fluxtion.runtime.annotations.Stop;
 import com.fluxtion.runtime.annotations.TearDown;
 
-public class SimpleLifecycle {
+public class SingleLifecycle {
 
     public static class MyNode {
 

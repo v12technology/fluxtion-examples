@@ -4,7 +4,7 @@ import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnTrigger;
 
-public class SimpleConditionalTriggerChild {
+public class ConditionalTriggerChild {
 
     public static class MyNode {
         @OnEventHandler

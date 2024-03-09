@@ -5,7 +5,7 @@ import com.fluxtion.compiler.builder.dataflow.DataFlow;
 
 import java.util.function.Consumer;
 
-public class SimpleSink {
+public class OutputSink {
 
     public static void main(String[] args) {
         var processor = Fluxtion.interpret(cfg ->

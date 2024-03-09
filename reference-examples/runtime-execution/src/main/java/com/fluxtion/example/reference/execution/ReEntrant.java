@@ -4,7 +4,7 @@ import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 
-public class SimpleReEntrant {
+public class ReEntrant {
     public static class MyNode {
         @OnEventHandler
         public boolean handleStringEvent(String stringToProcess) {

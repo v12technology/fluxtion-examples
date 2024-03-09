@@ -3,18 +3,12 @@ package com.fluxtion.example.reference.execution;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 
-public class SimpleMultipleEventTypes {
+public class SingleEvent {
 
     public static class MyNode {
         @OnEventHandler
         public boolean handleStringEvent(String stringToProcess) {
-            System.out.println("String received:" + stringToProcess);
-            return true;
-        }
-
-        @OnEventHandler
-        public boolean handleIntEvent(int intToProcess) {
-            System.out.println("Int received:" + intToProcess);
+            System.out.println("received:" + stringToProcess);
             return true;
         }
     }
@@ -23,6 +17,5 @@ public class SimpleMultipleEventTypes {
         var processor = Fluxtion.interpret(new MyNode());
         processor.init();
         processor.onEvent("TEST");
-        processor.onEvent(16);
     }
 }

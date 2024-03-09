@@ -4,7 +4,7 @@ import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.event.Signal;
 
-public class SimpleFilterEvent {
+public class SingleFilterEvent {
 
     public static class MyNode {
         @OnEventHandler(filterString = "CLEAR_SIGNAL")
