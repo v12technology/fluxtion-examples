@@ -22,7 +22,7 @@ public class EventHandlerCollection {
             this.name = name;
         }
 
-        @OnEventHandler()
+        @OnEventHandler
         public boolean handleIntSignal(IntSignal intSignal) {
             System.out.printf("MyNode-%s::handleIntSignal - %s%n", filter, intSignal.getValue());
             return true;
