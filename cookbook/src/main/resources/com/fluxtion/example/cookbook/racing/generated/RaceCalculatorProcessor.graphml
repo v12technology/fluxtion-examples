@@ -65,20 +65,20 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <node id="RunnerFinished">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;RunnerFinished"/>
-                    <jGraph:Style properties="EVENT"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
         <node id="RunnerStarted">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
                     <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;RunnerStarted"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="RunnerFinished">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;RunnerFinished"/>
                     <jGraph:Style properties="EVENT"/>
                 </jGraph:ShapeNode>
             </data>
@@ -108,12 +108,12 @@
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="6" source="RunnerFinished" target="raceCalculator">
+        <edge id="6" source="RunnerStarted" target="raceCalculator">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="7" source="RunnerStarted" target="raceCalculator">
+        <edge id="7" source="RunnerFinished" target="raceCalculator">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
