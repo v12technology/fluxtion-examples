@@ -13,7 +13,6 @@ public class OverrideTriggerReference {
             System.out.println("MyNode::handleStringEvent received:" + stringToProcess);
             return true;
         }
-
     }
 
     public static class MyNode2 {
