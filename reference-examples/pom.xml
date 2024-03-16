@@ -24,6 +24,7 @@
     <modules>
         <module>racing</module>
         <module>runtime-execution</module>
+        <module>generation</module>
     </modules>
 
 <!--    <dependencies>-->
