@@ -16,7 +16,7 @@ public class RaceCalculatorAotBuilder implements FluxtionGraphBuilder {
     @Override
     public void configureGeneration(FluxtionCompilerConfig fluxtionCompilerConfig) {
         fluxtionCompilerConfig.setClassName("RaceCalculatorProcessor");
-        fluxtionCompilerConfig.setPackageName("com.fluxtion.example.cookbook.racing.generated");
+        fluxtionCompilerConfig.setPackageName("com.fluxtion.example.reference.racing.generated");
     }
 }
 

@@ -1,14 +1,13 @@
 package com.fluxtion.example.reference.racing;
 
 
-import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.runtime.EventProcessor;
+import com.fluxtion.example.reference.racing.generated.RaceCalculatorProcessor;
 
 import static com.fluxtion.example.reference.racing.RaceCalculator.*;
 
 public class RaceCalculatorApp {
     public static void main(String[] args) {
-        var raceCalculator = buildEventProcessor();
+        RaceCalculatorProcessor raceCalculator = new RaceCalculatorProcessor();
         raceCalculator.init();
 
         ResultsPublisher resultsPublisher = raceCalculator.getExportedService();
@@ -24,9 +23,5 @@ public class RaceCalculatorApp {
 
         //publish full results
         resultsPublisher.publishAllResults();
-    }
-
-    public static EventProcessor<?> buildEventProcessor(){
-        return Fluxtion.interpret( new ResultsPublisherImpl(new RaceTimeTracker()));
     }
 }

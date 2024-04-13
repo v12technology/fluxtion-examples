@@ -19,10 +19,12 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <fluxtion.mavenplugin.version>3.0.14</fluxtion.mavenplugin.version>
     </properties>
 
     <modules>
         <module>racing</module>
+        <module>racing-aot</module>
         <module>runtime-execution</module>
         <module>generation</module>
     </modules>
@@ -40,22 +42,6 @@
 <!--        </dependency>-->
 <!--    </dependencies>-->
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.fluxtion</groupId>
-                <artifactId>fluxtion-maven-plugin</artifactId>
-                <version>${fluxtion.mavenplugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>fluxtion builder cookbook</id>
-                        <goals>
-                            <goal>scan</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+
 
 </project>
