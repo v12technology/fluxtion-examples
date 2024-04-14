@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         # test against the latest update of each major Java version, as well as specific updates of LTS versions:
-        java: [17]
+        java: [21]
     name: Java ${{ matrix.java }} build
     steps:
       - uses: actions/checkout@v2
