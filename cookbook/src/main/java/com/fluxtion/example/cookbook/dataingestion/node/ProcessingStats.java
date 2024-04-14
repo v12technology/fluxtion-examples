@@ -6,14 +6,14 @@ public class ProcessingStats {
 
 
     public void badCsvInput(CsvRecordValidator message){
-        System.out.println("ProcessingStats::badCsvInput: ");
+        System.out.println("ProcessingStats::badCsvInput - " + message.getHouseInputRecord());
     }
 
     public void badHousingRecord(RecordValidator message){
-        System.out.println("ProcessingStats::badHousingRecord: ");
+        System.out.println("ProcessingStats::badHousingRecord - " + message.getRecord());
     }
 
     public void validHousingRecord(HouseInputRecord message){
-        System.out.println("ProcessingStats::validHousingRecord");
+        System.out.println("ProcessingStats::validHousingRecord - " + message);
     }
 }

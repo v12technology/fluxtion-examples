@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 public class InvalidLog {
 
     public void badCsvInput(CsvRecordValidator message){
-        System.out.println("InvalidLog::badCsvInput: ");
+        System.out.println("InvalidLog::badCsvInput - " + message.getHouseInputRecord());
     }
 
     public void badHousingRecord(RecordValidator message){
-        System.out.println("InvalidLog::badHousingRecord: ");
+        System.out.println("InvalidLog::badHousingRecord - " + message.getRecord());
     }
 }
