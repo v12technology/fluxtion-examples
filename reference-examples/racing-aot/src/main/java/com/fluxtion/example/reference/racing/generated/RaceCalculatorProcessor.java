@@ -1,5 +1,4 @@
 /*
-* Copyright (C) 2024 gregory higgins
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the Server Side Public License, version 1,
@@ -51,8 +50,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.2.6
- * api version                     : 9.2.6
+ * eventProcessorGenerator version : 9.2.18
+ * api version                     : 9.2.18
  * </pre>
  *
  * Event classes supported:
