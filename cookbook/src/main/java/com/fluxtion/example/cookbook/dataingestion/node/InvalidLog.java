@@ -1,4 +1,4 @@
-package com.fluxtion.example.cookbook.dataingestion;
+package com.fluxtion.example.cookbook.dataingestion.node;
 
 import lombok.RequiredArgsConstructor;
 
@@ -9,7 +9,7 @@ public class InvalidLog {
         System.out.println("InvalidLog::badCsvInput: ");
     }
 
-    public void badHousingRecord(RecordTransformer message){
-        System.out.println("InvalidLog::badCsvRecord: ");
+    public void badHousingRecord(RecordValidator message){
+        System.out.println("InvalidLog::badHousingRecord: ");
     }
 }
