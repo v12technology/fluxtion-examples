@@ -10,6 +10,6 @@ public class InvalidLog {
     }
 
     public void badHousingRecord(RecordTransformer message){
-        System.out.println("InvalidLog::badCsvRecord: ");
+        System.out.println("InvalidLog::badHousingRecord: ");
     }
 }

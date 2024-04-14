@@ -8,7 +8,7 @@ public class ProcessingStats {
     }
 
     public void badHousingRecord(RecordTransformer message){
-        System.out.println("ProcessingStats::badCsvRecord: ");
+        System.out.println("ProcessingStats::badHousingRecord: ");
     }
 
     public void validHousingRecord(HouseInputRecord message){

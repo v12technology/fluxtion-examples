@@ -6,11 +6,15 @@ public class RecordTransformer {
 
 
     @Getter
-    private boolean inValidRecord = false;
+    private boolean validRecord = false;
+    @Getter
+    private HouseInputRecord record;
 
-    public HouseInputRecord transform(HouseInputRecord record) {
+    public RecordTransformer transform(HouseInputRecord record) {
         System.out.println("RecordTransformer::transform: " + record);
-        return record;
+        validRecord = !record.getHouseId().equalsIgnoreCase("BAD");
+        this.record = validRecord ? record : null;
+        return this;
     }
 
 }

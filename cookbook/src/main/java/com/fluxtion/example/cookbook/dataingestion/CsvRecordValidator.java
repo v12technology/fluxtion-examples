@@ -4,16 +4,22 @@ import lombok.Getter;
 
 public class CsvRecordValidator {
 
-//    @Getter
-    private boolean inValidRecord = false;
+    @Getter
+    private boolean validRecord = false;
+    @Getter
+    private HouseInputRecord houseInputRecord;
 
-    public HouseInputRecord marshall(String inputData) {
-        inValidRecord = inputData == null || inputData.isBlank();
-        System.out.println("CsvRecordValidator::marshall inputData: " + inputData + ", inValidRecord: " + inValidRecord);
-        return inValidRecord ? null: new HouseInputRecord();
+    public CsvRecordValidator marshall(String inputData) {
+        validRecord = inputData != null && !inputData.isBlank();
+        System.out.println("CsvRecordValidator::marshall inputData: " + inputData + ", validRecord: " + validRecord);
+        houseInputRecord = validRecord ? new HouseInputRecord() : null;
+        if(validRecord) {
+            houseInputRecord.setHouseId(inputData);
+        }
+        return this;
     }
 
-    public boolean isInValidRecord() {
-        return inValidRecord;
-    }
+//    public boolean isInValidRecord() {
+//        return inValidRecord;
+//    }
 }
