@@ -1,19 +1,18 @@
 package com.fluxtion.example.cookbook.dataingestion.node;
 
-import com.fluxtion.example.cookbook.dataingestion.HouseInputRecord;
+import com.fluxtion.example.cookbook.dataingestion.HouseData;
 
 public class ProcessingStats {
 
-
-    public void badCsvInput(CsvRecordValidator message){
-        System.out.println("ProcessingStats::badCsvInput - " + message.getHouseInputRecord());
+    public void badCsvRecord(CsvHouseDataValidator message){
+        System.out.println("ProcessingStats::badCsvInput - " + message.getHouseData());
     }
 
-    public void badHousingRecord(RecordValidator message){
+    public void badHouseDataRecord(HouseDataRecordValidator message){
         System.out.println("ProcessingStats::badHousingRecord - " + message.getRecord());
     }
 
-    public void validHousingRecord(HouseInputRecord message){
+    public void validHousingRecord(HouseData message){
         System.out.println("ProcessingStats::validHousingRecord - " + message);
     }
 }

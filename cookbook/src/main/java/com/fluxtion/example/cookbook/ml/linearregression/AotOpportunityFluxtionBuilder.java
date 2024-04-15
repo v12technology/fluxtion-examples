@@ -20,5 +20,6 @@ public class AotOpportunityFluxtionBuilder implements FluxtionGraphBuilder {
     public void configureGeneration(FluxtionCompilerConfig fluxtionCompilerConfig) {
         fluxtionCompilerConfig.setClassName("OpportunityMlProcessor");
         fluxtionCompilerConfig.setPackageName("com.fluxtion.example.cookbook.ml.linearregression.generated");
+//        fluxtionCompilerConfig.setFormatSource(false);
     }
 }

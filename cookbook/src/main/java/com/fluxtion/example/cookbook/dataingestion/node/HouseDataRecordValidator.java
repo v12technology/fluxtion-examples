@@ -1,18 +1,18 @@
 package com.fluxtion.example.cookbook.dataingestion.node;
 
-import com.fluxtion.example.cookbook.dataingestion.HouseInputRecord;
+import com.fluxtion.example.cookbook.dataingestion.HouseData;
 import lombok.Getter;
 
-public class RecordValidator {
+public class HouseDataRecordValidator {
 
     @Getter
     private boolean inValidRecord = false;
     @Getter
-    private HouseInputRecord record;
+    private HouseData record;
 
-    public RecordValidator validate(HouseInputRecord record){
+    public HouseDataRecordValidator validate(HouseData record){
         System.out.println("RecordValidator::validate: " + record);
-        inValidRecord = record.getHouseId().equalsIgnoreCase("BAD");
+        inValidRecord = record.MS_Zoning().equalsIgnoreCase("BAD");
         this.record = inValidRecord ? null : record;
         return this;
     }

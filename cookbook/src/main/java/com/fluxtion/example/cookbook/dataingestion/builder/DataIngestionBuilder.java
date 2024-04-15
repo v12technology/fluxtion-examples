@@ -6,41 +6,43 @@ import com.fluxtion.compiler.FluxtionGraphBuilder;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.example.cookbook.dataingestion.node.*;
 
+//@Disabled
 public class DataIngestionBuilder implements FluxtionGraphBuilder {
     @Override
     public void buildGraph(EventProcessorConfig eventProcessorConfig) {
         //flows Csv String -> HouseInputRecord -> x_formed(HouseInputRecord)
-        var csvFlow = DataFlow.subscribe(String.class).map(new CsvRecordValidator()::marshall);
-        var validXformedFlow = csvFlow.map(CsvRecordValidator::getHouseInputRecord)
-                .map(new RecordTransformer()::transform)
-                .map(new RecordValidator()::validate);
+        var csvFlow = DataFlow.subscribe(String.class).map(new CsvHouseDataValidator()::marshall);
+        var validXformedFlow = csvFlow.map(CsvHouseDataValidator::getHouseData)
+                .map(new HouseDataRecordTransformer()::transform)
+                .map(new HouseDataRecordValidator()::validate);
 
         //outputs
-        var csvWriter = new RecordCsvWriter();
-        var binaryWriter = new RecordBinaryWriter();
+        var csvWriter = new HouseDataRecordCsvWriter();
+        var binaryWriter = new HouseDataRecordBinaryWriter();
         var stats = new ProcessingStats();
         var invalidLog = new InvalidLog();
 
         //write validated output
-        validXformedFlow.map(RecordValidator::getRecord)
+        validXformedFlow.map(HouseDataRecordValidator::getRecord)
                 .push(stats::validHousingRecord)
-                .push(csvWriter::validHousingRecord)
-                .push(binaryWriter::validHousingRecord);
+                .push(csvWriter::validHouseDataRecord)
+                .push(binaryWriter::validHouseDataRecord);
 
         //invalid csv marshall
-        csvFlow.filter(CsvRecordValidator::isInValidRecord)
-                .push(invalidLog::badCsvInput)
-                .push(stats::badCsvInput);
+        csvFlow.filter(CsvHouseDataValidator::isInValidRecord)
+                .push(invalidLog::badCsvRecord)
+                .push(stats::badCsvRecord);
 
         //invalid transform
-        validXformedFlow.filter(RecordValidator::isInValidRecord)
-                .push(invalidLog::badHousingRecord)
-                .push(stats::badHousingRecord);
+        validXformedFlow.filter(HouseDataRecordValidator::isInValidRecord)
+                .push(invalidLog::badHouseDataRecord)
+                .push(stats::badHouseDataRecord);
     }
 
     @Override
     public void configureGeneration(FluxtionCompilerConfig compilerConfig) {
         compilerConfig.setClassName("DataIngestion");
         compilerConfig.setPackageName("com.fluxtion.example.cookbook.dataingestion.generated");
+//        compilerConfig.setFormatSource(false);
     }
 }

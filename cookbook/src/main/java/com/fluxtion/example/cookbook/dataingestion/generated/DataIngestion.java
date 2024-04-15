@@ -21,13 +21,13 @@ import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
-import com.fluxtion.example.cookbook.dataingestion.node.CsvRecordValidator;
+import com.fluxtion.example.cookbook.dataingestion.node.CsvHouseDataValidator;
+import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordBinaryWriter;
+import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordCsvWriter;
+import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordTransformer;
+import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordValidator;
 import com.fluxtion.example.cookbook.dataingestion.node.InvalidLog;
 import com.fluxtion.example.cookbook.dataingestion.node.ProcessingStats;
-import com.fluxtion.example.cookbook.dataingestion.node.RecordBinaryWriter;
-import com.fluxtion.example.cookbook.dataingestion.node.RecordCsvWriter;
-import com.fluxtion.example.cookbook.dataingestion.node.RecordTransformer;
-import com.fluxtion.example.cookbook.dataingestion.node.RecordValidator;
 import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
@@ -80,14 +80,18 @@ public class DataIngestion
 
   // Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  private final CsvRecordValidator csvRecordValidator_0 = new CsvRecordValidator();
+  private final CsvHouseDataValidator csvHouseDataValidator_0 = new CsvHouseDataValidator();
+  private final HouseDataRecordBinaryWriter houseDataRecordBinaryWriter_36 =
+      new HouseDataRecordBinaryWriter();
+  private final HouseDataRecordCsvWriter houseDataRecordCsvWriter_37 =
+      new HouseDataRecordCsvWriter();
+  private final HouseDataRecordTransformer houseDataRecordTransformer_3 =
+      new HouseDataRecordTransformer();
+  private final HouseDataRecordValidator houseDataRecordValidator_5 =
+      new HouseDataRecordValidator();
   private final InvalidLog invalidLog_56 = new InvalidLog();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final ProcessingStats processingStats_55 = new ProcessingStats();
-  private final RecordBinaryWriter recordBinaryWriter_36 = new RecordBinaryWriter();
-  private final RecordCsvWriter recordCsvWriter_37 = new RecordCsvWriter();
-  private final RecordTransformer recordTransformer_3 = new RecordTransformer();
-  private final RecordValidator recordValidator_5 = new RecordValidator();
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
@@ -96,34 +100,35 @@ public class DataIngestion
       new DefaultEventHandlerNode<>(
           2147483647, "", java.lang.String.class, "handlerString", context);
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_1 =
-      new MapRef2RefFlowFunction<>(handlerString, csvRecordValidator_0::marshall);
+      new MapRef2RefFlowFunction<>(handlerString, csvHouseDataValidator_0::marshall);
   private final FilterFlowFunction filterFlowFunction_11 =
-      new FilterFlowFunction<>(mapRef2RefFlowFunction_1, CsvRecordValidator::isInValidRecord);
+      new FilterFlowFunction<>(mapRef2RefFlowFunction_1, CsvHouseDataValidator::isInValidRecord);
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_2 =
-      new MapRef2RefFlowFunction<>(
-          mapRef2RefFlowFunction_1, CsvRecordValidator::getHouseInputRecord);
+      new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_1, CsvHouseDataValidator::getHouseData);
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_4 =
-      new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_2, recordTransformer_3::transform);
+      new MapRef2RefFlowFunction<>(
+          mapRef2RefFlowFunction_2, houseDataRecordTransformer_3::transform);
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_6 =
-      new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_4, recordValidator_5::validate);
+      new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_4, houseDataRecordValidator_5::validate);
   private final FilterFlowFunction filterFlowFunction_14 =
-      new FilterFlowFunction<>(mapRef2RefFlowFunction_6, RecordValidator::isInValidRecord);
+      new FilterFlowFunction<>(mapRef2RefFlowFunction_6, HouseDataRecordValidator::isInValidRecord);
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_7 =
-      new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_6, RecordValidator::getRecord);
+      new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_6, HouseDataRecordValidator::getRecord);
   private final PushFlowFunction pushFlowFunction_8 =
       new PushFlowFunction<>(mapRef2RefFlowFunction_7, processingStats_55::validHousingRecord);
   private final PushFlowFunction pushFlowFunction_9 =
-      new PushFlowFunction<>(pushFlowFunction_8, recordCsvWriter_37::validHousingRecord);
+      new PushFlowFunction<>(pushFlowFunction_8, houseDataRecordCsvWriter_37::validHouseDataRecord);
   private final PushFlowFunction pushFlowFunction_10 =
-      new PushFlowFunction<>(pushFlowFunction_9, recordBinaryWriter_36::validHousingRecord);
+      new PushFlowFunction<>(
+          pushFlowFunction_9, houseDataRecordBinaryWriter_36::validHouseDataRecord);
   private final PushFlowFunction pushFlowFunction_12 =
-      new PushFlowFunction<>(filterFlowFunction_11, invalidLog_56::badCsvInput);
+      new PushFlowFunction<>(filterFlowFunction_11, invalidLog_56::badCsvRecord);
   private final PushFlowFunction pushFlowFunction_13 =
-      new PushFlowFunction<>(pushFlowFunction_12, processingStats_55::badCsvInput);
+      new PushFlowFunction<>(pushFlowFunction_12, processingStats_55::badCsvRecord);
   private final PushFlowFunction pushFlowFunction_15 =
-      new PushFlowFunction<>(filterFlowFunction_14, invalidLog_56::badHousingRecord);
+      new PushFlowFunction<>(filterFlowFunction_14, invalidLog_56::badHouseDataRecord);
   private final PushFlowFunction pushFlowFunction_16 =
-      new PushFlowFunction<>(pushFlowFunction_15, processingStats_55::badHousingRecord);
+      new PushFlowFunction<>(pushFlowFunction_15, processingStats_55::badHouseDataRecord);
   public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
@@ -486,13 +491,13 @@ public class DataIngestion
 
   private void initialiseAuditor(Auditor auditor) {
     auditor.init();
-    auditor.nodeRegistered(csvRecordValidator_0, "csvRecordValidator_0");
+    auditor.nodeRegistered(csvHouseDataValidator_0, "csvHouseDataValidator_0");
+    auditor.nodeRegistered(houseDataRecordBinaryWriter_36, "houseDataRecordBinaryWriter_36");
+    auditor.nodeRegistered(houseDataRecordCsvWriter_37, "houseDataRecordCsvWriter_37");
+    auditor.nodeRegistered(houseDataRecordTransformer_3, "houseDataRecordTransformer_3");
+    auditor.nodeRegistered(houseDataRecordValidator_5, "houseDataRecordValidator_5");
     auditor.nodeRegistered(invalidLog_56, "invalidLog_56");
     auditor.nodeRegistered(processingStats_55, "processingStats_55");
-    auditor.nodeRegistered(recordBinaryWriter_36, "recordBinaryWriter_36");
-    auditor.nodeRegistered(recordCsvWriter_37, "recordCsvWriter_37");
-    auditor.nodeRegistered(recordTransformer_3, "recordTransformer_3");
-    auditor.nodeRegistered(recordValidator_5, "recordValidator_5");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
     auditor.nodeRegistered(filterFlowFunction_11, "filterFlowFunction_11");
     auditor.nodeRegistered(filterFlowFunction_14, "filterFlowFunction_14");
@@ -618,20 +623,20 @@ public class DataIngestion
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
   }
 
+  private boolean guardCheck_houseDataRecordBinaryWriter_36() {
+    return isDirty_pushFlowFunction_10;
+  }
+
+  private boolean guardCheck_houseDataRecordCsvWriter_37() {
+    return isDirty_pushFlowFunction_9;
+  }
+
   private boolean guardCheck_invalidLog_56() {
     return isDirty_pushFlowFunction_12 | isDirty_pushFlowFunction_15;
   }
 
   private boolean guardCheck_processingStats_55() {
     return isDirty_pushFlowFunction_8 | isDirty_pushFlowFunction_13 | isDirty_pushFlowFunction_16;
-  }
-
-  private boolean guardCheck_recordBinaryWriter_36() {
-    return isDirty_pushFlowFunction_10;
-  }
-
-  private boolean guardCheck_recordCsvWriter_37() {
-    return isDirty_pushFlowFunction_9;
   }
 
   private boolean guardCheck_filterFlowFunction_11() {

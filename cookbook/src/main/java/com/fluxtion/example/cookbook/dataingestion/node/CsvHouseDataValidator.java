@@ -1,21 +1,20 @@
 package com.fluxtion.example.cookbook.dataingestion.node;
 
-import com.fluxtion.example.cookbook.dataingestion.HouseInputRecord;
+import com.fluxtion.example.cookbook.dataingestion.HouseData;
 import lombok.Getter;
 
-public class CsvRecordValidator {
+@Getter
+public class CsvHouseDataValidator {
 
-    @Getter
     private boolean validRecord = false;
-    @Getter
-    private HouseInputRecord houseInputRecord;
+    private HouseData houseData;
 
-    public CsvRecordValidator marshall(String inputData) {
+    public CsvHouseDataValidator marshall(String inputData) {
         validRecord = inputData != null && !inputData.isBlank();
         System.out.println("CsvRecordValidator::marshall inputData: " + inputData + ", validRecord: " + validRecord);
-        houseInputRecord = validRecord ? new HouseInputRecord() : null;
+        houseData = validRecord ? new HouseData() : null;
         if(validRecord) {
-            houseInputRecord.setHouseId(inputData);
+            houseData.MS_Zoning(inputData);
         }
         return this;
     }
