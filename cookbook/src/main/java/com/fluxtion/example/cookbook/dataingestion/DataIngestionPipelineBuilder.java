@@ -5,9 +5,8 @@ import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.FluxtionCompilerConfig;
 import com.fluxtion.compiler.FluxtionGraphBuilder;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
-import com.fluxtion.compiler.builder.dataflow.FlowBuilder;
-import com.fluxtion.example.cookbook.dataingestion.api.HouseData;
 import com.fluxtion.example.cookbook.dataingestion.function.*;
+import com.fluxtion.runtime.EventProcessor;
 
 /**
  * Builds the data ingestion processing graph, invoked by the Fluxtion maven plugin to generate the pipeline AOT as
@@ -56,10 +55,16 @@ public class DataIngestionPipelineBuilder implements FluxtionGraphBuilder {
 
     //used for testing
     public static void main(String[] args) {
-        Fluxtion.interpret(c -> {
-            DataFlow.subscribe(String.class)
-                    .map(new CsvHouseDataValidator()::csvToHouseData)
-                    .map(new HouseDataRecordTransformer()::transform);
-        });
+        EventProcessor<?> dataIngestionPipeline = Fluxtion.interpret(new DataIngestionPipelineBuilder()::buildGraph);
+        dataIngestionPipeline.init();
+
+        //Send some data
+        dataIngestionPipeline.onEvent("");
+        System.out.println();
+
+        dataIngestionPipeline.onEvent("good");
+        System.out.println();
+
+        dataIngestionPipeline.onEvent("BAD");
     }
 }
