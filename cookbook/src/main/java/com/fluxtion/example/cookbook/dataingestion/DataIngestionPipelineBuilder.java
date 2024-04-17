@@ -1,16 +1,25 @@
-package com.fluxtion.example.cookbook.dataingestion.builder;
+package com.fluxtion.example.cookbook.dataingestion;
 
 import com.fluxtion.compiler.EventProcessorConfig;
+import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.FluxtionCompilerConfig;
 import com.fluxtion.compiler.FluxtionGraphBuilder;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
-import com.fluxtion.example.cookbook.dataingestion.node.*;
+import com.fluxtion.compiler.builder.dataflow.FlowBuilder;
+import com.fluxtion.example.cookbook.dataingestion.api.HouseData;
+import com.fluxtion.example.cookbook.dataingestion.function.*;
 
-//@Disabled
-public class DataIngestionBuilder implements FluxtionGraphBuilder {
+/**
+ * Builds the data ingestion processing graph, invoked by the Fluxtion maven plugin to generate the pipeline AOT as
+ * part of the build.
+ *
+ */
+public class DataIngestionPipelineBuilder implements FluxtionGraphBuilder {
+
     @Override
     public void buildGraph(EventProcessorConfig eventProcessorConfig) {
-        //flows Csv String -> HouseInputRecord -> x_formed(HouseInputRecord)
+
+        //flows Csv String -> HouseInputRecord -> x_formed(HouseInputRecord) -> houseRecordValidator(validate)
         var csvFlow = DataFlow.subscribe(String.class).map(new CsvHouseDataValidator()::marshall);
         var validXformedFlow = csvFlow.map(CsvHouseDataValidator::getHouseData)
                 .map(new HouseDataRecordTransformer()::transform)
@@ -41,8 +50,16 @@ public class DataIngestionBuilder implements FluxtionGraphBuilder {
 
     @Override
     public void configureGeneration(FluxtionCompilerConfig compilerConfig) {
-        compilerConfig.setClassName("DataIngestion");
+        compilerConfig.setClassName("DataIngestionPipeline");
         compilerConfig.setPackageName("com.fluxtion.example.cookbook.dataingestion.generated");
-//        compilerConfig.setFormatSource(false);
+    }
+
+    //used for testing
+    public static void main(String[] args) {
+        Fluxtion.interpret(c -> {
+            DataFlow.subscribe(String.class)
+                    .map(new CsvHouseDataValidator()::csvToHouseData)
+                    .map(new HouseDataRecordTransformer()::transform);
+        });
     }
 }

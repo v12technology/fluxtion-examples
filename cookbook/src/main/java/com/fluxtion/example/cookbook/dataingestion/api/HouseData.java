@@ -1,4 +1,4 @@
-package com.fluxtion.example.cookbook.dataingestion;
+package com.fluxtion.example.cookbook.dataingestion.api;
 
 import com.fluxtion.extension.csvcompiler.annotations.ColumnMapping;
 import com.fluxtion.extension.csvcompiler.annotations.CsvMarshaller;

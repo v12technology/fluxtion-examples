@@ -21,13 +21,14 @@ import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
-import com.fluxtion.example.cookbook.dataingestion.node.CsvHouseDataValidator;
-import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordBinaryWriter;
-import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordCsvWriter;
-import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordTransformer;
-import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordValidator;
-import com.fluxtion.example.cookbook.dataingestion.node.InvalidLog;
-import com.fluxtion.example.cookbook.dataingestion.node.ProcessingStats;
+import com.fluxtion.example.cookbook.dataingestion.api.DataIngestConfigListener;
+import com.fluxtion.example.cookbook.dataingestion.function.CsvHouseDataValidator;
+import com.fluxtion.example.cookbook.dataingestion.function.HouseDataRecordBinaryWriter;
+import com.fluxtion.example.cookbook.dataingestion.function.HouseDataRecordCsvWriter;
+import com.fluxtion.example.cookbook.dataingestion.function.HouseDataRecordTransformer;
+import com.fluxtion.example.cookbook.dataingestion.function.HouseDataRecordValidator;
+import com.fluxtion.example.cookbook.dataingestion.function.InvalidLog;
+import com.fluxtion.example.cookbook.dataingestion.function.ProcessingStats;
 import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
@@ -57,13 +58,14 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.2.18
- * api version                     : 9.2.18
+ * eventProcessorGenerator version : 9.2.21
+ * api version                     : 9.2.21
  * </pre>
  *
  * Event classes supported:
  *
  * <ul>
+ *   <li>com.fluxtion.compiler.generation.model.ExportFunctionMarker
  *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
  *   <li>java.lang.String
  * </ul>
@@ -71,12 +73,13 @@ import java.util.function.Consumer;
  * @author Greg Higgins
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class DataIngestion
-    implements EventProcessor<DataIngestion>,
+public class DataIngestionPipeline
+    implements EventProcessor<DataIngestionPipeline>,
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
-        Lifecycle {
+        Lifecycle,
+        DataIngestConfigListener {
 
   // Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
@@ -159,7 +162,7 @@ public class DataIngestion
 
   // Filter constants
 
-  public DataIngestion(Map<Object, Object> contextMap) {
+  public DataIngestionPipeline(Map<Object, Object> contextMap) {
     context.replaceMappings(contextMap);
     filterFlowFunction_11.setEventProcessorContext(context);
     filterFlowFunction_14.setEventProcessorContext(context);
@@ -182,7 +185,7 @@ public class DataIngestion
     context.setEventProcessorCallback(this);
   }
 
-  public DataIngestion() {
+  public DataIngestionPipeline() {
     this(null);
   }
 
@@ -379,6 +382,22 @@ public class DataIngestion
     afterEvent();
   }
   // EVENT DISPATCH - END
+
+  // EXPORTED SERVICE FUNCTIONS - START
+  @Override
+  public boolean configUpdate(
+      com.fluxtion.example.cookbook.dataingestion.api.DataIngestConfig arg0) {
+    beforeServiceCall(
+        "public boolean com.fluxtion.example.cookbook.dataingestion.function.HouseDataRecordTransformer.configUpdate(com.fluxtion.example.cookbook.dataingestion.api.DataIngestConfig)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    houseDataRecordTransformer_3.configUpdate(arg0);
+    houseDataRecordCsvWriter_37.configUpdate(arg0);
+    houseDataRecordBinaryWriter_36.configUpdate(arg0);
+    invalidLog_56.configUpdate(arg0);
+    afterServiceCall();
+    return true;
+  }
+  // EXPORTED SERVICE FUNCTIONS - END
 
   public void bufferEvent(Object event) {
     buffering = true;
@@ -717,13 +736,13 @@ public class DataIngestion
   }
 
   @Override
-  public DataIngestion newInstance() {
-    return new DataIngestion();
+  public DataIngestionPipeline newInstance() {
+    return new DataIngestionPipeline();
   }
 
   @Override
-  public DataIngestion newInstance(Map<Object, Object> contextMap) {
-    return new DataIngestion();
+  public DataIngestionPipeline newInstance(Map<Object, Object> contextMap) {
+    return new DataIngestionPipeline();
   }
 
   @Override

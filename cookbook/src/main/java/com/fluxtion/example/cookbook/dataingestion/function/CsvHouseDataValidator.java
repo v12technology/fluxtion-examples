@@ -1,6 +1,6 @@
-package com.fluxtion.example.cookbook.dataingestion.node;
+package com.fluxtion.example.cookbook.dataingestion.function;
 
-import com.fluxtion.example.cookbook.dataingestion.HouseData;
+import com.fluxtion.example.cookbook.dataingestion.api.HouseData;
 import lombok.Getter;
 
 @Getter
@@ -17,6 +17,11 @@ public class CsvHouseDataValidator {
             houseData.MS_Zoning(inputData);
         }
         return this;
+    }
+
+    public HouseData csvToHouseData(String inputData) {
+        marshall(inputData);
+        return houseData;
     }
 
     public boolean isInValidRecord() {
