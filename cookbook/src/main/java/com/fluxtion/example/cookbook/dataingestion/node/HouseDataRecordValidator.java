@@ -1,13 +1,12 @@
 package com.fluxtion.example.cookbook.dataingestion.node;
 
-import com.fluxtion.example.cookbook.dataingestion.HouseData;
+import com.fluxtion.example.cookbook.dataingestion.api.HouseData;
 import lombok.Getter;
 
+@Getter
 public class HouseDataRecordValidator {
 
-    @Getter
     private boolean inValidRecord = false;
-    @Getter
     private HouseData record;
 
     public HouseDataRecordValidator validate(HouseData record){

@@ -1,6 +1,7 @@
 package com.fluxtion.example.cookbook.dataingestion.node;
 
-import com.fluxtion.example.cookbook.dataingestion.HouseData;
+import com.fluxtion.example.cookbook.dataingestion.api.DataIngestConfig;
+import com.fluxtion.example.cookbook.dataingestion.api.HouseData;
 
 public class ProcessingStats {
 
@@ -15,4 +16,5 @@ public class ProcessingStats {
     public void validHousingRecord(HouseData message){
         System.out.println("ProcessingStats::validHousingRecord - " + message);
     }
+
 }

@@ -21,6 +21,7 @@ import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.callback.InternalEventProcessor;
+import com.fluxtion.example.cookbook.dataingestion.api.DataIngestConfigListener;
 import com.fluxtion.example.cookbook.dataingestion.node.CsvHouseDataValidator;
 import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordBinaryWriter;
 import com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordCsvWriter;
@@ -57,13 +58,14 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.2.18
- * api version                     : 9.2.18
+ * eventProcessorGenerator version : 9.2.21
+ * api version                     : 9.2.21
  * </pre>
  *
  * Event classes supported:
  *
  * <ul>
+ *   <li>com.fluxtion.compiler.generation.model.ExportFunctionMarker
  *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
  *   <li>java.lang.String
  * </ul>
@@ -76,7 +78,8 @@ public class DataIngestion
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
-        Lifecycle {
+        Lifecycle,
+        DataIngestConfigListener {
 
   // Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
@@ -379,6 +382,22 @@ public class DataIngestion
     afterEvent();
   }
   // EVENT DISPATCH - END
+
+  // EXPORTED SERVICE FUNCTIONS - START
+  @Override
+  public boolean configUpdate(
+      com.fluxtion.example.cookbook.dataingestion.api.DataIngestConfig arg0) {
+    beforeServiceCall(
+        "public boolean com.fluxtion.example.cookbook.dataingestion.node.HouseDataRecordTransformer.configUpdate(com.fluxtion.example.cookbook.dataingestion.api.DataIngestConfig)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    houseDataRecordTransformer_3.configUpdate(arg0);
+    houseDataRecordCsvWriter_37.configUpdate(arg0);
+    houseDataRecordBinaryWriter_36.configUpdate(arg0);
+    invalidLog_56.configUpdate(arg0);
+    afterServiceCall();
+    return true;
+  }
+  // EXPORTED SERVICE FUNCTIONS - END
 
   public void bufferEvent(Object event) {
     buffering = true;
