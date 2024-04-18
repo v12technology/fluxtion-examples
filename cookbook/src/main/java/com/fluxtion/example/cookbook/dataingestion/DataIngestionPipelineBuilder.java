@@ -51,6 +51,6 @@ public class DataIngestionPipelineBuilder implements FluxtionGraphBuilder {
     @Override
     public void configureGeneration(FluxtionCompilerConfig compilerConfig) {
         compilerConfig.setClassName("DataIngestionPipeline");
-        compilerConfig.setPackageName("com.fluxtion.example.cookbook.dataingestion.generated");
+        compilerConfig.setPackageName("com.fluxtion.example.cookbook.dataingestion.pipeline");
     }
 }

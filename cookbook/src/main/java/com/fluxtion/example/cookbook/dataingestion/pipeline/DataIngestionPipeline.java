@@ -14,7 +14,7 @@
 *
 <http://www.mongodb.com/licensing/server-side-public-license>.
 */
-package com.fluxtion.example.cookbook.dataingestion.generated;
+package com.fluxtion.example.cookbook.dataingestion.pipeline;
 
 import com.fluxtion.runtime.StaticEventProcessor;
 import com.fluxtion.runtime.lifecycle.BatchHandler;

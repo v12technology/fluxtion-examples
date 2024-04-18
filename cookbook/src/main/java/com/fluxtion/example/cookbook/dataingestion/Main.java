@@ -1,6 +1,6 @@
 package com.fluxtion.example.cookbook.dataingestion;
 
-import com.fluxtion.example.cookbook.dataingestion.generated.DataIngestionPipeline;
+import com.fluxtion.example.cookbook.dataingestion.pipeline.DataIngestionPipeline;
 
 import java.io.IOException;
 import java.nio.file.Files;
