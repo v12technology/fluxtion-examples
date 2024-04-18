@@ -8,11 +8,11 @@ import lombok.experimental.Accessors;
 @Data
 @CsvMarshaller(fluent = true)
 @Accessors(fluent = true)
-public class HouseData {
+public class HouseRecord {
 
     @ColumnMapping(outputField = false)
     private int Order;
-    @ColumnMapping(outputField = false, defaultValue = "-1")
+    @ColumnMapping(outputField = false, columnName = "Lot Frontage", defaultValue = "-1")
     private int Lot_Frontage;
     @ColumnMapping(outputField = false, columnName = "MS Zoning")
     private String MS_Zoning;

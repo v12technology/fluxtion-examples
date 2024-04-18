@@ -1,28 +1,25 @@
 package com.fluxtion.example.cookbook.dataingestion;
 
-
-
 import com.fluxtion.example.cookbook.dataingestion.generated.DataIngestionPipeline;
-import com.fluxtion.runtime.audit.EventLogControlEvent;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
         var dataIngest = new DataIngestionPipeline();
-
-        //Send some data
         dataIngest.init();
-        dataIngest.setAuditLogLevel(EventLogControlEvent.LogLevel.DEBUG);
 
-        dataIngest.onEvent("");
-        System.out.println();
+        try (Stream<String> reader = Files.lines(Path.of("data/ml/linear_regression/AmesHousing.csv"))) {
+            reader.forEach(dataIngest::onEvent);
+        }
 
-        dataIngest.onEvent("good");
-        System.out.println();
+        System.out.println("finished");
 
-        dataIngest.onEvent("BAD");
+        dataIngest.tearDown();
     }
 
 }

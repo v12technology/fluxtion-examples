@@ -1,19 +1,30 @@
 package com.fluxtion.example.cookbook.dataingestion.function;
 
-import com.fluxtion.example.cookbook.dataingestion.api.HouseData;
+import com.fluxtion.example.cookbook.dataingestion.api.DataIngestLifecycle;
+import com.fluxtion.example.cookbook.dataingestion.api.HouseRecord;
 
-public class ProcessingStats {
+public class ProcessingStats implements DataIngestLifecycle {
 
-    public void badCsvRecord(CsvHouseDataValidator message){
-        System.out.println("ProcessingStats::badCsvInput - " + message.getHouseData());
+    private int badCsvCount;
+    private int goodRecordCount;
+    private int badRecordCount;
+
+    public void badCsvRecord(CsvToHouseRecord message){
+        badCsvCount++;
     }
 
-    public void badHouseDataRecord(HouseDataRecordValidator message){
-        System.out.println("ProcessingStats::badHousingRecord - " + message.getRecord());
+    public void invalidHouseRecord(HouseRecordValidator message){
+        badRecordCount++;
     }
 
-    public void validHousingRecord(HouseData message){
-        System.out.println("ProcessingStats::validHousingRecord - " + message);
+    public void validHouseRecord(HouseRecord message){
+        goodRecordCount++;
     }
 
+    @Override
+    public void tearDown() {
+        System.out.println("ProcessingStats::badCsvCount - " + badCsvCount);
+        System.out.println("ProcessingStats::invalidHouseRecord - " + badRecordCount);
+        System.out.println("ProcessingStats::validHouseRecord - " + goodRecordCount);
+    }
 }

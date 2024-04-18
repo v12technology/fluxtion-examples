@@ -41,9 +41,15 @@
         <dependency>
             <groupId>com.fluxtion.csv-compiler</groupId>
             <artifactId>csv-compiler</artifactId>
-            <version>0.1.15</version>
+            <version>0.2.0</version>
         </dependency>
-<!--        <dependency>-->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!--        <dependency>-->
 <!--            <groupId>org.apache.commons</groupId>-->
 <!--            <artifactId>commons-text</artifactId>-->
 <!--            <version>1.10.0</version>-->

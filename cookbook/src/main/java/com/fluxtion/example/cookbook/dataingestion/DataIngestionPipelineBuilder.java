@@ -1,17 +1,14 @@
 package com.fluxtion.example.cookbook.dataingestion;
 
 import com.fluxtion.compiler.EventProcessorConfig;
-import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.FluxtionCompilerConfig;
 import com.fluxtion.compiler.FluxtionGraphBuilder;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.example.cookbook.dataingestion.function.*;
-import com.fluxtion.runtime.EventProcessor;
 
 /**
  * Builds the data ingestion processing graph, invoked by the Fluxtion maven plugin to generate the pipeline AOT as
  * part of the build.
- *
  */
 public class DataIngestionPipelineBuilder implements FluxtionGraphBuilder {
 
@@ -19,52 +16,36 @@ public class DataIngestionPipelineBuilder implements FluxtionGraphBuilder {
     public void buildGraph(EventProcessorConfig eventProcessorConfig) {
 
         //flows Csv String -> HouseInputRecord -> x_formed(HouseInputRecord) -> houseRecordValidator(validate)
-        var csvFlow = DataFlow.subscribe(String.class).map(new CsvHouseDataValidator()::marshall);
-        var validXformedFlow = csvFlow.map(CsvHouseDataValidator::getHouseData)
-                .map(new HouseDataRecordTransformer()::transform)
-                .map(new HouseDataRecordValidator()::validate);
+        var csvFlow = DataFlow.subscribe(String.class).map(new CsvToHouseRecord()::marshall);
+        //flows HouseInputRecord -> x_formed(HouseInputRecord) -> houseRecordValidator(validate)
+        var validXformedFlow = csvFlow.map(CsvToHouseRecord::getHouseRecord)
+                .map(new HouseRecordTransformer()::transform)
+                .map(new HouseRecordValidator()::validate);
 
         //outputs
-        var csvWriter = new HouseDataRecordCsvWriter();
-        var binaryWriter = new HouseDataRecordBinaryWriter();
+        var csvWriter = new HouseRecordCsvWriter();
+        var binaryWriter = new HouseRecordBinaryWriter();
         var stats = new ProcessingStats();
         var invalidLog = new InvalidLog();
 
-        //write validated output
-        validXformedFlow.map(HouseDataRecordValidator::getRecord)
-                .push(stats::validHousingRecord)
-                .push(csvWriter::validHouseDataRecord)
-                .push(binaryWriter::validHouseDataRecord);
+        //write validated output to [stats, csv, binary]
+        validXformedFlow.map(HouseRecordValidator::getValidHouseRecord)
+                .push(stats::validHouseRecord, csvWriter::validHouseRecord, binaryWriter::validHouseRecord);
 
-        //invalid csv marshall
-        csvFlow.filter(CsvHouseDataValidator::isInValidRecord)
-                .push(invalidLog::badCsvRecord)
-                .push(stats::badCsvRecord);
+        //invalid csv parsing output to [invalid log, stats]
+        var invalidCsv = csvFlow.filter(CsvToHouseRecord::isInValidRecord);
+        invalidCsv.push(invalidLog::badCsvRecord);
+        invalidCsv.push(stats::badCsvRecord);
 
-        //invalid transform
-        validXformedFlow.filter(HouseDataRecordValidator::isInValidRecord)
-                .push(invalidLog::badHouseDataRecord)
-                .push(stats::badHouseDataRecord);
+        //invalid transform output to [invalid log, stats]
+        var invalidHouseRecord = validXformedFlow.filter(HouseRecordValidator::isInValidRecord);
+        invalidHouseRecord.push(invalidLog::invalidHouseRecord);
+        invalidHouseRecord.push(stats::invalidHouseRecord);
     }
 
     @Override
     public void configureGeneration(FluxtionCompilerConfig compilerConfig) {
         compilerConfig.setClassName("DataIngestionPipeline");
         compilerConfig.setPackageName("com.fluxtion.example.cookbook.dataingestion.generated");
-    }
-
-    //used for testing
-    public static void main(String[] args) {
-        EventProcessor<?> dataIngestionPipeline = Fluxtion.interpret(new DataIngestionPipelineBuilder()::buildGraph);
-        dataIngestionPipeline.init();
-
-        //Send some data
-        dataIngestionPipeline.onEvent("");
-        System.out.println();
-
-        dataIngestionPipeline.onEvent("good");
-        System.out.println();
-
-        dataIngestionPipeline.onEvent("BAD");
     }
 }
