@@ -10,7 +10,7 @@ import lombok.Getter;
 
 
 @Getter
-public class CsvToHouseRecord implements DataIngestLifecycle {
+public class CsvToHouseRecordSerializer implements DataIngestLifecycle, ValidationLogger {
 
     private SingleRowMarshaller<HouseRecord> houseDataCsvMarshaller;
     private boolean validRecord = false;
@@ -21,23 +21,11 @@ public class CsvToHouseRecord implements DataIngestLifecycle {
     @Override
     public void init() {
         houseDataCsvMarshaller = RowMarshaller.load(HouseRecord.class)
-                .setValidationLogger(new ValidationLogger() {
-                    @Override
-                    public void logFatal(CsvProcessingException e) {
-                        validRecord = false;
-                        processingException = e;
-                    }
-
-                    @Override
-                    public void logWarning(CsvProcessingException e) {
-                        validRecord = false;
-                        processingException = e;
-                    }
-                })
+                .setValidationLogger(this)
                 .parser();
     }
 
-    public CsvToHouseRecord marshall(String inputData) {
+    public CsvToHouseRecordSerializer marshall(String inputData) {
         validRecord = true;
         this.inputString = inputData + "\n";
         houseRecord = houseDataCsvMarshaller.parse(inputString);
@@ -46,5 +34,17 @@ public class CsvToHouseRecord implements DataIngestLifecycle {
 
     public boolean isBadCsvMessage() {
         return !validRecord;
+    }
+
+    @Override
+    public void logFatal(CsvProcessingException e) {
+        validRecord = false;
+        processingException = e;
+    }
+
+    @Override
+    public void logWarning(CsvProcessingException e) {
+        validRecord = false;
+        processingException = e;
     }
 }

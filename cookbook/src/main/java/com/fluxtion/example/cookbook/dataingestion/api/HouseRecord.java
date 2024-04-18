@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class HouseRecord {
 
+    //input only use @ColumnMapping(outputField = false)
     @ColumnMapping(outputField = false)
     private int Order;
     @ColumnMapping(outputField = false, columnName = "Lot Frontage", defaultValue = "-1")
@@ -22,7 +23,7 @@ public class HouseRecord {
     @ColumnMapping(columnName = "MS SubClass")
     private int MS_SubClass;
 
-    //derived
+    //derived output
     @ColumnMapping(optionalField = true)
     private int Lot_Frontage_Squared;
     @ColumnMapping(optionalField = true)
