@@ -15,10 +15,14 @@ public class DataIngestionPipelineBuilder implements FluxtionGraphBuilder {
     @Override
     public void buildGraph(EventProcessorConfig eventProcessorConfig) {
 
-        //flows Csv String -> HouseInputRecord -> x_formed(HouseInputRecord) -> houseRecordValidator(validate)
-        var csvFlow = DataFlow.subscribe(String.class).map(new CsvToHouseRecord()::marshall);
-        //flows HouseInputRecord -> x_formed(HouseInputRecord) -> houseRecordValidator(validate)
-        var validXformedFlow = csvFlow.map(CsvToHouseRecord::getHouseRecord)
+        //flow: Csv String -> HouseInputRecord
+        var csv2HouseRecordFlow = DataFlow
+                .subscribe(String.class)
+                .map(new CsvToHouseRecord()::marshall);
+
+        //flow: HouseInputRecord -> x_formed(HouseInputRecord) -> validated(HouseInputRecord)
+        var validTransformedFlow = csv2HouseRecordFlow
+                .map(CsvToHouseRecord::getHouseRecord)
                 .map(new HouseRecordTransformer()::transform)
                 .map(new HouseRecordValidator()::validate);
 
@@ -28,19 +32,20 @@ public class DataIngestionPipelineBuilder implements FluxtionGraphBuilder {
         var stats = new ProcessingStats();
         var invalidLog = new InvalidLog();
 
-        //write validated output to [stats, csv, binary]
-        validXformedFlow.map(HouseRecordValidator::getValidHouseRecord)
+        //write validated output push to [stats, csv, binary]
+        validTransformedFlow
+                .map(HouseRecordValidator::getValidHouseRecord)
                 .push(stats::validHouseRecord, csvWriter::validHouseRecord, binaryWriter::validHouseRecord);
 
-        //invalid csv parsing output to [invalid log, stats]
-        var invalidCsv = csvFlow.filter(CsvToHouseRecord::isInValidRecord);
-        invalidCsv.push(invalidLog::badCsvRecord);
-        invalidCsv.push(stats::badCsvRecord);
+        //invalid csv parsing output push to [invalid log, stats]
+        csv2HouseRecordFlow
+                .filter(CsvToHouseRecord::isBadCsvMessage)
+                .push(invalidLog::badCsvRecord, stats::badCsvRecord);
 
-        //invalid transform output to [invalid log, stats]
-        var invalidHouseRecord = validXformedFlow.filter(HouseRecordValidator::isInValidRecord);
-        invalidHouseRecord.push(invalidLog::invalidHouseRecord);
-        invalidHouseRecord.push(stats::invalidHouseRecord);
+        //invalid transform output push to [invalid log, stats]
+        validTransformedFlow
+                .filter(HouseRecordValidator::isInValidRecord)
+                .push(invalidLog::invalidHouseRecord, stats::invalidHouseRecord);
     }
 
     @Override

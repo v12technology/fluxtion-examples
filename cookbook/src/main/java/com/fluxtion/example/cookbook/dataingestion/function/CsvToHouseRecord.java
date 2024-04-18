@@ -44,7 +44,7 @@ public class CsvToHouseRecord implements DataIngestLifecycle {
         return this;
     }
 
-    public boolean isInValidRecord() {
+    public boolean isBadCsvMessage() {
         return !validRecord;
     }
 }

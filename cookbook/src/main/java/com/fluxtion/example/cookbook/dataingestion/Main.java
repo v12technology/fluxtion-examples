@@ -17,8 +17,6 @@ public class Main {
             reader.forEach(dataIngest::onEvent);
         }
 
-        System.out.println("finished");
-
         dataIngest.tearDown();
     }
 

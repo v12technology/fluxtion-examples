@@ -58,8 +58,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.2.22
- * api version                     : 9.2.22
+ * eventProcessorGenerator version : 9.2.23
+ * api version                     : 9.2.23
  * </pre>
  *
  * Event classes supported:
@@ -101,7 +101,7 @@ public class DataIngestionPipeline
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_1 =
       new MapRef2RefFlowFunction<>(handlerString, csvToHouseRecord_0::marshall);
   private final FilterFlowFunction filterFlowFunction_11 =
-      new FilterFlowFunction<>(mapRef2RefFlowFunction_1, CsvToHouseRecord::isInValidRecord);
+      new FilterFlowFunction<>(mapRef2RefFlowFunction_1, CsvToHouseRecord::isBadCsvMessage);
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_2 =
       new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_1, CsvToHouseRecord::getHouseRecord);
   private final MapRef2RefFlowFunction mapRef2RefFlowFunction_4 =
