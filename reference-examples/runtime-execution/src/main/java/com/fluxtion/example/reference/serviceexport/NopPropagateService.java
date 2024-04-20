@@ -1,4 +1,4 @@
-package com.fluxtion.example.reference.execution;
+package com.fluxtion.example.reference.serviceexport;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.ExportService;
