@@ -28,6 +28,7 @@ along with this program.  If not, see
         <module>unplugged/part1</module>
         <module>imperative-helloworld</module>
         <module>functional-helloworld</module>
+        <module>imperative-helloworld-aot</module>
         <module>cookbook</module>
         <module>cookbook-functional</module>
         <module>dispatch-performnce</module>

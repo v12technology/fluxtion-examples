@@ -1,6 +1,7 @@
 package com.fluxtion.example.imperative.helloworld;
 
 import com.fluxtion.compiler.Fluxtion;
+import com.fluxtion.example.imperative.helloworld.generated.BreachNotifierProcessor;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnTrigger;
 
@@ -18,7 +19,7 @@ public class Main {
     private static final boolean USE_AOT = true;
 
     public static void main(String[] args) {
-        var eventProcessor = Fluxtion.interpret(new BreachNotifier());
+        var eventProcessor = USE_AOT ? new BreachNotifierProcessor() : Fluxtion.interpret(new BreachNotifier());
         eventProcessor.init();
         eventProcessor.onEvent(new Event_A(34.4));
         eventProcessor.onEvent(new Event_B(52.1));
