@@ -1,5 +1,6 @@
 package com.fluxtion.example.functional.helloworld;
 
+import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.runtime.EventProcessor;
@@ -17,19 +18,7 @@ import com.fluxtion.runtime.EventProcessor;
 public class Main {
     public static void main(String[] args) {
         //build the EventProcessor and initialise it
-        var eventProcessor = Fluxtion.interpret(cfg -> {
-            var data1Stream = DataFlow.subscribe(Data1.class)
-                    .mapToDouble(Data1::value)
-                    .defaultValue(0);
-
-            DataFlow.subscribe(Data2.class)
-                    .mapToDouble(Data2::value)
-                    .defaultValue(0)
-                    .mapBiFunction(Double::sum, data1Stream)
-                    .console("sum:{}")
-                    .filter(d -> d > 100)
-                    .console("WARNING DataSumCalculator value is greater than 100 sum = {}");
-        });
+        var eventProcessor = Fluxtion.interpret(Main::bindFunctions);
         eventProcessor.init();
 
         //send events
@@ -39,10 +28,22 @@ public class Main {
         eventProcessor.onEvent(new Data1(12.4));
     }
 
-    public record Data1(double value) {
+    private static void bindFunctions(EventProcessorConfig cfg) {
+        var data1Stream = DataFlow.subscribe(Data1.class)
+                .mapToDouble(Data1::value)
+                .defaultValue(0);
+
+        DataFlow.subscribe(Data2.class)
+                .mapToDouble(Data2::value)
+                .defaultValue(0)
+                .mapBiFunction(Double::sum, data1Stream)
+                .console("sum:{}")
+                .filter(d -> d > 100)
+                .console("WARNING DataSumCalculator value is greater than 100 sum = {}");
     }
 
-    public record Data2(double value) {
-    }
+    public record Data1(double value) {}
+
+    public record Data2(double value) {}
 }
 
