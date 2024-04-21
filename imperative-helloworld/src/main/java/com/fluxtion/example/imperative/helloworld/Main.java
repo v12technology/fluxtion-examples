@@ -15,7 +15,6 @@ import com.fluxtion.runtime.annotations.OnTrigger;
  * the event is only propagated if the sum > 100.
  */
 public class Main {
-    private static final boolean USE_AOT = true;
 
     public static void main(String[] args) {
         var eventProcessor = Fluxtion.interpret(new BreachNotifier());
@@ -25,5 +24,4 @@ public class Main {
         eventProcessor.onEvent(new Event_A(105));//should create a breach warning
         eventProcessor.onEvent(new Event_A(12.4));
     }
-
 }

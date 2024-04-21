@@ -40,6 +40,7 @@ along with this program.  If not, see
         <module>getting-started/tutorial5-lottery-extended</module>
         <module>getting-started/tutorial6-lottery-nospring</module>
         <module>reference-examples</module>
+        <module>service-helloworld</module>
     </modules>
 
     <properties>
