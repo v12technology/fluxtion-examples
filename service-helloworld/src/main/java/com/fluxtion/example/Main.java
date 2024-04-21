@@ -12,7 +12,7 @@ public class Main {
         var eventProcessor = Fluxtion.interpret(new BreachNotifier());
         eventProcessor.init();
 
-        //use the service api
+        //use the service api to trigger sum calculations
         DataSumCalculator dataSumCalculator = eventProcessor.getExportedService();
         dataSumCalculator.updateA(new Event_A(34.4));
         dataSumCalculator.updateB(new Event_B(52.1));
