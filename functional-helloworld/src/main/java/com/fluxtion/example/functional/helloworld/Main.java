@@ -16,27 +16,27 @@ import com.fluxtion.runtime.EventProcessor;
  */
 public class Main {
     public static void main(String[] args) {
-        //builds the EventProcessor
-        EventProcessor eventProcessor = Fluxtion.interpret(cfg -> {
+        //build the EventProcessor and initialise it
+        var eventProcessor = Fluxtion.interpret(cfg -> {
             var data1Stream = DataFlow.subscribe(Data1.class)
-                    .console("rcvd -> {}")
-                    .mapToDouble(Data1::value);
+                    .mapToDouble(Data1::value)
+                    .defaultValue(0);
 
             DataFlow.subscribe(Data2.class)
-                    .console("rcvd -> {}")
                     .mapToDouble(Data2::value)
+                    .defaultValue(0)
                     .mapBiFunction(Double::sum, data1Stream)
+                    .console("sum:{}")
                     .filter(d -> d > 100)
-                    .console("OUT: sum {} > 100");
+                    .console("WARNING DataSumCalculator value is greater than 100 sum = {}");
         });
-        //init and send events
         eventProcessor.init();
-        //no output < 100
-        eventProcessor.onEvent(new Data1(20.5));
-        //no output < 100
-        eventProcessor.onEvent(new Data2(63));
-        //output > 100 - log to console
-        eventProcessor.onEvent(new Data1(56.8));
+
+        //send events
+        eventProcessor.onEvent(new Data1(34));
+        eventProcessor.onEvent(new Data2(52.1));
+        eventProcessor.onEvent(new Data1(105));//should create a breach warning
+        eventProcessor.onEvent(new Data1(12.4));
     }
 
     public record Data1(double value) {
