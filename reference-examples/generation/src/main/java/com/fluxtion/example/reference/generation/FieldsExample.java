@@ -17,6 +17,7 @@ public class FieldsExample {
                 BasicTypeHolder.builder()
                         .cId("cid")
                         .name("holder")
+                        .transientName("NON-SERIALISED_transient")
                         .myChar('$')
                         .longVal(2334L)
                         .intVal(12)
@@ -38,6 +39,7 @@ public class FieldsExample {
     @RequiredArgsConstructor
     public static class BasicTypeHolder implements NamedNode {
         private String name;
+        private transient String transientName;
         @AssignToField("cId")
         private final String cId;
         private char myChar;
