@@ -1,11 +1,12 @@
-package com.fluxtion.example.reference;
+package com.fluxtion.example.reference.binding;
 
-import com.fluxtion.compiler.Fluxtion;
+import com.fluxtion.compiler.extern.spring.FluxtionSpring;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnTrigger;
-import com.fluxtion.runtime.annotations.builder.Inject;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class InjectSingletonNoFactory {
+public class SpringConfigAdd {
+
     public static class MyNode {
         @OnEventHandler
         public boolean handleStringEvent(String stringToProcess) {
@@ -14,30 +15,25 @@ public class InjectSingletonNoFactory {
         }
     }
 
-    public static class Root1{
-        @Inject(singleton = true)
+    public static class Root1 {
         private final MyNode myNode;
-        private final String id;
 
-        public Root1(String id) {
-            this(null, id);
-        }
-
-        public Root1(MyNode myNode, String id) {
+        public Root1(MyNode myNode) {
             this.myNode = myNode;
-            this.id = id;
         }
 
         @OnTrigger
         public boolean trigger() {
-            System.out.println(id + "::triggered");
+            System.out.println("Root1::triggered");
             return true;
         }
     }
 
     public static void main(String[] args) {
-        var processor = Fluxtion.interpret(new Root1("r1"), new Root1("r2"), new Root1("r3"));
+        var context = new ClassPathXmlApplicationContext("com/fluxtion/example/reference/spring-example.xml");
+        var processor = FluxtionSpring.interpret(context);
         processor.init();
+
         processor.onEvent("TEST");
     }
 }

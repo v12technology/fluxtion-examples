@@ -1,7 +1,6 @@
-package com.fluxtion.example.reference;
+package com.fluxtion.example.reference.binding;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.runtime.node.NamedNode;
 import com.fluxtion.runtime.node.SingleNamedNode;
 
 public class AddNamedNode {

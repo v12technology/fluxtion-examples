@@ -1,9 +1,9 @@
-package com.fluxtion.example.reference;
+package com.fluxtion.example.reference.binding;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 
-public class VarArgsAddMultiple {
+public class ImperativeAddMultiple {
 
     public static class MyNode {
 
@@ -21,10 +21,11 @@ public class VarArgsAddMultiple {
     }
 
     public static void main(String[] args) {
-        var processor = Fluxtion.interpret(
-                new MyNode("node_1"),
-                new MyNode("node_2"),
-                new MyNode("node_3"));
+        var processor = Fluxtion.interpret(cfg -> {
+            cfg.addNode(new MyNode("node_1"));
+            cfg.addNode(new MyNode("node_2"));
+            cfg.addNode(new MyNode("node_3"));
+        });
         processor.init();
         processor.onEvent("TEST");
     }

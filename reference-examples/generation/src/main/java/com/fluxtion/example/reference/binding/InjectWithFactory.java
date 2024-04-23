@@ -1,8 +1,7 @@
-package com.fluxtion.example.reference;
+package com.fluxtion.example.reference.binding;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.factory.NodeFactory;
-import com.fluxtion.compiler.builder.factory.NodeFactoryRegistration;
 import com.fluxtion.compiler.builder.factory.NodeRegistry;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnParentUpdate;
@@ -12,7 +11,6 @@ import com.fluxtion.runtime.annotations.builder.Inject;
 import com.google.auto.service.AutoService;
 
 import java.util.Map;
-import java.util.Objects;
 
 public class InjectWithFactory {
     public static class MyNode {

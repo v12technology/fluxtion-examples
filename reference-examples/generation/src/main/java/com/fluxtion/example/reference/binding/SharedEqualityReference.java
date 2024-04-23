@@ -1,10 +1,8 @@
-package com.fluxtion.example.reference;
+package com.fluxtion.example.reference.binding;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnTrigger;
-
-import java.util.Objects;
 
 public class SharedEqualityReference {
 

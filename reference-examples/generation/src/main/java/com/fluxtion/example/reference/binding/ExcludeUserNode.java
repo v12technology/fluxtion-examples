@@ -1,10 +1,11 @@
-package com.fluxtion.example.reference;
+package com.fluxtion.example.reference.binding;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.annotations.OnTrigger;
+import com.fluxtion.runtime.annotations.builder.ExcludeNode;
 
-public class ImplicitAdd {
+public class ExcludeUserNode {
 
     public static class MyNode {
         @OnEventHandler
@@ -14,6 +15,7 @@ public class ImplicitAdd {
         }
     }
 
+    @ExcludeNode
     public static class Root1 {
         private final MyNode myNode;
 
@@ -29,7 +31,7 @@ public class ImplicitAdd {
     }
 
     public static void main(String[] args) {
-        var processor = Fluxtion.interpret(cfg -> cfg.addNode(new Root1(new MyNode())));
+        var processor = Fluxtion.interpret(new Root1(new MyNode()));
         processor.init();
         processor.onEvent("TEST");
     }

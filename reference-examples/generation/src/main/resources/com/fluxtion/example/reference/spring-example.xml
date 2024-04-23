@@ -5,10 +5,10 @@
     http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="myNode" class="com.fluxtion.example.reference.SpringConfigAdd.MyNode">
+    <bean id="myNode" class="com.fluxtion.example.reference.binding.SpringConfigAdd.MyNode">
     </bean>
 
-    <bean id="root1" class="com.fluxtion.example.reference.SpringConfigAdd.Root1">
+    <bean id="root1" class="com.fluxtion.example.reference.binding.SpringConfigAdd.Root1">
         <constructor-arg ref="myNode"/>
     </bean>
 </beans>
