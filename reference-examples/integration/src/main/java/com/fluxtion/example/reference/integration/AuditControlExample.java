@@ -8,7 +8,7 @@ import com.fluxtion.runtime.audit.EventLogNode;
 import com.fluxtion.runtime.audit.LogRecord;
 import com.fluxtion.runtime.time.Clock;
 
-public class AuditEncodeExample {
+public class AuditControlExample {
     public static void main(String[] args) {
         var processor = Fluxtion.interpret(c ->{
            c.addNode(new MyAuditingNode());
@@ -16,7 +16,17 @@ public class AuditEncodeExample {
         });
 
         processor.init();
+
+        //AUDIT IS INFO BY DEFAULT
+        processor.onEvent("detailed message 1");
+
+        //CHANGE LOG LEVEL DYNAMICALLY
+        processor.setAuditLogLevel(EventLogControlEvent.LogLevel.DEBUG);
+        processor.onEvent("detailed message 2");
+
+        //REPLACE LOGRECORD ENCODER
         processor.setAuditLogRecordEncoder(new MyLogEncoder(Clock.DEFAULT_CLOCK));
+        //REPLACE LOGRECORD PROCESSOR
         processor.setAuditLogProcessor(logRecord -> {
             System.err.println("WARNING -> "+ logRecord.toString());
         });

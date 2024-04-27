@@ -3,7 +3,6 @@ package com.fluxtion.example.reference.integration;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.Initialise;
 import com.fluxtion.runtime.annotations.OnEventHandler;
-import com.fluxtion.runtime.audit.EventLogControlEvent;
 import com.fluxtion.runtime.audit.EventLogNode;
 
 public class AuditExample {
@@ -12,14 +11,9 @@ public class AuditExample {
            c.addNode(new MyAuditingNode());
            c.addEventAudit();
         });
-
         processor.init();
-
+        //AUDIT IS INFO BY DEFAULT
         processor.onEvent("detailed message 1");
-
-        //change log level dynamically
-        processor.setAuditLogLevel(EventLogControlEvent.LogLevel.DEBUG);
-        processor.onEvent("detailed message 2");
     }
 
     public static class MyAuditingNode extends EventLogNode {
