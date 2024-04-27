@@ -8,6 +8,17 @@ import java.util.Date;
 
 public class SignalInput {
 
+    public static void main(String[] args) {
+        var processor = Fluxtion.interpret(new SignalInput());
+        processor.init();
+
+        processor.publishIntSignal("1", 200);
+        processor.publishSignal("ALERT_SIGNAL", "alert!!");
+        processor.publishSignal("WAKEUP");
+        processor.publishObjectSignal("WAKEUP");
+        processor.publishObjectSignal(new Date());
+    }
+
     @OnEventHandler(filterString = "1")
     public boolean intSignal(Signal.IntSignal value) {
         System.out.println("intSignal [" + value.getValue() + "]");
@@ -36,16 +47,5 @@ public class SignalInput {
     public boolean namedSignal(Signal<?> signalToProcess) {
         System.out.println("namedSignal [" + signalToProcess.filterString() + "]");
         return true;
-    }
-
-    public static void main(String[] args) {
-        var processor = Fluxtion.interpret(new SignalInput());
-        processor.init();
-
-        processor.publishIntSignal("1", 200);
-        processor.publishSignal("ALERT_SIGNAL", "alert!!");
-        processor.publishSignal("WAKEUP");
-        processor.publishObjectSignal("WAKEUP");
-        processor.publishObjectSignal(new Date());
     }
 }
