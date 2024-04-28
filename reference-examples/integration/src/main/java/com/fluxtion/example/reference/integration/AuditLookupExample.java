@@ -18,7 +18,8 @@ public class AuditLookupExample {
 
         //LOOKUP AUDITOR BY NAME
         MyAuditor myAuditor = processor.getAuditorById("myAuditor");
-        System.out.println("\nMyAuditor::invocationCount " + myAuditor.getInvocationCount());
+        //PULL DATA FROM AUDITOR
+        System.out.println("\nPULL MyAuditor::invocationCount " + myAuditor.getInvocationCount());
     }
 
     public static class MyAuditor implements Auditor {

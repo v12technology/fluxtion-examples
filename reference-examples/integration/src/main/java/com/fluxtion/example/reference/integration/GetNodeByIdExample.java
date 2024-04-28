@@ -1,32 +1,30 @@
 package com.fluxtion.example.reference.integration;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.node.NamedNode;
 
 public class GetNodeByIdExample {
     public static void main(String[] args) throws NoSuchFieldException {
-        var processor = Fluxtion.interpret(c ->{
-            DataFlow.subscribeToNode(new DirtyStateNode())
-                    .console("Monday is triggered");
-        });
+        var processor = Fluxtion.interpret(new MondayChecker());
         processor.init();
 
         processor.onEvent("Monday");
         processor.onEvent("Tuesday");
         processor.onEvent("Wednesday");
 
-        DirtyStateNode dirtyStateNode = processor.getNodeById("MondayChecker");
-        System.out.println("Monday count:" + dirtyStateNode.getMondayCount() + "\n");
+        //LOOKUP USER NODE
+        MondayChecker mondayChecker = processor.getNodeById("MondayChecker");
 
+        //PULL DATA
+        System.out.println("PULLING Monday count:" + mondayChecker.getMondayCount());
 
         processor.onEvent("Monday");
-        System.out.println("Monday count:" + dirtyStateNode.getMondayCount());
+        //PULL DATA
+        System.out.println("PULLING Monday count:" + mondayChecker.getMondayCount());
     }
 
-    public static class DirtyStateNode implements NamedNode {
-
+    public static class MondayChecker implements NamedNode {
         private int mondayCounter = 0;
 
         @OnEventHandler
