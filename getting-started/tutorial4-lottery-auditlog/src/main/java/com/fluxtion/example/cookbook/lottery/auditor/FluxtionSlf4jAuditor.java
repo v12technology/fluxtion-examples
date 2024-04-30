@@ -8,6 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 public class FluxtionSlf4jAuditor implements LogRecordListener {
     @Override
     public void processLogRecord(LogRecord logRecord) {
-        log.info(logRecord.toString());
+        log.info("\n" + logRecord.toString() + "\n---");
     }
 }

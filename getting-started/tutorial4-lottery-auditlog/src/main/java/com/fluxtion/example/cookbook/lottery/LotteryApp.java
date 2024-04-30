@@ -24,7 +24,7 @@ public class LotteryApp {
     private static EventProcessor<?> lotteryEventProcessor;
 
     public static void main(String[] args) {
-        start(log::info, log::info);
+        start(System.out::println, System.out::println);
         //try and buy a ticket - store is closed
         ticketStore.buyTicket(new Ticket(12_65_56));
 
