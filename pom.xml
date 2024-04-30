@@ -41,6 +41,7 @@ along with this program.  If not, see
         <module>getting-started/tutorial6-lottery-nospring</module>
         <module>reference-examples</module>
         <module>service-helloworld</module>
+        <module>getting-started/developer-workflow</module>
     </modules>
 
     <properties>
