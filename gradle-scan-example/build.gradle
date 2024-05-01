@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.fluxtion.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation          'com.fluxtion:compiler:9.2.16'
+    annotationProcessor     'com.fluxtion:compiler:9.2.16'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.register('generateEventProcessors', JavaExec) {
+    group = "generation"
+    description = "Generate fluxtion event processors"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.fluxtion.example.generation.gradle.GenerateFluxtion'
+}
