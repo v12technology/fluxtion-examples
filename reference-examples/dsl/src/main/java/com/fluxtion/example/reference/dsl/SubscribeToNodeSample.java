@@ -24,10 +24,10 @@ public class SubscribeToNodeSample {
 
     public static void buildGraph(EventProcessorConfig processorConfig) {
         DataFlow.subscribeToNode(new MyComplexNode())
-                .console("node update trigger :{}")
+                .console("node triggered -> {}")
                 .map(MyComplexNode::getIn)
                 .aggregate(Collectors.listFactory(4))
-                .console("last 4 elements:{}");
+                .console("last 4 elements:{}\n");
     }
 
     public static void main(String[] args) {
