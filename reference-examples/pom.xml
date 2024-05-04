@@ -27,6 +27,7 @@
         <module>runtime-execution</module>
         <module>generation</module>
         <module>integration</module>
+        <module>dsl</module>
     </modules>
 
 <!--    <dependencies>-->
