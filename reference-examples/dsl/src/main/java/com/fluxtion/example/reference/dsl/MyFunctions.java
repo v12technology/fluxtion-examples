@@ -27,7 +27,7 @@ public class MyFunctions {
         return upperCaseCharCount;
     }
 
-    public static double updatePercentage(long longA, long longB) {
+    public static double wordUpperCasePercentage(long longA, long longB) {
         return (double) longA /longB;
     }
 
