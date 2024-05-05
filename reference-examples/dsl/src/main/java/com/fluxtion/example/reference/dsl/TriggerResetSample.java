@@ -6,14 +6,13 @@ import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.runtime.dataflow.helpers.Collectors;
 
 public class TriggerResetSample {
-
     public static void buildGraph(EventProcessorConfig processorConfig) {
         DataFlow.subscribeToNode(new SubscribeToNodeSample.MyComplexNode())
                 .console("node triggered -> {}")
                 .map(SubscribeToNodeSample.MyComplexNode::getIn)
                 .aggregate(Collectors.listFactory(4))
-                .resetTrigger(DataFlow.subscribeToSignal("resetMe"))
-                .console("last 4 elements:{}\n");
+                .resetTrigger(DataFlow.subscribeToSignal("resetMe").console("\n--- resetTrigger ---"))
+                .console("last 4 elements:{}");
     }
 
     public static void main(String[] args) {
