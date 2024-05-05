@@ -1,9 +1,5 @@
 package com.fluxtion.example.reference.dsl;
 
-
-import lombok.Getter;
-
-@Getter
 public class MyFunctions {
 
     private long totalCharCount;
@@ -31,7 +27,6 @@ public class MyFunctions {
         return (double) longA /longB;
     }
 
-    @Getter
     public static class SimpleMath {
         private double a;
         private double b;

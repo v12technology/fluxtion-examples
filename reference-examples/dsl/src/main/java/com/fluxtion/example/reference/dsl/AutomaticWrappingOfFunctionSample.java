@@ -5,7 +5,7 @@ import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.example.reference.dsl.MyFunctions.SimpleMath;
 
-public class DSLCodeSketch {
+public class AutomaticWrappingOfFunctionSample {
 
     private static void mapSample(EventProcessorConfig config) {
         //STATEFUL FUNCTIONS
@@ -37,7 +37,7 @@ public class DSLCodeSketch {
     }
 
     public static void main(String[] args) {
-        var processor = Fluxtion.interpret(DSLCodeSketch::mapSample);
+        var processor = Fluxtion.interpret(AutomaticWrappingOfFunctionSample::mapSample);
         processor.init();
 
         processor.onEvent("test ME");
