@@ -3,7 +3,7 @@ package com.fluxtion.example.reference.dsl;
 import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
-import com.fluxtion.runtime.dataflow.aggregate.function.primitive.IntSumFlowFunction;
+import com.fluxtion.runtime.dataflow.helpers.Aggregates;
 
 import java.util.Random;
 import java.util.concurrent.*;
@@ -12,7 +12,7 @@ public class TumblingWindowSample {
 
     public static void buildGraph(EventProcessorConfig processorConfig) {
         DataFlow.subscribe(Integer.class)
-                .tumblingAggregate(IntSumFlowFunction::new, 300)
+                .tumblingAggregate(Aggregates.intSumFactory(), 300)
                 .console("current tumble sum:{} eventTime:%e");
     }
 
