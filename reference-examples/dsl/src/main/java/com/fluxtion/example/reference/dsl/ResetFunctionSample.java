@@ -42,6 +42,4 @@ public class ResetFunctionSample {
         processor.onEvent("E");
         processor.onEvent("F");
     }
-
-
 }
