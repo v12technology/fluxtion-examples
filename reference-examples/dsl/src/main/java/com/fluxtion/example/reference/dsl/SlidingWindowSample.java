@@ -15,7 +15,7 @@ public class SlidingWindowSample {
     public static void buildGraph(EventProcessorConfig processorConfig) {
         DataFlow.subscribe(Integer.class)
                 .slidingAggregate(Aggregates.intSumFactory(), 300, 4)
-                .console("current tumble sum:{} eventTime:%e");
+                .console("current sliding 1.2 second sum:{} eventTime:%e");
     }
 
     public static void main(String[] args) throws InterruptedException {

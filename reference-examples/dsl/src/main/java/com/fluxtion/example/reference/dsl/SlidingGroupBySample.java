@@ -19,7 +19,7 @@ public class SlidingGroupBySample {
         DataFlow.subscribe(Trade.class)
                 .groupBySliding(Trade::symbol, Trade::amountTraded, Aggregates.intSumFactory(), 250, 4)
                 .map(GroupBy::toMap)
-                .console("Trade volume for last 200ms:{} time:%e");
+                .console("Trade volume for last second:{} time:%e");
     }
 
     public static void main(String[] args) throws InterruptedException {
