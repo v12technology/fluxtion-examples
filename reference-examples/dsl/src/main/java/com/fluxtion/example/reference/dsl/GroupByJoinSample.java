@@ -27,7 +27,7 @@ public class GroupByJoinSample {
     }
 
     private static String prettyPrint(School schoolName, List<Pupil> pupils) {
-        return pupils.stream().map(Pupil::name).collect(Collectors.joining(",", "pupils[", "] ") );
+        return pupils.stream().map(Pupil::name).collect(Collectors.joining(",", "pupils[", "]") );
     }
 
 
