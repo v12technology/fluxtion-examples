@@ -18,7 +18,7 @@ public class GroupByMapKeySample {
                 .groupByFieldsAggregate(Aggregates.countFactory(), Pupil::year, Pupil::sex)
                 .mapKeys(GroupByKey::getKey)//MAPS KEYS
                 .map(GroupBy::toMap)
-                .console("{}\n----");
+                .console("{}");
     }
 
     public static void main(String[] args) {
