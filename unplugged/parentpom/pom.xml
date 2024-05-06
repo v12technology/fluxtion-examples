@@ -31,8 +31,13 @@ along with this program.  If not, see
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>compiler</artifactId>
-            <version>9.2.2</version>
+            <version>9.3.0</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.fluxtion</groupId>-->
+<!--            <artifactId>compiler</artifactId>-->
+<!--            <version>9.3.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

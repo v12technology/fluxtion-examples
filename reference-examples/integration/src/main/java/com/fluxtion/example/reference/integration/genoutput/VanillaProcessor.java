@@ -49,8 +49,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.2.23
- * api version                     : 9.2.23
+ * eventProcessorGenerator version : 9.3.0
+ * api version                     : 9.3.0
  * </pre>
  *
  * Event classes supported:
@@ -122,6 +122,7 @@ public class VanillaProcessor
     isDirty("test");
     clock.init();
     handlerString.init();
+    templateMessage_0.initialise();
     peekFlowFunction_1.initialiseEventStream();
     afterEvent();
   }
@@ -133,7 +134,7 @@ public class VanillaProcessor
     }
     processing = true;
     auditEvent(Lifecycle.LifecycleEvent.Start);
-
+    templateMessage_0.start();
     afterEvent();
     callbackDispatcher.dispatchQueuedCallbacks();
     processing = false;
