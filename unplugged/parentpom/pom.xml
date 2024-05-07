@@ -31,7 +31,7 @@ along with this program.  If not, see
         <dependency>
             <groupId>com.fluxtion</groupId>
             <artifactId>compiler</artifactId>
-            <version>9.3.0</version>
+            <version>9.3.1</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>com.fluxtion</groupId>-->

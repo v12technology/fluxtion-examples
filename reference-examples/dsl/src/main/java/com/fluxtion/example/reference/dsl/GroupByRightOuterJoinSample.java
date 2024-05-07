@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GroupByLeftOuterJoinSample {
+public class GroupByRightOuterJoinSample {
 
     public record Pupil(int year, String school, String name){}
     public record School(String name){}
@@ -21,11 +21,10 @@ public class GroupByLeftOuterJoinSample {
         var schools = DataFlow.subscribe(School.class)
                 .groupBy(School::name);
         var pupils = DataFlow.subscribe(Pupil.class)
-                .groupByToList(Pupil::school)
-                .defaultValue(GroupBy.emptyCollection());
+                .groupByToList(Pupil::school);
 
-        JoinFlowBuilder.leftJoin(schools, pupils)
-                .mapValues(Tuples.mapTuple(GroupByLeftOuterJoinSample::prettyPrint))
+        JoinFlowBuilder.rightJoin(schools, pupils)
+                .mapValues(Tuples.mapTuple(GroupByRightOuterJoinSample::prettyPrint))
                 .map(GroupBy::toMap)
                 .console();
     }
@@ -37,7 +36,7 @@ public class GroupByLeftOuterJoinSample {
 
 
     public static void main(String[] args) {
-        var processor = Fluxtion.interpret(GroupByLeftOuterJoinSample::buildGraph);
+        var processor = Fluxtion.interpret(GroupByRightOuterJoinSample::buildGraph);
         processor.init();
 
         //register some schools
@@ -48,10 +47,9 @@ public class GroupByLeftOuterJoinSample {
         processor.onEvent(new Pupil(2015, "RGS", "Bob"));
         processor.onEvent(new Pupil(2013, "RGS", "Ashkay"));
         processor.onEvent(new Pupil(2013, "Belles", "Channing"));
-        processor.onEvent(new Pupil(2015, "Belles", "Sunita"));
 
-        System.out.println("left outer join\n");
+        System.out.println("right outer join\n");
         //left outer
-        processor.onEvent(new School("Framling"));
+        processor.onEvent(new Pupil(2015, "Framling", "Sunita"));
     }
 }
