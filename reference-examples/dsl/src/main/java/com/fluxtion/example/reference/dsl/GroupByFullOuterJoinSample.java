@@ -49,7 +49,7 @@ public class GroupByFullOuterJoinSample {
         processor.onEvent(new Pupil(2013, "Belles", "Channing"));
 
         System.out.println("full outer join\n");
-        //left outer
+        //full outer
         processor.onEvent(new Pupil(2015, "Framling", "Sunita"));
         processor.onEvent(new School("St trinians"));
     }
