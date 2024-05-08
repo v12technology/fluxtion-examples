@@ -42,6 +42,7 @@ along with this program.  If not, see
         <module>reference-examples</module>
         <module>service-helloworld</module>
         <module>getting-started/developer-workflow</module>
+        <module>jmh</module>
     </modules>
 
     <properties>
@@ -78,6 +79,21 @@ along with this program.  If not, see
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>6.0.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>1.37</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <version>1.37</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hdrhistogram</groupId>
+                <artifactId>HdrHistogram</artifactId>
+                <version>2.2.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
