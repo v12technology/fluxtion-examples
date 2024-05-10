@@ -13,7 +13,7 @@ public class TumblingWindowSample {
     public static void buildGraph(EventProcessorConfig processorConfig) {
         DataFlow.subscribe(Integer.class)
                 .tumblingAggregate(Aggregates.intSumFactory(), 300)
-                .console("current tumble sum:{} eventTime:%e");
+                .console("current tumble sum:{} eventTime:%dt");
     }
 
     public static void main(String[] args) throws InterruptedException {
