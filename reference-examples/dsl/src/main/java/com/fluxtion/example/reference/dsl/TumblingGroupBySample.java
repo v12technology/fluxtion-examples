@@ -19,7 +19,7 @@ public class TumblingGroupBySample {
         DataFlow.subscribe(Trade.class)
                 .groupByTumbling(Trade::symbol, Trade::amountTraded, Aggregates.intSumFactory(), 250)
                 .map(GroupBy::toMap)
-                .console("Trade volume for last 250 millis:{} time:%dt");
+                .console("Trade volume for last 250 millis:{} timeDelta:%dt");
     }
 
     public static void main(String[] args) throws InterruptedException {

@@ -27,7 +27,7 @@ public class SlidingGroupByCompoundKeySample {
                         Aggregates.intSumFactory(),
                         250, 4)
                 .map(SlidingGroupByCompoundKeySample::formatGroupBy)
-                .console("Trade volume for last second by client and symbol time:%dt:\n{}----------------------\n");
+                .console("Trade volume for last second by client and symbol timeDelta:%dt:\n{}----------------------\n");
     }
 
     private static <T> String formatGroupBy(GroupBy<GroupByKey<T>, Integer> groupBy) {

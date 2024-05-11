@@ -26,7 +26,7 @@ public class TumblingGroupByCompoundKeySample {
                         Aggregates.intSumFactory(),
                         250)
                 .map(TumblingGroupByCompoundKeySample::formatGroupBy)
-                .console("Trade volume tumbling per 250 millis by client and symbol time:%dt:\n{}----------------------\n");
+                .console("Trade volume tumbling per 250 millis by client and symbol timeDelta:%dt:\n{}----------------------\n");
     }
 
     private static <T> String formatGroupBy(GroupBy<GroupByKey<T>, Integer> groupBy) {
