@@ -24,5 +24,4 @@ public class Event_A_Handler {
         value = eventA.value();
         return true;
     }
-
 }

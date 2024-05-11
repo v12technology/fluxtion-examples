@@ -34,5 +34,4 @@ public class DataSumCalculator {
         System.out.println("sum:" + sum);
         return sum > 100;
     }
-
 }
