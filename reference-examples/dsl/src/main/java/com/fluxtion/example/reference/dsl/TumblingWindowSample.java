@@ -23,9 +23,7 @@ public class TumblingWindowSample {
 
         try (ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor()) {
             executor.scheduleAtFixedRate(
-                    () -> {
-                        processor.onEvent(rand.nextInt(100));
-                    },
+                    () -> processor.onEvent(rand.nextInt(100)),
                     10,10, TimeUnit.MILLISECONDS);
             Thread.sleep(4_000);
         }
