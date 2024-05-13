@@ -2,7 +2,6 @@ package com.fluxtion.example.reference.dsl;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
-import com.fluxtion.compiler.builder.dataflow.GroupByFlowBuilder;
 import com.fluxtion.compiler.builder.dataflow.MultiJoinBuilder;
 import com.fluxtion.runtime.dataflow.groupby.GroupBy;
 import lombok.Data;
@@ -13,9 +12,9 @@ public class MultiJoinSample {
     public static void main(String[] args) {
 
         var processor = Fluxtion.interpret(c -> {
-            GroupByFlowBuilder<String, LeftData> leftBuilder = DataFlow.groupBy(LeftData::getName);
-            GroupByFlowBuilder<String, MiddleData> middleBuilder = DataFlow.groupBy(MiddleData::getName);
-            GroupByFlowBuilder<String, RightData> rightBuilder = DataFlow.groupBy(RightData::getName);
+            var leftBuilder = DataFlow.groupBy(LeftData::getName);
+            var middleBuilder = DataFlow.groupBy(MiddleData::getName);
+            var rightBuilder = DataFlow.groupBy(RightData::getName);
 
             MultiJoinBuilder.builder(String.class, MergedData::new)
                     .addJoin(leftBuilder, MergedData::setLeftData)
