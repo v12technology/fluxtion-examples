@@ -1,6 +1,7 @@
 package com.fluxtion.example.reference.generation;
 
 import com.fluxtion.compiler.Fluxtion;
+import com.fluxtion.runtime.EventProcessor;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 
 public class TestMain {
@@ -9,6 +10,7 @@ public class TestMain {
     public static class MyNode {
 
         private final String name;
+        private String in;
 
         public MyNode(String name) {
             this.name = name;
@@ -17,19 +19,27 @@ public class TestMain {
         @OnEventHandler
         public boolean handleStringEvent(String stringToProcess) {
             System.out.println(name + " received:" + stringToProcess);
+            in = stringToProcess;
             return true;
         }
     }
 
     public static void main(String[] args) {
-        Fluxtion.compile(
-                //binds classes to event processor
-                eventProcessorConfig -> eventProcessorConfig.addNode(new MyNode("node A")),
-                //controls the generation
-                fluxtionCompilerConfig -> {
-                    fluxtionCompilerConfig.setClassName("MyEventProcessor");
-                    fluxtionCompilerConfig.setPackageName("com.fluxtion.example.aot.generated");
-                });
+//        Fluxtion.compile(
+//                //binds classes to event processor
+//                eventProcessorConfig -> eventProcessorConfig.addNode(new MyNode("node A")),
+//                //controls the generation
+//                fluxtionCompilerConfig -> {
+//                    fluxtionCompilerConfig.setClassName("MyEventProcessor");
+//                    fluxtionCompilerConfig.setPackageName("com.fluxtion.example.aot.generated");
+//                });
+        var myNode = new MyNode("node A");
+        var eventProcessor = Fluxtion.compileDispatcher(myNode);
+        eventProcessor.init();
+        eventProcessor.onEvent("TEST");
+        System.out.println("->" + myNode.in);
+
+
 //        EventProcessor<?> processor;
 //
 //        //these are equivalent processors

@@ -51,8 +51,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.4
- * api version                     : 9.3.4
+ * eventProcessorGenerator version : 9.3.9
+ * api version                     : 9.3.9
  * </pre>
  *
  * Event classes supported:
@@ -67,12 +67,14 @@ import java.util.function.Consumer;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class PriceLadderProcessor
     implements EventProcessor<PriceLadderProcessor>,
+        /*--- @ExportService start ---*/
+        PriceCalculator,
+        PriceLadderConsumer,
+        /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
-        Lifecycle,
-        PriceCalculator,
-        PriceLadderConsumer {
+        Lifecycle {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
@@ -100,17 +102,27 @@ public class PriceLadderProcessor
   private boolean isDirty_levelsCalculator_1 = false;
   private boolean isDirty_midCalculator_3 = false;
   private boolean isDirty_skewCalculator_2 = false;
+
   //Forked declarations
 
   //Filter constants
 
+  //unknown event handler
+  private Consumer unKnownEventHandler = (e) -> {};
+
   public PriceLadderProcessor(Map<Object, Object> contextMap) {
-    context.replaceMappings(contextMap);
+    if (context != null) {
+      context.replaceMappings(contextMap);
+    }
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
-    subscriptionManager.setSubscribingEventProcessor(this);
-    context.setEventProcessorCallback(this);
+    if (subscriptionManager != null) {
+      subscriptionManager.setSubscribingEventProcessor(this);
+    }
+    if (context != null) {
+      context.setEventProcessorCallback(this);
+    }
   }
 
   public PriceLadderProcessor() {
@@ -194,6 +206,8 @@ public class PriceLadderProcessor
     if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       handleEvent(typedEvent);
+    } else {
+      unKnownEventHandler(event);
     }
   }
 
@@ -433,5 +447,14 @@ public class PriceLadderProcessor
     } catch (Throwable e) {
       return "";
     }
+  }
+
+  public void unKnownEventHandler(Object object) {
+    unKnownEventHandler.accept(object);
+  }
+
+  @Override
+  public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
+    unKnownEventHandler = consumer;
   }
 }

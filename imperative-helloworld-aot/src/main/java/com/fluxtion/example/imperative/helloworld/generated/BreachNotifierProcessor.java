@@ -51,8 +51,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.4
- * api version                     : 9.3.4
+ * eventProcessorGenerator version : 9.3.9
+ * api version                     : 9.3.9
  * </pre>
  *
  * Event classes supported:
@@ -99,17 +99,27 @@ public class BreachNotifierProcessor
   private boolean isDirty_dataSumCalculator_1 = false;
   private boolean isDirty_event_A_Handler_2 = false;
   private boolean isDirty_event_B_Handler_3 = false;
+
   //Forked declarations
 
   //Filter constants
 
+  //unknown event handler
+  private Consumer unKnownEventHandler = (e) -> {};
+
   public BreachNotifierProcessor(Map<Object, Object> contextMap) {
-    context.replaceMappings(contextMap);
+    if (context != null) {
+      context.replaceMappings(contextMap);
+    }
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
-    subscriptionManager.setSubscribingEventProcessor(this);
-    context.setEventProcessorCallback(this);
+    if (subscriptionManager != null) {
+      subscriptionManager.setSubscribingEventProcessor(this);
+    }
+    if (context != null) {
+      context.setEventProcessorCallback(this);
+    }
   }
 
   public BreachNotifierProcessor() {
@@ -199,6 +209,8 @@ public class BreachNotifierProcessor
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       handleEvent(typedEvent);
+    } else {
+      unKnownEventHandler(event);
     }
   }
 
@@ -403,5 +415,14 @@ public class BreachNotifierProcessor
     } catch (Throwable e) {
       return "";
     }
+  }
+
+  public void unKnownEventHandler(Object object) {
+    unKnownEventHandler.accept(object);
+  }
+
+  @Override
+  public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
+    unKnownEventHandler = consumer;
   }
 }

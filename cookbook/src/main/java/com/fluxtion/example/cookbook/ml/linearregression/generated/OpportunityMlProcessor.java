@@ -61,8 +61,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.4
- * api version                     : 9.3.4
+ * eventProcessorGenerator version : 9.3.9
+ * api version                     : 9.3.9
  * </pre>
  *
  * Event classes supported:
@@ -79,13 +79,15 @@ import java.util.function.Consumer;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class OpportunityMlProcessor
     implements EventProcessor<OpportunityMlProcessor>,
+        /*--- @ExportService start ---*/
+        CalibrationProcessor,
+        HouseSalesMonitor,
+        OpportunityNotifier,
+        /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
-        Lifecycle,
-        CalibrationProcessor,
-        HouseSalesMonitor,
-        OpportunityNotifier {
+        Lifecycle {
 
   // Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
@@ -146,20 +148,30 @@ public class OpportunityMlProcessor
   private boolean isDirty_locationCategoryFeature = false;
   private boolean isDirty_offerPrice = false;
   private boolean isDirty_predictiveLinearRegressionModel_3 = false;
+
   // Forked declarations
 
   // Filter constants
 
+  // unknown event handler
+  private Consumer unKnownEventHandler = (e) -> {};
+
   public OpportunityMlProcessor(Map<Object, Object> contextMap) {
-    context.replaceMappings(contextMap);
+    if (context != null) {
+      context.replaceMappings(contextMap);
+    }
     liveHouseSalesCache_4.setDispatcher(callbackDispatcher);
     filterFlowFunction_1.setEventProcessorContext(context);
     filterFlowFunction_2.setEventProcessorContext(context);
     // node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
-    subscriptionManager.setSubscribingEventProcessor(this);
-    context.setEventProcessorCallback(this);
+    if (subscriptionManager != null) {
+      subscriptionManager.setSubscribingEventProcessor(this);
+    }
+    if (context != null) {
+      context.setEventProcessorCallback(this);
+    }
   }
 
   public OpportunityMlProcessor() {
@@ -261,6 +273,8 @@ public class OpportunityMlProcessor
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       handleEvent(typedEvent);
+    } else {
+      unKnownEventHandler(event);
     }
   }
 
@@ -684,5 +698,14 @@ public class OpportunityMlProcessor
     } catch (Throwable e) {
       return "";
     }
+  }
+
+  public void unKnownEventHandler(Object object) {
+    unKnownEventHandler.accept(object);
+  }
+
+  @Override
+  public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
+    unKnownEventHandler = consumer;
   }
 }

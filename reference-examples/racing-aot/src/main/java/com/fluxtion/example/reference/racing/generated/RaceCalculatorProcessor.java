@@ -50,8 +50,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.4
- * api version                     : 9.3.4
+ * eventProcessorGenerator version : 9.3.9
+ * api version                     : 9.3.9
  * </pre>
  *
  * Event classes supported:
@@ -68,11 +68,13 @@ import java.util.function.Consumer;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class RaceCalculatorProcessor
     implements EventProcessor<RaceCalculatorProcessor>,
+        /*--- @ExportService start ---*/
+        ResultsPublisher,
+        /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
-        Lifecycle,
-        ResultsPublisher {
+        Lifecycle {
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
@@ -95,17 +97,27 @@ public class RaceCalculatorProcessor
       new IdentityHashMap<>(1);
 
   private boolean isDirty_raceCalculator = false;
+
   //Forked declarations
 
   //Filter constants
 
+  //unknown event handler
+  private Consumer unKnownEventHandler = (e) -> {};
+
   public RaceCalculatorProcessor(Map<Object, Object> contextMap) {
-    context.replaceMappings(contextMap);
+    if (context != null) {
+      context.replaceMappings(contextMap);
+    }
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
-    subscriptionManager.setSubscribingEventProcessor(this);
-    context.setEventProcessorCallback(this);
+    if (subscriptionManager != null) {
+      subscriptionManager.setSubscribingEventProcessor(this);
+    }
+    if (context != null) {
+      context.setEventProcessorCallback(this);
+    }
   }
 
   public RaceCalculatorProcessor() {
@@ -197,6 +209,8 @@ public class RaceCalculatorProcessor
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       handleEvent(typedEvent);
+    } else {
+      unKnownEventHandler(event);
     }
   }
 
@@ -389,5 +403,14 @@ public class RaceCalculatorProcessor
     } catch (Throwable e) {
       return "";
     }
+  }
+
+  public void unKnownEventHandler(Object object) {
+    unKnownEventHandler.accept(object);
+  }
+
+  @Override
+  public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
+    unKnownEventHandler = consumer;
   }
 }

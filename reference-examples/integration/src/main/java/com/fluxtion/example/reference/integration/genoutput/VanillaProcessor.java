@@ -49,8 +49,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.4
- * api version                     : 9.3.4
+ * eventProcessorGenerator version : 9.3.9
+ * api version                     : 9.3.9
  * </pre>
  *
  * Event classes supported:
@@ -95,19 +95,29 @@ public class VanillaProcessor
       new IdentityHashMap<>(1);
 
   private boolean isDirty_handlerString = false;
+
   //Forked declarations
 
   //Filter constants
 
+  //unknown event handler
+  private Consumer unKnownEventHandler = (e) -> {};
+
   public VanillaProcessor(Map<Object, Object> contextMap) {
-    context.replaceMappings(contextMap);
+    if (context != null) {
+      context.replaceMappings(contextMap);
+    }
     peekFlowFunction_1.setEventProcessorContext(context);
     templateMessage_0.clock = clock;
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
-    subscriptionManager.setSubscribingEventProcessor(this);
-    context.setEventProcessorCallback(this);
+    if (subscriptionManager != null) {
+      subscriptionManager.setSubscribingEventProcessor(this);
+    }
+    if (context != null) {
+      context.setEventProcessorCallback(this);
+    }
   }
 
   public VanillaProcessor() {
@@ -198,6 +208,8 @@ public class VanillaProcessor
     } else if (event instanceof java.lang.String) {
       String typedEvent = (String) event;
       handleEvent(typedEvent);
+    } else {
+      unKnownEventHandler(event);
     }
   }
 
@@ -374,5 +386,14 @@ public class VanillaProcessor
     } catch (Throwable e) {
       return "";
     }
+  }
+
+  public void unKnownEventHandler(Object object) {
+    unKnownEventHandler.accept(object);
+  }
+
+  @Override
+  public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
+    unKnownEventHandler = consumer;
   }
 }

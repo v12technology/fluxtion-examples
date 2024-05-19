@@ -52,8 +52,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.4
- * api version                     : 9.3.4
+ * eventProcessorGenerator version : 9.3.9
+ * api version                     : 9.3.9
  * </pre>
  *
  * Event classes supported:
@@ -101,12 +101,18 @@ public class GlobalPnlProcessor
   private boolean isDirty_bookPnl_2 = false;
   private boolean isDirty_bookPnl_3 = false;
   private boolean isDirty_clock = false;
+
   //Forked declarations
 
   //Filter constants
 
+  //unknown event handler
+  private Consumer unKnownEventHandler = (e) -> {};
+
   public GlobalPnlProcessor(Map<Object, Object> contextMap) {
-    context.replaceMappings(contextMap);
+    if (context != null) {
+      context.replaceMappings(contextMap);
+    }
     yamlReplayRecordWriter.setClassBlackList(new HashSet<>(Arrays.asList()));
     yamlReplayRecordWriter.setClassWhiteList(
         new HashSet<>(
@@ -116,8 +122,12 @@ public class GlobalPnlProcessor
     initialiseAuditor(clock);
     initialiseAuditor(yamlReplayRecordWriter);
     initialiseAuditor(nodeNameLookup);
-    subscriptionManager.setSubscribingEventProcessor(this);
-    context.setEventProcessorCallback(this);
+    if (subscriptionManager != null) {
+      subscriptionManager.setSubscribingEventProcessor(this);
+    }
+    if (context != null) {
+      context.setEventProcessorCallback(this);
+    }
   }
 
   public GlobalPnlProcessor() {
@@ -205,6 +215,8 @@ public class GlobalPnlProcessor
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       handleEvent(typedEvent);
+    } else {
+      unKnownEventHandler(event);
     }
   }
 
@@ -431,5 +443,14 @@ public class GlobalPnlProcessor
     } catch (Throwable e) {
       return "";
     }
+  }
+
+  public void unKnownEventHandler(Object object) {
+    unKnownEventHandler.accept(object);
+  }
+
+  @Override
+  public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
+    unKnownEventHandler = consumer;
   }
 }

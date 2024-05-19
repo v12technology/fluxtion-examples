@@ -59,8 +59,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.4
- * api version                     : 9.3.4
+ * eventProcessorGenerator version : 9.3.9
+ * api version                     : 9.3.9
  * </pre>
  *
  * Event classes supported:
@@ -76,12 +76,14 @@ import java.util.function.Consumer;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class DataIngestionPipeline
     implements EventProcessor<DataIngestionPipeline>,
+        /*--- @ExportService start ---*/
+        DataIngestComponent,
+        DataIngestStats,
+        /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
-        Lifecycle,
-        DataIngestComponent,
-        DataIngestStats {
+        Lifecycle {
 
   // Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
@@ -159,12 +161,18 @@ public class DataIngestionPipeline
   private boolean isDirty_pushFlowFunction_13 = false;
   private boolean isDirty_pushFlowFunction_15 = false;
   private boolean isDirty_pushFlowFunction_16 = false;
+
   // Forked declarations
 
   // Filter constants
 
+  // unknown event handler
+  private Consumer unKnownEventHandler = (e) -> {};
+
   public DataIngestionPipeline(Map<Object, Object> contextMap) {
-    context.replaceMappings(contextMap);
+    if (context != null) {
+      context.replaceMappings(contextMap);
+    }
     filterFlowFunction_11.setEventProcessorContext(context);
     filterFlowFunction_14.setEventProcessorContext(context);
     mapRef2RefFlowFunction_1.setEventProcessorContext(context);
@@ -182,8 +190,12 @@ public class DataIngestionPipeline
     // node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
-    subscriptionManager.setSubscribingEventProcessor(this);
-    context.setEventProcessorCallback(this);
+    if (subscriptionManager != null) {
+      subscriptionManager.setSubscribingEventProcessor(this);
+    }
+    if (context != null) {
+      context.setEventProcessorCallback(this);
+    }
   }
 
   public DataIngestionPipeline() {
@@ -298,6 +310,8 @@ public class DataIngestionPipeline
     } else if (event instanceof java.lang.String) {
       String typedEvent = (String) event;
       handleEvent(typedEvent);
+    } else {
+      unKnownEventHandler(event);
     }
   }
 
@@ -780,5 +794,14 @@ public class DataIngestionPipeline
     } catch (Throwable e) {
       return "";
     }
+  }
+
+  public void unKnownEventHandler(Object object) {
+    unKnownEventHandler.accept(object);
+  }
+
+  @Override
+  public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
+    unKnownEventHandler = consumer;
   }
 }
