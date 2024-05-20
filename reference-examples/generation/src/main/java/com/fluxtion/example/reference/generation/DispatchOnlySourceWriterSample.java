@@ -4,10 +4,11 @@ import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.runtime.annotations.OnEventHandler;
 import lombok.Data;
 
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DispatchOnlySample {
+public class DispatchOnlySourceWriterSample {
 
     public static void main(String[] args) {
         Map<String, String> lookupMap = new HashMap<>();
@@ -15,8 +16,13 @@ public class DispatchOnlySample {
         myStringHandler.setLookupMap(lookupMap);
         myStringHandler.prefix = "default prefix";
 
-        var processor = Fluxtion.compileDispatcher(myStringHandler);
+        StringWriter stringWriter = new StringWriter();
+        var processor = Fluxtion.compileDispatcher(c -> c.addNode(myStringHandler), stringWriter);
         processor.init();
+
+        //Write generated dispatch only processor to console
+        String separator = "-".repeat(60);
+        System.out.printf("GENERATION START \n%s \n%s\n%1$s\nGENERATION END \n%1$s\n\n", separator, stringWriter);
 
         //no lookup match for input string
         myStringHandler.setPrefix("RECEIVED -> ");
