@@ -50,8 +50,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.10
- * api version                     : 9.3.10
+ * eventProcessorGenerator version : 9.3.16
+ * api version                     : 9.3.16
  * </pre>
  *
  * Event classes supported:
