@@ -50,8 +50,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -78,6 +78,7 @@ public class RaceCalculatorProcessor
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final Clock clock = new Clock();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   public final RaceTimeTracker raceCalculator = new RaceTimeTracker();
   public final ResultsPublisherImpl resultsPublisher = new ResultsPublisherImpl(raceCalculator);
@@ -85,17 +86,17 @@ public class RaceCalculatorProcessor
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(1);
+      new IdentityHashMap<>(2);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(1);
+      new IdentityHashMap<>(2);
 
+  private boolean isDirty_clock = false;
   private boolean isDirty_raceCalculator = false;
 
   //Forked declarations
@@ -109,6 +110,7 @@ public class RaceCalculatorProcessor
     if (context != null) {
       context.replaceMappings(contextMap);
     }
+    context.setClock(clock);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -130,8 +132,8 @@ public class RaceCalculatorProcessor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     //initialise dirty lookup map
     isDirty("test");
-    raceCalculator.init();
     clock.init();
+    raceCalculator.init();
     afterEvent();
   }
 
@@ -234,6 +236,7 @@ public class RaceCalculatorProcessor
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
+    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -264,6 +267,7 @@ public class RaceCalculatorProcessor
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
+      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     }
   }
@@ -315,6 +319,7 @@ public class RaceCalculatorProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    isDirty_clock = false;
     isDirty_raceCalculator = false;
   }
 
@@ -346,6 +351,7 @@ public class RaceCalculatorProcessor
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(raceCalculator, () -> isDirty_raceCalculator);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
@@ -354,6 +360,7 @@ public class RaceCalculatorProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(raceCalculator, (b) -> isDirty_raceCalculator = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
@@ -361,6 +368,10 @@ public class RaceCalculatorProcessor
 
   private boolean guardCheck_resultsPublisher() {
     return isDirty_raceCalculator;
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override

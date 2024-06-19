@@ -51,8 +51,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -75,6 +75,7 @@ public class BreachNotifierProcessor
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final Clock clock = new Clock();
   private final Event_A_Handler event_A_Handler_2 = new Event_A_Handler();
   private final Event_B_Handler event_B_Handler_3 = new Event_B_Handler();
   private final DataSumCalculator dataSumCalculator_1 =
@@ -85,17 +86,17 @@ public class BreachNotifierProcessor
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(3);
+      new IdentityHashMap<>(4);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(3);
+      new IdentityHashMap<>(4);
 
+  private boolean isDirty_clock = false;
   private boolean isDirty_dataSumCalculator_1 = false;
   private boolean isDirty_event_A_Handler_2 = false;
   private boolean isDirty_event_B_Handler_3 = false;
@@ -111,6 +112,7 @@ public class BreachNotifierProcessor
     if (context != null) {
       context.replaceMappings(contextMap);
     }
+    context.setClock(clock);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -243,6 +245,7 @@ public class BreachNotifierProcessor
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
+    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -261,6 +264,7 @@ public class BreachNotifierProcessor
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
+      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     }
   }
@@ -317,6 +321,7 @@ public class BreachNotifierProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    isDirty_clock = false;
     isDirty_dataSumCalculator_1 = false;
     isDirty_event_A_Handler_2 = false;
     isDirty_event_B_Handler_3 = false;
@@ -350,6 +355,7 @@ public class BreachNotifierProcessor
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(dataSumCalculator_1, () -> isDirty_dataSumCalculator_1);
       dirtyFlagSupplierMap.put(event_A_Handler_2, () -> isDirty_event_A_Handler_2);
       dirtyFlagSupplierMap.put(event_B_Handler_3, () -> isDirty_event_B_Handler_3);
@@ -360,6 +366,7 @@ public class BreachNotifierProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(dataSumCalculator_1, (b) -> isDirty_dataSumCalculator_1 = b);
       dirtyFlagUpdateMap.put(event_A_Handler_2, (b) -> isDirty_event_A_Handler_2 = b);
       dirtyFlagUpdateMap.put(event_B_Handler_3, (b) -> isDirty_event_B_Handler_3 = b);
@@ -373,6 +380,10 @@ public class BreachNotifierProcessor
 
   private boolean guardCheck_dataSumCalculator_1() {
     return isDirty_event_A_Handler_2 | isDirty_event_B_Handler_3;
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override

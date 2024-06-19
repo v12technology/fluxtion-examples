@@ -61,8 +61,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -91,6 +91,7 @@ public class OpportunityMlProcessor
 
   // Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final Clock clock = new Clock();
   private final LiveHouseSalesCache liveHouseSalesCache_4 = new LiveHouseSalesCache();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
@@ -128,20 +129,20 @@ public class OpportunityMlProcessor
           new Feature[] {offerPrice, area, areaSquared, locationCategoryFeature, bedroom});
   private final OpportunityNotifierNode opportunityNotifierNode_0 =
       new OpportunityNotifierNode(predictiveLinearRegressionModel_3, liveHouseSalesCache_4);
-  public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(9);
+      new IdentityHashMap<>(10);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(9);
+      new IdentityHashMap<>(10);
 
   private boolean isDirty_area = false;
   private boolean isDirty_areaSquared = false;
   private boolean isDirty_bedroom = false;
+  private boolean isDirty_clock = false;
   private boolean isDirty_filterFlowFunction_1 = false;
   private boolean isDirty_filterFlowFunction_2 = false;
   private boolean isDirty_handlerHouseSaleDetails = false;
@@ -163,6 +164,7 @@ public class OpportunityMlProcessor
     liveHouseSalesCache_4.setDispatcher(callbackDispatcher);
     filterFlowFunction_1.setEventProcessorContext(context);
     filterFlowFunction_2.setEventProcessorContext(context);
+    context.setClock(clock);
     // node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -184,6 +186,7 @@ public class OpportunityMlProcessor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     // initialise dirty lookup map
     isDirty("test");
+    clock.init();
     handlerHouseSaleDetails.init();
     filterFlowFunction_1.initialiseEventStream();
     filterFlowFunction_2.initialiseEventStream();
@@ -193,7 +196,6 @@ public class OpportunityMlProcessor
     locationCategoryFeature.init();
     offerPrice.init();
     predictiveLinearRegressionModel_3.init();
-    clock.init();
     afterEvent();
   }
 
@@ -330,6 +332,7 @@ public class OpportunityMlProcessor
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     // Default, no filter methods
+    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -460,6 +463,7 @@ public class OpportunityMlProcessor
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
+      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     }
   }
@@ -551,6 +555,7 @@ public class OpportunityMlProcessor
     isDirty_area = false;
     isDirty_areaSquared = false;
     isDirty_bedroom = false;
+    isDirty_clock = false;
     isDirty_filterFlowFunction_1 = false;
     isDirty_filterFlowFunction_2 = false;
     isDirty_handlerHouseSaleDetails = false;
@@ -590,6 +595,7 @@ public class OpportunityMlProcessor
       dirtyFlagSupplierMap.put(area, () -> isDirty_area);
       dirtyFlagSupplierMap.put(areaSquared, () -> isDirty_areaSquared);
       dirtyFlagSupplierMap.put(bedroom, () -> isDirty_bedroom);
+      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(filterFlowFunction_1, () -> isDirty_filterFlowFunction_1);
       dirtyFlagSupplierMap.put(filterFlowFunction_2, () -> isDirty_filterFlowFunction_2);
       dirtyFlagSupplierMap.put(handlerHouseSaleDetails, () -> isDirty_handlerHouseSaleDetails);
@@ -607,6 +613,7 @@ public class OpportunityMlProcessor
       dirtyFlagUpdateMap.put(area, (b) -> isDirty_area = b);
       dirtyFlagUpdateMap.put(areaSquared, (b) -> isDirty_areaSquared = b);
       dirtyFlagUpdateMap.put(bedroom, (b) -> isDirty_bedroom = b);
+      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(filterFlowFunction_1, (b) -> isDirty_filterFlowFunction_1 = b);
       dirtyFlagUpdateMap.put(filterFlowFunction_2, (b) -> isDirty_filterFlowFunction_2 = b);
       dirtyFlagUpdateMap.put(handlerHouseSaleDetails, (b) -> isDirty_handlerHouseSaleDetails = b);
@@ -656,6 +663,10 @@ public class OpportunityMlProcessor
 
   private boolean guardCheck_offerPrice() {
     return isDirty_filterFlowFunction_2;
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override

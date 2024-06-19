@@ -49,8 +49,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -76,6 +76,7 @@ public class PermittedCommandProcessor
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final Clock clock = new Clock();
   private final CommandAuthorizerNode commandAuthorizerNode_1 = new CommandAuthorizerNode();
   private final CommandExecutor commandExecutor_0 = new CommandExecutor(commandAuthorizerNode_1);
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
@@ -83,16 +84,17 @@ public class PermittedCommandProcessor
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(0);
+      new IdentityHashMap<>(1);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(0);
+      new IdentityHashMap<>(1);
+
+  private boolean isDirty_clock = false;
 
   //Filter constants
 
@@ -103,6 +105,7 @@ public class PermittedCommandProcessor
     if (context != null) {
       context.replaceMappings(contextMap);
     }
+    context.setClock(clock);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -213,6 +216,7 @@ public class PermittedCommandProcessor
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
+    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -250,6 +254,7 @@ public class PermittedCommandProcessor
     } else if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
+      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     }
   }
@@ -298,6 +303,7 @@ public class PermittedCommandProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    isDirty_clock = false;
   }
 
   @Override
@@ -327,16 +333,22 @@ public class PermittedCommandProcessor
 
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
-    if (dirtyFlagSupplierMap.isEmpty()) {}
-
+    if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
+    }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
   }
 
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
-    if (dirtyFlagUpdateMap.isEmpty()) {}
-
+    if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
+    }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override

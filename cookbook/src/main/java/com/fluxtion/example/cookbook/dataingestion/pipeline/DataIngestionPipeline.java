@@ -59,8 +59,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -87,6 +87,7 @@ public class DataIngestionPipeline
 
   // Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final Clock clock = new Clock();
   private final CsvToHouseRecordSerializer csvToHouseRecordSerializer_0 =
       new CsvToHouseRecordSerializer();
   private final HouseRecordTransformer houseRecordTransformer_3 = new HouseRecordTransformer();
@@ -135,17 +136,17 @@ public class DataIngestionPipeline
       new PushFlowFunction<>(filterFlowFunction_14, invalidLogWriter_47::invalidHouseRecord);
   private final PushFlowFunction pushFlowFunction_16 =
       new PushFlowFunction<>(filterFlowFunction_14, processingStats_51::invalidHouseRecord);
-  public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(15);
+      new IdentityHashMap<>(16);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(15);
+      new IdentityHashMap<>(16);
 
+  private boolean isDirty_clock = false;
   private boolean isDirty_filterFlowFunction_11 = false;
   private boolean isDirty_filterFlowFunction_14 = false;
   private boolean isDirty_handlerString = false;
@@ -187,6 +188,7 @@ public class DataIngestionPipeline
     pushFlowFunction_13.setEventProcessorContext(context);
     pushFlowFunction_15.setEventProcessorContext(context);
     pushFlowFunction_16.setEventProcessorContext(context);
+    context.setClock(clock);
     // node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -208,6 +210,7 @@ public class DataIngestionPipeline
     auditEvent(Lifecycle.LifecycleEvent.Init);
     // initialise dirty lookup map
     isDirty("test");
+    clock.init();
     csvToHouseRecordSerializer_0.init();
     houseRecordValidator_5.init();
     invalidLogWriter_47.init();
@@ -229,7 +232,6 @@ public class DataIngestionPipeline
     pushFlowFunction_13.initialiseEventStream();
     pushFlowFunction_15.initialiseEventStream();
     pushFlowFunction_16.initialiseEventStream();
-    clock.init();
     afterEvent();
   }
 
@@ -318,6 +320,7 @@ public class DataIngestionPipeline
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     // Default, no filter methods
+    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -452,6 +455,7 @@ public class DataIngestionPipeline
     if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
+      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     } else if (event instanceof java.lang.String) {
       String typedEvent = (String) event;
@@ -596,6 +600,7 @@ public class DataIngestionPipeline
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    isDirty_clock = false;
     isDirty_filterFlowFunction_11 = false;
     isDirty_filterFlowFunction_14 = false;
     isDirty_handlerString = false;
@@ -641,6 +646,7 @@ public class DataIngestionPipeline
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(filterFlowFunction_11, () -> isDirty_filterFlowFunction_11);
       dirtyFlagSupplierMap.put(filterFlowFunction_14, () -> isDirty_filterFlowFunction_14);
       dirtyFlagSupplierMap.put(handlerString, () -> isDirty_handlerString);
@@ -663,6 +669,7 @@ public class DataIngestionPipeline
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(filterFlowFunction_11, (b) -> isDirty_filterFlowFunction_11 = b);
       dirtyFlagUpdateMap.put(filterFlowFunction_14, (b) -> isDirty_filterFlowFunction_14 = b);
       dirtyFlagUpdateMap.put(handlerString, (b) -> isDirty_handlerString = b);
@@ -752,6 +759,10 @@ public class DataIngestionPipeline
 
   private boolean guardCheck_pushFlowFunction_16() {
     return isDirty_filterFlowFunction_14;
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override

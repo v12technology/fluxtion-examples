@@ -49,8 +49,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -90,10 +90,11 @@ public class VanillaProcessor
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(1);
+      new IdentityHashMap<>(2);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(1);
+      new IdentityHashMap<>(2);
 
+  private boolean isDirty_clock = false;
   private boolean isDirty_handlerString = false;
 
   //Forked declarations
@@ -109,6 +110,7 @@ public class VanillaProcessor
     }
     peekFlowFunction_1.setEventProcessorContext(context);
     templateMessage_0.clock = clock;
+    context.setClock(clock);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -216,6 +218,7 @@ public class VanillaProcessor
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
+    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -239,6 +242,7 @@ public class VanillaProcessor
     if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
+      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     } else if (event instanceof java.lang.String) {
       String typedEvent = (String) event;
@@ -298,6 +302,7 @@ public class VanillaProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    isDirty_clock = false;
     isDirty_handlerString = false;
   }
 
@@ -329,6 +334,7 @@ public class VanillaProcessor
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(handlerString, () -> isDirty_handlerString);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
@@ -337,6 +343,7 @@ public class VanillaProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(handlerString, (b) -> isDirty_handlerString = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
@@ -344,6 +351,10 @@ public class VanillaProcessor
 
   private boolean guardCheck_peekFlowFunction_1() {
     return isDirty_handlerString;
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override

@@ -51,8 +51,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -78,6 +78,7 @@ public class PriceLadderProcessorNoBranching
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final Clock clock = new Clock();
   private final MidCalculator midCalculator_3 = new MidCalculator();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SkewCalculator skewCalculator_2 = new SkewCalculator(midCalculator_3);
@@ -88,7 +89,6 @@ public class PriceLadderProcessorNoBranching
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
@@ -110,6 +110,7 @@ public class PriceLadderProcessorNoBranching
     if (context != null) {
       context.replaceMappings(contextMap);
     }
+    context.setClock(clock);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);

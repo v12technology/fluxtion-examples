@@ -52,8 +52,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -118,6 +118,7 @@ public class GlobalPnlProcessor
         new HashSet<>(
             Arrays.asList(com.fluxtion.example.reference.integration.replay.PnlUpdate.class)));
     globalPnl_0.clock = clock;
+    context.setClock(clock);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(yamlReplayRecordWriter);
@@ -401,6 +402,10 @@ public class GlobalPnlProcessor
 
   private boolean guardCheck_globalPnl_0() {
     return isDirty_bookPnl_1 | isDirty_bookPnl_2 | isDirty_bookPnl_3 | isDirty_clock;
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override

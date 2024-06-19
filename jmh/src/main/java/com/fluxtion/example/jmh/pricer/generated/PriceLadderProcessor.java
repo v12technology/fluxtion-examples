@@ -51,8 +51,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -78,6 +78,7 @@ public class PriceLadderProcessor
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final Clock clock = new Clock();
   private final MidCalculator midCalculator_3 = new MidCalculator();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SkewCalculator skewCalculator_2 = new SkewCalculator(midCalculator_3);
@@ -88,17 +89,17 @@ public class PriceLadderProcessor
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(3);
+      new IdentityHashMap<>(4);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(3);
+      new IdentityHashMap<>(4);
 
+  private boolean isDirty_clock = false;
   private boolean isDirty_levelsCalculator_1 = false;
   private boolean isDirty_midCalculator_3 = false;
   private boolean isDirty_skewCalculator_2 = false;
@@ -114,6 +115,7 @@ public class PriceLadderProcessor
     if (context != null) {
       context.replaceMappings(contextMap);
     }
+    context.setClock(clock);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -214,6 +216,7 @@ public class PriceLadderProcessor
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
+    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -284,6 +287,7 @@ public class PriceLadderProcessor
     if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
+      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     }
   }
@@ -345,6 +349,7 @@ public class PriceLadderProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    isDirty_clock = false;
     isDirty_levelsCalculator_1 = false;
     isDirty_midCalculator_3 = false;
     isDirty_skewCalculator_2 = false;
@@ -378,6 +383,7 @@ public class PriceLadderProcessor
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(levelsCalculator_1, () -> isDirty_levelsCalculator_1);
       dirtyFlagSupplierMap.put(midCalculator_3, () -> isDirty_midCalculator_3);
       dirtyFlagSupplierMap.put(skewCalculator_2, () -> isDirty_skewCalculator_2);
@@ -388,6 +394,7 @@ public class PriceLadderProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(levelsCalculator_1, (b) -> isDirty_levelsCalculator_1 = b);
       dirtyFlagUpdateMap.put(midCalculator_3, (b) -> isDirty_midCalculator_3 = b);
       dirtyFlagUpdateMap.put(skewCalculator_2, (b) -> isDirty_skewCalculator_2 = b);
@@ -405,6 +412,10 @@ public class PriceLadderProcessor
 
   private boolean guardCheck_skewCalculator_2() {
     return isDirty_midCalculator_3;
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override

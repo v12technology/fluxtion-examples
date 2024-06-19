@@ -48,8 +48,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.17
- * api version                     : 9.3.17
+ * eventProcessorGenerator version : 9.3.20
+ * api version                     : 9.3.20
  * </pre>
  *
  * Event classes supported:
@@ -71,6 +71,7 @@ public class SampleAotBuilderProcessor
 
   //Node declarations
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final Clock clock = new Clock();
   public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
   private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
   private final MutableEventProcessorContext context =
@@ -81,17 +82,17 @@ public class SampleAotBuilderProcessor
           2147483647, "", java.lang.String.class, "handlerString", context);
   private final MapRef2ToIntFlowFunction mapRef2ToIntFlowFunction_0 =
       new MapRef2ToIntFlowFunction<>(handlerString, String::length);
-  public final Clock clock = new Clock();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
   private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
-      new IdentityHashMap<>(1);
+      new IdentityHashMap<>(2);
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
-      new IdentityHashMap<>(1);
+      new IdentityHashMap<>(2);
 
+  private boolean isDirty_clock = false;
   private boolean isDirty_handlerString = false;
 
   //Forked declarations
@@ -106,6 +107,7 @@ public class SampleAotBuilderProcessor
       context.replaceMappings(contextMap);
     }
     mapRef2ToIntFlowFunction_0.setEventProcessorContext(context);
+    context.setClock(clock);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
@@ -127,9 +129,9 @@ public class SampleAotBuilderProcessor
     auditEvent(Lifecycle.LifecycleEvent.Init);
     //initialise dirty lookup map
     isDirty("test");
+    clock.init();
     handlerString.init();
     mapRef2ToIntFlowFunction_0.initialiseEventStream();
-    clock.init();
     afterEvent();
   }
 
@@ -212,6 +214,7 @@ public class SampleAotBuilderProcessor
   public void handleEvent(ClockStrategyEvent typedEvent) {
     auditEvent(typedEvent);
     //Default, no filter methods
+    isDirty_clock = true;
     clock.setClockStrategy(typedEvent);
     afterEvent();
   }
@@ -235,6 +238,7 @@ public class SampleAotBuilderProcessor
     if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
       ClockStrategyEvent typedEvent = (ClockStrategyEvent) event;
       auditEvent(typedEvent);
+      isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
     } else if (event instanceof java.lang.String) {
       String typedEvent = (String) event;
@@ -293,6 +297,7 @@ public class SampleAotBuilderProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    isDirty_clock = false;
     isDirty_handlerString = false;
   }
 
@@ -324,6 +329,7 @@ public class SampleAotBuilderProcessor
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
+      dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(handlerString, () -> isDirty_handlerString);
     }
     return dirtyFlagSupplierMap.getOrDefault(node, StaticEventProcessor.ALWAYS_FALSE);
@@ -332,6 +338,7 @@ public class SampleAotBuilderProcessor
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
+      dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(handlerString, (b) -> isDirty_handlerString = b);
     }
     dirtyFlagUpdateMap.get(node).accept(dirtyFlag);
@@ -339,6 +346,10 @@ public class SampleAotBuilderProcessor
 
   private boolean guardCheck_mapRef2ToIntFlowFunction_0() {
     return isDirty_handlerString;
+  }
+
+  private boolean guardCheck_context() {
+    return isDirty_clock;
   }
 
   @Override
