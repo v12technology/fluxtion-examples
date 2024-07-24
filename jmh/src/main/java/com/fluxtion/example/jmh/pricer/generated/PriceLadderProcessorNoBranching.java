@@ -35,9 +35,12 @@ import com.fluxtion.runtime.callback.CallbackDispatcherImpl;
 import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
+import com.fluxtion.runtime.input.SubscriptionManager;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
 import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
+import com.fluxtion.runtime.service.ServiceListener;
+import com.fluxtion.runtime.service.ServiceRegistryNode;
 import com.fluxtion.runtime.time.Clock;
 import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
 import java.util.Map;
@@ -51,8 +54,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.20
- * api version                     : 9.3.20
+ * eventProcessorGenerator version : 9.3.29
+ * api version                     : 9.3.29
  * </pre>
  *
  * Event classes supported:
@@ -70,6 +73,7 @@ public class PriceLadderProcessorNoBranching
         /*--- @ExportService start ---*/
         PriceCalculator,
         PriceLadderConsumer,
+        ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -89,6 +93,7 @@ public class PriceLadderProcessorNoBranching
   private final MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
+  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
@@ -111,9 +116,11 @@ public class PriceLadderProcessorNoBranching
       context.replaceMappings(contextMap);
     }
     context.setClock(clock);
+    serviceRegistry.setEventProcessorContext(context);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
+    initialiseAuditor(serviceRegistry);
     if (subscriptionManager != null) {
       subscriptionManager.setSubscribingEventProcessor(this);
     }
@@ -166,6 +173,7 @@ public class PriceLadderProcessorNoBranching
   public void tearDown() {
     initCalled = false;
     auditEvent(Lifecycle.LifecycleEvent.TearDown);
+    serviceRegistry.tearDown();
     nodeNameLookup.tearDown();
     clock.tearDown();
     subscriptionManager.tearDown();
@@ -231,6 +239,24 @@ public class PriceLadderProcessorNoBranching
   }
 
   @Override
+  public void deRegisterService(com.fluxtion.runtime.service.Service<?> arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.runtime.service.ServiceRegistryNode.deRegisterService(com.fluxtion.runtime.service.Service<?>)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    serviceRegistry.deRegisterService(arg0);
+    afterServiceCall();
+  }
+
+  @Override
+  public void registerService(com.fluxtion.runtime.service.Service<?> arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.runtime.service.ServiceRegistryNode.registerService(com.fluxtion.runtime.service.Service<?>)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    serviceRegistry.registerService(arg0);
+    afterServiceCall();
+  }
+
+  @Override
   public void setLevels(int arg0) {
     beforeServiceCall(
         "public default void com.fluxtion.example.jmh.pricer.PriceCalculator.setLevels(int)");
@@ -285,11 +311,13 @@ public class PriceLadderProcessorNoBranching
   private void auditEvent(Object typedEvent) {
     clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
+    serviceRegistry.eventReceived(typedEvent);
   }
 
   private void auditEvent(Event typedEvent) {
     clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
+    serviceRegistry.eventReceived(typedEvent);
   }
 
   private void initialiseAuditor(Auditor auditor) {
@@ -322,6 +350,7 @@ public class PriceLadderProcessorNoBranching
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    serviceRegistry.processingComplete();
   }
 
   @Override
@@ -412,5 +441,10 @@ public class PriceLadderProcessorNoBranching
   @Override
   public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
     unKnownEventHandler = consumer;
+  }
+
+  @Override
+  public SubscriptionManager getSubscriptionManager() {
+    return subscriptionManager;
   }
 }

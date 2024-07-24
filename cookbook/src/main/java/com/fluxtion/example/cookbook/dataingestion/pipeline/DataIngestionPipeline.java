@@ -41,10 +41,13 @@ import com.fluxtion.runtime.dataflow.function.MapFlowFunction.MapRef2RefFlowFunc
 import com.fluxtion.runtime.dataflow.function.PushFlowFunction;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
+import com.fluxtion.runtime.input.SubscriptionManager;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
 import com.fluxtion.runtime.node.DefaultEventHandlerNode;
 import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
+import com.fluxtion.runtime.service.ServiceListener;
+import com.fluxtion.runtime.service.ServiceRegistryNode;
 import com.fluxtion.runtime.time.Clock;
 import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
 import java.io.File;
@@ -59,8 +62,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.20
- * api version                     : 9.3.20
+ * eventProcessorGenerator version : 9.3.29
+ * api version                     : 9.3.29
  * </pre>
  *
  * Event classes supported:
@@ -79,6 +82,7 @@ public class DataIngestionPipeline
         /*--- @ExportService start ---*/
         DataIngestComponent,
         DataIngestStats,
+        ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -136,6 +140,7 @@ public class DataIngestionPipeline
       new PushFlowFunction<>(filterFlowFunction_14, invalidLogWriter_47::invalidHouseRecord);
   private final PushFlowFunction pushFlowFunction_16 =
       new PushFlowFunction<>(filterFlowFunction_14, processingStats_51::invalidHouseRecord);
+  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
   private boolean initCalled = false;
@@ -189,9 +194,11 @@ public class DataIngestionPipeline
     pushFlowFunction_15.setEventProcessorContext(context);
     pushFlowFunction_16.setEventProcessorContext(context);
     context.setClock(clock);
+    serviceRegistry.setEventProcessorContext(context);
     // node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
+    initialiseAuditor(serviceRegistry);
     if (subscriptionManager != null) {
       subscriptionManager.setSubscribingEventProcessor(this);
     }
@@ -265,6 +272,7 @@ public class DataIngestionPipeline
   public void tearDown() {
     initCalled = false;
     auditEvent(Lifecycle.LifecycleEvent.TearDown);
+    serviceRegistry.tearDown();
     nodeNameLookup.tearDown();
     clock.tearDown();
     handlerString.tearDown();
@@ -441,11 +449,29 @@ public class DataIngestionPipeline
   }
 
   @Override
+  public void deRegisterService(com.fluxtion.runtime.service.Service<?> arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.runtime.service.ServiceRegistryNode.deRegisterService(com.fluxtion.runtime.service.Service<?>)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    serviceRegistry.deRegisterService(arg0);
+    afterServiceCall();
+  }
+
+  @Override
   public void publishStats() {
     beforeServiceCall(
         "public void com.fluxtion.example.cookbook.dataingestion.function.ProcessingStats.publishStats()");
     ExportFunctionAuditEvent typedEvent = functionAudit;
     processingStats_51.publishStats();
+    afterServiceCall();
+  }
+
+  @Override
+  public void registerService(com.fluxtion.runtime.service.Service<?> arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.runtime.service.ServiceRegistryNode.registerService(com.fluxtion.runtime.service.Service<?>)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    serviceRegistry.registerService(arg0);
     afterServiceCall();
   }
   // EXPORTED SERVICE FUNCTIONS - END
@@ -545,11 +571,13 @@ public class DataIngestionPipeline
   private void auditEvent(Object typedEvent) {
     clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
+    serviceRegistry.eventReceived(typedEvent);
   }
 
   private void auditEvent(Event typedEvent) {
     clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
+    serviceRegistry.eventReceived(typedEvent);
   }
 
   private void initialiseAuditor(Auditor auditor) {
@@ -600,6 +628,7 @@ public class DataIngestionPipeline
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    serviceRegistry.processingComplete();
     isDirty_clock = false;
     isDirty_filterFlowFunction_11 = false;
     isDirty_filterFlowFunction_14 = false;
@@ -814,5 +843,10 @@ public class DataIngestionPipeline
   @Override
   public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
     unKnownEventHandler = consumer;
+  }
+
+  @Override
+  public SubscriptionManager getSubscriptionManager() {
+    return subscriptionManager;
   }
 }

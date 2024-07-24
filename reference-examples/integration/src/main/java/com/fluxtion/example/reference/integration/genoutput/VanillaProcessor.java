@@ -31,10 +31,13 @@ import com.fluxtion.runtime.dataflow.function.PeekFlowFunction;
 import com.fluxtion.runtime.dataflow.helpers.Peekers.TemplateMessage;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
+import com.fluxtion.runtime.input.SubscriptionManager;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
 import com.fluxtion.runtime.node.DefaultEventHandlerNode;
 import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
+import com.fluxtion.runtime.service.ServiceListener;
+import com.fluxtion.runtime.service.ServiceRegistryNode;
 import com.fluxtion.runtime.time.Clock;
 import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
 import java.io.File;
@@ -49,13 +52,14 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.20
- * api version                     : 9.3.20
+ * eventProcessorGenerator version : 9.3.29
+ * api version                     : 9.3.29
  * </pre>
  *
  * Event classes supported:
  *
  * <ul>
+ *   <li>com.fluxtion.compiler.generation.model.ExportFunctionMarker
  *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
  *   <li>java.lang.String
  * </ul>
@@ -65,6 +69,9 @@ import java.util.function.Consumer;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class VanillaProcessor
     implements EventProcessor<VanillaProcessor>,
+        /*--- @ExportService start ---*/
+        ServiceListener,
+        /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
         BatchHandler,
@@ -81,6 +88,7 @@ public class VanillaProcessor
   private final DefaultEventHandlerNode handlerString =
       new DefaultEventHandlerNode<>(
           2147483647, "", java.lang.String.class, "handlerString", context);
+  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
   private final TemplateMessage templateMessage_0 = new TemplateMessage<>("received -> {}");
   private final PeekFlowFunction peekFlowFunction_1 =
       new PeekFlowFunction<>(handlerString, templateMessage_0::templateAndLogToConsole);
@@ -111,9 +119,11 @@ public class VanillaProcessor
     peekFlowFunction_1.setEventProcessorContext(context);
     templateMessage_0.clock = clock;
     context.setClock(clock);
+    serviceRegistry.setEventProcessorContext(context);
     //node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
+    initialiseAuditor(serviceRegistry);
     if (subscriptionManager != null) {
       subscriptionManager.setSubscribingEventProcessor(this);
     }
@@ -169,6 +179,7 @@ public class VanillaProcessor
   public void tearDown() {
     initCalled = false;
     auditEvent(Lifecycle.LifecycleEvent.TearDown);
+    serviceRegistry.tearDown();
     nodeNameLookup.tearDown();
     clock.tearDown();
     handlerString.tearDown();
@@ -237,6 +248,26 @@ public class VanillaProcessor
   }
   //EVENT DISPATCH - END
 
+  //EXPORTED SERVICE FUNCTIONS - START
+  @Override
+  public void deRegisterService(com.fluxtion.runtime.service.Service<?> arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.runtime.service.ServiceRegistryNode.deRegisterService(com.fluxtion.runtime.service.Service<?>)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    serviceRegistry.deRegisterService(arg0);
+    afterServiceCall();
+  }
+
+  @Override
+  public void registerService(com.fluxtion.runtime.service.Service<?> arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.runtime.service.ServiceRegistryNode.registerService(com.fluxtion.runtime.service.Service<?>)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    serviceRegistry.registerService(arg0);
+    afterServiceCall();
+  }
+  //EXPORTED SERVICE FUNCTIONS - END
+
   public void bufferEvent(Object event) {
     buffering = true;
     if (event instanceof com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent) {
@@ -266,11 +297,13 @@ public class VanillaProcessor
   private void auditEvent(Object typedEvent) {
     clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
+    serviceRegistry.eventReceived(typedEvent);
   }
 
   private void auditEvent(Event typedEvent) {
     clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
+    serviceRegistry.eventReceived(typedEvent);
   }
 
   private void initialiseAuditor(Auditor auditor) {
@@ -302,6 +335,7 @@ public class VanillaProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    serviceRegistry.processingComplete();
     isDirty_clock = false;
     isDirty_handlerString = false;
   }
@@ -406,5 +440,10 @@ public class VanillaProcessor
   @Override
   public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
     unKnownEventHandler = consumer;
+  }
+
+  @Override
+  public SubscriptionManager getSubscriptionManager() {
+    return subscriptionManager;
   }
 }

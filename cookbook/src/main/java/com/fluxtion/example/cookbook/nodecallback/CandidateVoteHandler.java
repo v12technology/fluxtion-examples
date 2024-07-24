@@ -1,20 +1,22 @@
 package com.fluxtion.example.cookbook.nodecallback;
 
 import com.fluxtion.runtime.callback.CallBackNode;
+import com.fluxtion.runtime.node.NamedNode;
 import lombok.Getter;
 
 /**
  * This class extends {@link CallBackNode} which allows it to trigger a graph process cycle from an internal function
  * using the {@link CallBackNode#triggerGraphCycle()} with this node as the root of the processing cycle.
  */
-public class CandidateVoteHandler extends CallBackNode {
+public class CandidateVoteHandler extends CallBackNode implements NamedNode {
 
     private int updateId;
     private String lastNewsStory = "";
     private int totalVotes;
+    private final String name;
 
     public CandidateVoteHandler(String name) {
-        super(name);
+        this.name = name;
     }
 
     public void newStory(VoteData<String> argument, int updateId) {
@@ -36,5 +38,10 @@ public class CandidateVoteHandler extends CallBackNode {
                 ", updateId=" + updateId +
                 ", lastNewsStory='" + lastNewsStory + '\''
                 ;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

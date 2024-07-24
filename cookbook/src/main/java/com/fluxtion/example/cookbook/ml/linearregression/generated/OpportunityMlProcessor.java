@@ -38,6 +38,7 @@ import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.dataflow.function.FilterFlowFunction;
 import com.fluxtion.runtime.event.Event;
 import com.fluxtion.runtime.input.EventFeed;
+import com.fluxtion.runtime.input.SubscriptionManager;
 import com.fluxtion.runtime.input.SubscriptionManagerNode;
 import com.fluxtion.runtime.ml.CalibrationProcessor;
 import com.fluxtion.runtime.ml.Feature;
@@ -47,6 +48,8 @@ import com.fluxtion.runtime.ml.PropertyToFeature;
 import com.fluxtion.runtime.node.DefaultEventHandlerNode;
 import com.fluxtion.runtime.node.ForkedTriggerTask;
 import com.fluxtion.runtime.node.MutableEventProcessorContext;
+import com.fluxtion.runtime.service.ServiceListener;
+import com.fluxtion.runtime.service.ServiceRegistryNode;
 import com.fluxtion.runtime.time.Clock;
 import com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent;
 import java.io.File;
@@ -61,8 +64,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.20
- * api version                     : 9.3.20
+ * eventProcessorGenerator version : 9.3.29
+ * api version                     : 9.3.29
  * </pre>
  *
  * Event classes supported:
@@ -83,6 +86,7 @@ public class OpportunityMlProcessor
         CalibrationProcessor,
         HouseSalesMonitor,
         OpportunityNotifier,
+        ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -129,6 +133,7 @@ public class OpportunityMlProcessor
           new Feature[] {offerPrice, area, areaSquared, locationCategoryFeature, bedroom});
   private final OpportunityNotifierNode opportunityNotifierNode_0 =
       new OpportunityNotifierNode(predictiveLinearRegressionModel_3, liveHouseSalesCache_4);
+  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
   private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
   private boolean initCalled = false;
@@ -165,9 +170,11 @@ public class OpportunityMlProcessor
     filterFlowFunction_1.setEventProcessorContext(context);
     filterFlowFunction_2.setEventProcessorContext(context);
     context.setClock(clock);
+    serviceRegistry.setEventProcessorContext(context);
     // node auditors
     initialiseAuditor(clock);
     initialiseAuditor(nodeNameLookup);
+    initialiseAuditor(serviceRegistry);
     if (subscriptionManager != null) {
       subscriptionManager.setSubscribingEventProcessor(this);
     }
@@ -229,6 +236,7 @@ public class OpportunityMlProcessor
   public void tearDown() {
     initCalled = false;
     auditEvent(Lifecycle.LifecycleEvent.TearDown);
+    serviceRegistry.tearDown();
     nodeNameLookup.tearDown();
     clock.tearDown();
     handlerHouseSaleDetails.tearDown();
@@ -392,6 +400,15 @@ public class OpportunityMlProcessor
   }
 
   @Override
+  public void deRegisterService(com.fluxtion.runtime.service.Service<?> arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.runtime.service.ServiceRegistryNode.deRegisterService(com.fluxtion.runtime.service.Service<?>)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    serviceRegistry.deRegisterService(arg0);
+    afterServiceCall();
+  }
+
+  @Override
   public void houseSold(
       com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails arg0) {
     beforeServiceCall(
@@ -399,6 +416,15 @@ public class OpportunityMlProcessor
     ExportFunctionAuditEvent typedEvent = functionAudit;
     liveHouseSalesCache_4.houseSold(arg0);
     opportunityNotifierNode_0.houseSold(arg0);
+    afterServiceCall();
+  }
+
+  @Override
+  public void registerService(com.fluxtion.runtime.service.Service<?> arg0) {
+    beforeServiceCall(
+        "public void com.fluxtion.runtime.service.ServiceRegistryNode.registerService(com.fluxtion.runtime.service.Service<?>)");
+    ExportFunctionAuditEvent typedEvent = functionAudit;
+    serviceRegistry.registerService(arg0);
     afterServiceCall();
   }
 
@@ -508,11 +534,13 @@ public class OpportunityMlProcessor
   private void auditEvent(Object typedEvent) {
     clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
+    serviceRegistry.eventReceived(typedEvent);
   }
 
   private void auditEvent(Event typedEvent) {
     clock.eventReceived(typedEvent);
     nodeNameLookup.eventReceived(typedEvent);
+    serviceRegistry.eventReceived(typedEvent);
   }
 
   private void initialiseAuditor(Auditor auditor) {
@@ -552,6 +580,7 @@ public class OpportunityMlProcessor
 
     clock.processingComplete();
     nodeNameLookup.processingComplete();
+    serviceRegistry.processingComplete();
     isDirty_area = false;
     isDirty_areaSquared = false;
     isDirty_bedroom = false;
@@ -718,5 +747,10 @@ public class OpportunityMlProcessor
   @Override
   public <T> void setUnKnownEventHandler(Consumer<T> consumer) {
     unKnownEventHandler = consumer;
+  }
+
+  @Override
+  public SubscriptionManager getSubscriptionManager() {
+    return subscriptionManager;
   }
 }

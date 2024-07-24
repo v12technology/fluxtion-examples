@@ -2,6 +2,24 @@
     <key id="vertex_label" for="node" attr.name="nodeData" attr.type="string"/>
     <key id="edge_label" for="edge" attr.name="edgeData" attr.type="string"/>
     <graph edgedefault="undirected">
+        <node id="context">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="id:context&#10;class:MutableEventProcessorContext"/>
+                    <jGraph:Style properties="NODE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="clock">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;id:clock&#10;class:Clock"/>
+                    <jGraph:Style properties="EVENTHANDLER"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
         <node id="predictiveLinearRegressionModel_3">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
@@ -43,24 +61,6 @@
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
                     <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;id:handlerHouseSaleDetails&#10;class:DefaultEventHandlerNode"/>
-                    <jGraph:Style properties="EVENTHANDLER"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
-        <node id="context">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="id:context&#10;class:MutableEventProcessorContext"/>
-                    <jGraph:Style properties="NODE"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
-        <node id="clock">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;EventHandle&gt;&gt;&#10;id:clock&#10;class:Clock"/>
                     <jGraph:Style properties="EVENTHANDLER"/>
                 </jGraph:ShapeNode>
             </data>
@@ -146,6 +146,24 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
+        <node id="serviceRegistry">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="id:serviceRegistry&#10;class:ServiceRegistryNode"/>
+                    <jGraph:Style properties="NODE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <node id="ClockStrategyEvent">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;ClockStrategyEvent"/>
+                    <jGraph:Style properties="EVENT"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
         <node id="CalibrationProcessor">
             <data key="vertex_label">
                 <jGraph:ShapeNode>
@@ -160,15 +178,6 @@
                 <jGraph:ShapeNode>
                     <jGraph:Geometry height="70" width="160" x="20" y="20"/>
                     <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;HouseSaleDetails"/>
-                    <jGraph:Style properties="EVENT"/>
-                </jGraph:ShapeNode>
-            </data>
-        </node>
-        <node id="ClockStrategyEvent">
-            <data key="vertex_label">
-                <jGraph:ShapeNode>
-                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
-                    <jGraph:label text="&lt;&lt;Event&gt;&gt;&#10;ClockStrategyEvent"/>
                     <jGraph:Style properties="EVENT"/>
                 </jGraph:ShapeNode>
             </data>
@@ -200,27 +209,36 @@
                 </jGraph:ShapeNode>
             </data>
         </node>
-        <edge id="1" source="offerPrice" target="predictiveLinearRegressionModel_3">
+        <node id="ServiceListener">
+            <data key="vertex_label">
+                <jGraph:ShapeNode>
+                    <jGraph:Geometry height="70" width="160" x="20" y="20"/>
+                    <jGraph:label text="&lt;&lt;ExportService&gt;&gt;&#10;class:ServiceListener&#10;"/>
+                    <jGraph:Style properties="EXPORTSERVICE"/>
+                </jGraph:ShapeNode>
+            </data>
+        </node>
+        <edge id="1" source="clock" target="context">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="2" source="filterFlowFunction_2" target="offerPrice">
+        <edge id="2" source="offerPrice" target="predictiveLinearRegressionModel_3">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="3" source="filterFlowFunction_1" target="filterFlowFunction_2">
+        <edge id="3" source="filterFlowFunction_2" target="offerPrice">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="4" source="handlerHouseSaleDetails" target="filterFlowFunction_1">
+        <edge id="4" source="filterFlowFunction_1" target="filterFlowFunction_2">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="5" source="clock" target="context">
+        <edge id="5" source="handlerHouseSaleDetails" target="filterFlowFunction_1">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
@@ -310,77 +328,87 @@
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="23" source="CalibrationProcessor" target="predictiveLinearRegressionModel_3">
+        <edge id="23" source="context" target="serviceRegistry">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="24" source="CalibrationProcessor" target="offerPrice">
+        <edge id="24" source="ClockStrategyEvent" target="clock">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="25" source="HouseSaleDetails" target="handlerHouseSaleDetails">
+        <edge id="25" source="CalibrationProcessor" target="predictiveLinearRegressionModel_3">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="26" source="ClockStrategyEvent" target="clock">
+        <edge id="26" source="CalibrationProcessor" target="offerPrice">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="27" source="CalibrationProcessor" target="area">
+        <edge id="27" source="HouseSaleDetails" target="handlerHouseSaleDetails">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="28" source="CalibrationProcessor" target="areaSquared">
+        <edge id="28" source="CalibrationProcessor" target="area">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="29" source="CalibrationProcessor" target="locationCategoryFeature">
+        <edge id="29" source="CalibrationProcessor" target="areaSquared">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="30" source="CalibrationProcessor" target="bedroom">
+        <edge id="30" source="CalibrationProcessor" target="locationCategoryFeature">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="31" source="ReCalibrationCompleteEvent" target="opportunityNotifierNode_0">
+        <edge id="31" source="CalibrationProcessor" target="bedroom">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="32" source="CalibrationProcessor" target="opportunityNotifierNode_0">
+        <edge id="32" source="ReCalibrationCompleteEvent" target="opportunityNotifierNode_0">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="33" source="HouseSalesMonitor" target="opportunityNotifierNode_0">
+        <edge id="33" source="CalibrationProcessor" target="opportunityNotifierNode_0">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="34" source="OpportunityNotifier" target="opportunityNotifierNode_0">
+        <edge id="34" source="HouseSalesMonitor" target="opportunityNotifierNode_0">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="35" source="HouseSaleDetails" target="liveHouseSalesCache_4">
+        <edge id="35" source="OpportunityNotifier" target="opportunityNotifierNode_0">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="36" source="CalibrationProcessor" target="liveHouseSalesCache_4">
+        <edge id="36" source="HouseSaleDetails" target="liveHouseSalesCache_4">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
         </edge>
-        <edge id="37" source="HouseSalesMonitor" target="liveHouseSalesCache_4">
+        <edge id="37" source="CalibrationProcessor" target="liveHouseSalesCache_4">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="38" source="HouseSalesMonitor" target="liveHouseSalesCache_4">
+            <data key="edge_label">
+                <jGraph:ShapeEdge/>
+            </data>
+        </edge>
+        <edge id="39" source="ServiceListener" target="serviceRegistry">
             <data key="edge_label">
                 <jGraph:ShapeEdge/>
             </data>
