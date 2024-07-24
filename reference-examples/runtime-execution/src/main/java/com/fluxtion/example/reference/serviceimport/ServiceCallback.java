@@ -9,7 +9,30 @@ import com.fluxtion.runtime.annotations.runtime.ServiceRegistered;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-
+/**
+ * Registers a callback listener method with an externally imported service.
+ *
+ * <ul>
+ *     <li>Register a MarketDataPublisher service with the event processor that registers MarketDataSubscriber</li>
+ *     <li>Create a MarketDataSubscriberNode that implements and exports the listener call back interface, MarketDataSubscriber</li>
+ *     <li>Annotate a node method with {@code @ServiceRegistered} to access the external MarketDataPublisher service</li>
+ *     <li>Register the subscription callback with the MarketDataPublisher using the EventProcessor.exportedService</li>
+ * </ul>
+ *
+ * The event processor implements the exported listener interface, MarketDataSubscriber, and receives the market
+ * data update callbacks. The processor dispatches and market updates to the MarketDataSubscriberNode or any other node
+ * that exports the MarketDataSubscriber interface.
+ *
+ *
+ * <pre>
+ *
+ * running the example:
+ *
+ * marketUpdate: AAA 23.24
+ * marketUpdate: AAA 19.99
+ * marketUpdate: AAA 15.67
+ * </pre>
+ */
 public class ServiceCallback {
 
     public static void main(String[] args) {

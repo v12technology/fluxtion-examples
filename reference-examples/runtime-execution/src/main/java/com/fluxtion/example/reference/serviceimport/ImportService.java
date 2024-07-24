@@ -8,6 +8,18 @@ import com.fluxtion.runtime.event.Signal;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Imports a TimeService into the event processor, any node method annotated with {@code @ServiceRegistered} will receive
+ * the service if the types match.
+ *
+ * running the example:
+ *
+ * <pre>
+ *
+ *  started at 100
+ *  stopped at 500 elapsed:400
+ * </pre>
+ */
 public class ImportService {
 
     public static void main(String[] args) {
