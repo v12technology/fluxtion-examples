@@ -10,17 +10,19 @@ import com.fluxtion.runtime.annotations.runtime.ServiceRegistered;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Registers a callback listener method with an externally imported service.
+ * Registers a callback listener method with an externally imported service. The callback is implemented by the parent
+ * event processor and will route calls to any node that implements and exports the interface MarketDataSubscriber using
+ * the {@code @ExportService} annotation. This is effectively a one to many broadcast dispatch within the event processor.
  *
  * <ul>
- *     <li>Register a MarketDataPublisher service with the event processor that registers MarketDataSubscriber</li>
  *     <li>Create a MarketDataSubscriberNode that implements and exports the listener call back interface, MarketDataSubscriber</li>
  *     <li>Annotate a node method with {@code @ServiceRegistered} to access the external MarketDataPublisher service</li>
+ *     <li>Register a MarketDataPublisher service with the event processor</li>
  *     <li>Register the subscription callback with the MarketDataPublisher using the EventProcessor.exportedService</li>
  * </ul>
  *
  * The event processor implements the exported listener interface, MarketDataSubscriber, and receives the market
- * data update callbacks. The processor dispatches and market updates to the MarketDataSubscriberNode or any other node
+ * data update callbacks. The processor dispatches any market updates to the MarketDataSubscriberNode or any other node
  * that exports the MarketDataSubscriber interface.
  *
  *
@@ -33,10 +35,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * marketUpdate: AAA 15.67
  * </pre>
  */
-public class ServiceCallback {
+public class ImportedServiceCallbackToProcessor {
 
     public static void main(String[] args) {
-        EventProcessor processor = Fluxtion.interpret(new MarketDataSubscriberNode());
+        EventProcessor<?> processor = Fluxtion.interpret(new MarketDataSubscriberNode());
         processor.init();
 
         //create a simple market data publisher service and register with the processor
@@ -60,6 +62,7 @@ public class ServiceCallback {
         boolean marketUpdate(String symbol, double mid);
     }
 
+    //The node in the graph that is MarketDataSubscriber, receiving updates from MarketDataPublisher
     public static class MarketDataSubscriberNode
             implements
             @ExportService MarketDataSubscriber, //callback interface exported by processor
@@ -81,6 +84,7 @@ public class ServiceCallback {
             marketDataPublisher.subscribe("AAA", eventProcessorContext.getExportedService());
         }
 
+        //This is the callback method invoked by the external MarketDataPublisher service
         @Override
         public boolean marketUpdate(String symbol, double mid) {
             System.out.println("marketUpdate: " + symbol + " " + mid);

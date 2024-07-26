@@ -10,8 +10,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Imports a TimeService into the event processor, any node method annotated with {@code @ServiceRegistered} will receive
- * the service if the types match.
- *
+ * the service if the types match. The imported service can then be used within the node like any normal java class. In
+ * this case we are register an external TimeService that will be used inside a node in the graph.
+ * <p>
  * running the example:
  *
  * <pre>
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ImportService {
 
     public static void main(String[] args) {
-        EventProcessor processor = Fluxtion.interpret(new StopWatchNode());
+        EventProcessor<?> processor = Fluxtion.interpret(new StopWatchNode());
         processor.init();
 
         //register a time service, specifying the service interface TimeService
@@ -44,12 +45,12 @@ public class ImportService {
     }
 
     @FunctionalInterface
-    public interface TimeService{
+    public interface TimeService {
         long getTime();
     }
 
     //Stopwatch that uses the TimeService supplied at runtime
-    public static class StopWatchNode{
+    public static class StopWatchNode {
 
         private TimeService timeService;
         private long startTime;

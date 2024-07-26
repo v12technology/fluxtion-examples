@@ -1,7 +1,6 @@
 package com.fluxtion.example.cookbook.nodecallback;
 
 import com.fluxtion.compiler.Fluxtion;
-import com.fluxtion.runtime.callback.CallBackNode;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws NoSuchFieldException {
-        var voteProcessor = Fluxtion.compileAot(c -> c.addNode(new ElectionTracker(List.of(
+        var voteProcessor = Fluxtion.compile(c -> c.addNode(new ElectionTracker(List.of(
                 new CandidateVoteHandler("Red_party"),
                 new CandidateVoteHandler("Blue_party"),
                 new CandidateVoteHandler("Green_party")
