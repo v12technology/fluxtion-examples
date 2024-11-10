@@ -74,16 +74,13 @@ public class DerivedRateNode {
             graph.setEdgeWeight(graph.addEdge(dealtInstrument, contraInstrument), logRate);
             graph.setEdgeWeight(graph.addEdge(contraInstrument, dealtInstrument), logInverseRate);
         }
-        return false;
+        return true;
     }
 
     public InstrumentPosMtm calculateInstrumentPosMtm(InstrumentPosMtm instrumentPosMtm) {
-        Map<Instrument, Double> mtmPositionsMap = instrumentPosMtm.resetMtm().getMtmPositionsMap();
-        instrumentPosMtm.getPositionMap()
-                .forEach((key, value) -> {
-                    mtmPositionsMap.put(key, value * getRateForInstrument(key));
-                });
-        instrumentPosMtm.calcTradePnl();
+        Instrument positionInstrument = instrumentPosMtm.resetMtm().getInstrument();
+        double position = instrumentPosMtm.getPosition();
+        instrumentPosMtm.setMtmPosition(position * getRateForInstrument(positionInstrument));
         return instrumentPosMtm;
     }
 
@@ -97,7 +94,6 @@ public class DerivedRateNode {
                     instrument,
                     positionInstrument -> {
                         if (graph.containsVertex(positionInstrument) & graph.containsVertex(mtmInstrument)) {
-                            GraphPath<Instrument, DefaultWeightedEdge> path = shortestPath.getPath(positionInstrument, mtmInstrument);
                             double log10Rate = shortestPath.getPathWeight(positionInstrument, mtmInstrument);
                             return Double.isInfinite(log10Rate) ? Double.NaN : Math.pow(10, log10Rate);
                         }

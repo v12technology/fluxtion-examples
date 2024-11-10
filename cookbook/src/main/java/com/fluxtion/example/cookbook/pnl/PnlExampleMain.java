@@ -24,14 +24,14 @@ public class PnlExampleMain {
     public static void main(String[] args) {
         var pnlCalculator = Fluxtion.interpret(c -> {
                     var tradeStream = DataFlow.subscribe(Trade.class);
-                    var dealtPosition = tradeStream.groupBy(Trade::getDealtInstrument, TradeToPosition::aggregateDealtPosition);
-                    var contraPosition = tradeStream.groupBy(Trade::getContraInstrument, TradeToPosition::aggregateContraPosition);
+                    var dealtPosition = tradeStream.groupBy(Trade::dealtInstrument, TradeToPosition::aggregateDealt);
+                    var contraPosition = tradeStream.groupBy(Trade::contraInstrument, TradeToPosition::aggregateContra);
 
+                    DerivedRateNode derivedRate = new DerivedRateNode();
                     JoinFlowBuilder.outerJoin(dealtPosition, contraPosition, InstrumentPosMtm::merge)
-                            .publishTrigger(DataFlow.subscribe(MidPrice.class))
-                            .mapValues(new DerivedRateNode()::calculateInstrumentPosMtm)
-                            .map(PnlExampleMain::calculateTotalPnl)
-                            .sink("globalNetMtmListener");
+                            .publishTrigger(derivedRate)
+                            .mapValues(derivedRate::calculateInstrumentPosMtm)
+                            .map(PnlExampleMain::calculateTotalPnl);
                 }
         );
 
@@ -55,6 +55,7 @@ public class PnlExampleMain {
     }
 
     private static PnlSummary calculateTotalPnl(GroupBy<Instrument, InstrumentPosMtm> instrumentInstrumentPosMtmGroupBy) {
+        System.out.println("---------- summary -----------");
         System.out.println(instrumentInstrumentPosMtmGroupBy.toMap());
         return null;
     }

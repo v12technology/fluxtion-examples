@@ -10,11 +10,11 @@ import com.fluxtion.example.cookbook.pnl.refdata.Symbol;
 
 public record Trade(Symbol symbol, double dealtVolume, double contraVolume) {
 
-    public Instrument getDealtInstrument() {
+    public Instrument dealtInstrument() {
         return symbol.dealtInstrument();
     }
 
-    public Instrument getContraInstrument() {
+    public Instrument contraInstrument() {
         return symbol.contraInstrument();
     }
 }

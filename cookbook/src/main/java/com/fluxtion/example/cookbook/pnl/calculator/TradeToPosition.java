@@ -16,24 +16,25 @@ public class TradeToPosition implements AggregateFlowFunction<Trade, InstrumentP
         this.dealtSide = dealtSide;
     }
 
-    public static TradeToPosition aggregateDealtPosition() {
+    public static TradeToPosition aggregateDealt() {
         return new TradeToPosition(true);
     }
 
-    public static TradeToPosition aggregateContraPosition() {
+    public static TradeToPosition aggregateContra() {
         return new TradeToPosition(false);
     }
 
     @Override
     public InstrumentPosMtm aggregate(Trade input) {
+        final double previousPosition = instrumentPosMtm.getPosition();
         if (dealtSide) {
-            instrumentPosMtm.setBookName(input.getDealtInstrument().instrumentName());
+            instrumentPosMtm.setInstrument(input.dealtInstrument());
             final double dealtPosition = input.dealtVolume();
-            instrumentPosMtm.getPositionMap().compute(input.getDealtInstrument(), (s, d) -> d == null ? dealtPosition : d + dealtPosition);
+            instrumentPosMtm.setPosition( Double.isNaN(previousPosition) ? dealtPosition : dealtPosition + previousPosition);
         } else {
-            instrumentPosMtm.setBookName(input.getContraInstrument().instrumentName());
+            instrumentPosMtm.setInstrument(input.contraInstrument());
             final double contraPosition = input.contraVolume();
-            instrumentPosMtm.getPositionMap().compute(input.getContraInstrument(), (s, d) -> d == null ? contraPosition : d + contraPosition);
+            instrumentPosMtm.setPosition( Double.isNaN(previousPosition) ? contraPosition : contraPosition + previousPosition);
         }
         return instrumentPosMtm;
     }
@@ -48,5 +49,4 @@ public class TradeToPosition implements AggregateFlowFunction<Trade, InstrumentP
         instrumentPosMtm = new InstrumentPosMtm();
         return instrumentPosMtm;
     }
-
 }

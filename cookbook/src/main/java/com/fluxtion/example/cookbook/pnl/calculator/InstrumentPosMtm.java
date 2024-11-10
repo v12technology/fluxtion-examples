@@ -8,15 +8,11 @@ package com.fluxtion.example.cookbook.pnl.calculator;
 import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Data
 public class InstrumentPosMtm {
-    private String bookName;
-    private double tradePnl;
-    private Map<Instrument, Double> positionMap = new HashMap<>();
-    private Map<Instrument, Double> mtmPositionsMap = new HashMap<>();
+    private Instrument instrument;
+    private double position = 0;
+    private double mtmPosition = 0;
 
     public static InstrumentPosMtm merge(InstrumentPosMtm mtm1, InstrumentPosMtm mtm2) {
         return new InstrumentPosMtm(mtm1).combine(mtm2);
@@ -26,37 +22,23 @@ public class InstrumentPosMtm {
 
     public InstrumentPosMtm(InstrumentPosMtm from) {
         if (from != null) {
-            this.bookName = from.bookName;
-            this.tradePnl = from.tradePnl;
-            this.positionMap.putAll(from.positionMap);
-            this.mtmPositionsMap.putAll(from.mtmPositionsMap);
+            this.instrument = from.instrument;
+            this.position = from.position;
+            this.mtmPosition = from.mtmPosition;
         }
     }
 
     public InstrumentPosMtm combine(InstrumentPosMtm from) {
         if (from != null) {
-            this.tradePnl += from.tradePnl;
-
-            from.positionMap.forEach((key, value) -> {
-                positionMap.merge(key, value, Double::sum);
-            });
-
-            from.mtmPositionsMap.forEach((key, value) -> {
-                mtmPositionsMap.merge(key, value, Double::sum);
-            });
-
-            this.bookName = bookName == null ? from.bookName : bookName;
+            this.position += from.position;
+            this.mtmPosition += from.mtmPosition;
+            this.instrument = instrument == null ? from.instrument : instrument;
         }
         return this;
     }
 
     public InstrumentPosMtm resetMtm() {
-        getMtmPositionsMap().clear();
-        tradePnl = Double.NaN;
+        mtmPosition = 0;
         return this;
-    }
-
-    public double calcTradePnl() {
-        return tradePnl = mtmPositionsMap.values().stream().mapToDouble(Double::doubleValue).sum();
     }
 }
