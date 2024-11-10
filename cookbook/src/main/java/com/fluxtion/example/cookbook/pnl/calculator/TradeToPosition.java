@@ -5,8 +5,8 @@
 
 package com.fluxtion.example.cookbook.pnl.calculator;
 
-import com.fluxtion.runtime.dataflow.aggregate.AggregateFlowFunction;
 import com.fluxtion.example.cookbook.pnl.events.Trade;
+import com.fluxtion.runtime.dataflow.aggregate.AggregateFlowFunction;
 
 public class TradeToPosition implements AggregateFlowFunction<Trade, InstrumentPosMtm, TradeToPosition> {
     private InstrumentPosMtm instrumentPosMtm = new InstrumentPosMtm();
@@ -30,11 +30,11 @@ public class TradeToPosition implements AggregateFlowFunction<Trade, InstrumentP
         if (dealtSide) {
             instrumentPosMtm.setInstrument(input.dealtInstrument());
             final double dealtPosition = input.dealtVolume();
-            instrumentPosMtm.setPosition( Double.isNaN(previousPosition) ? dealtPosition : dealtPosition + previousPosition);
+            instrumentPosMtm.setPosition(Double.isNaN(previousPosition) ? dealtPosition : dealtPosition + previousPosition);
         } else {
             instrumentPosMtm.setInstrument(input.contraInstrument());
             final double contraPosition = input.contraVolume();
-            instrumentPosMtm.setPosition( Double.isNaN(previousPosition) ? contraPosition : contraPosition + previousPosition);
+            instrumentPosMtm.setPosition(Double.isNaN(previousPosition) ? contraPosition : contraPosition + previousPosition);
         }
         return instrumentPosMtm;
     }

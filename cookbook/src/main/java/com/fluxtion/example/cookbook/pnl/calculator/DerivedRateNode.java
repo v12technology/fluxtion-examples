@@ -5,13 +5,12 @@
 
 package com.fluxtion.example.cookbook.pnl.calculator;
 
-import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.example.cookbook.pnl.events.MidPrice;
 import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
 import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
 import com.fluxtion.example.cookbook.pnl.refdata.RefData;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 import lombok.Data;
-import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.BellmanFordShortestPath;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -63,8 +62,8 @@ public class DerivedRateNode {
         graph.addVertex(dealtInstrument);
         graph.addVertex(contraInstrument);
 
-        if(shortestPath == null || graph.vertexSet().size() > vertexCount) {
-            shortestPath = new BellmanFordShortestPath<>(graph, 0.000001, graph.vertexSet().size() - 1 );
+        if (shortestPath == null || graph.vertexSet().size() > vertexCount) {
+            shortestPath = new BellmanFordShortestPath<>(graph, 0.000001, graph.vertexSet().size() - 1);
         }
 
         if (graph.containsEdge(dealtInstrument, contraInstrument)) {

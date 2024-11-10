@@ -18,7 +18,8 @@ public class InstrumentPosMtm {
         return new InstrumentPosMtm(mtm1).combine(mtm2);
     }
 
-    public InstrumentPosMtm() {}
+    public InstrumentPosMtm() {
+    }
 
     public InstrumentPosMtm(InstrumentPosMtm from) {
         if (from != null) {
