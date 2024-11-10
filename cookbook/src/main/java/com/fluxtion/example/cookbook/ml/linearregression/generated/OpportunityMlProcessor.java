@@ -64,8 +64,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.29
- * api version                     : 9.3.29
+ * eventProcessorGenerator version : 9.3.44
+ * api version                     : 9.3.44
  * </pre>
  *
  * Event classes supported:
@@ -213,6 +213,19 @@ public class OpportunityMlProcessor
     }
     processing = true;
     auditEvent(Lifecycle.LifecycleEvent.Start);
+
+    afterEvent();
+    callbackDispatcher.dispatchQueuedCallbacks();
+    processing = false;
+  }
+
+  @Override
+  public void startComplete() {
+    if (!initCalled) {
+      throw new RuntimeException("init() must be called before startComplete()");
+    }
+    processing = true;
+    auditEvent(Lifecycle.LifecycleEvent.StartComplete);
 
     afterEvent();
     callbackDispatcher.dispatchQueuedCallbacks();
