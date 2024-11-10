@@ -3,20 +3,20 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.server.lib.pnl;
+package com.fluxtion.example.cookbook.pnl;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.compiler.builder.dataflow.JoinFlowBuilder;
 import com.fluxtion.runtime.dataflow.groupby.GroupBy;
-import com.fluxtion.server.lib.pnl.calculator.DerivedRateNode;
-import com.fluxtion.server.lib.pnl.calculator.InstrumentPosMtm;
-import com.fluxtion.server.lib.pnl.calculator.TradeToPosition;
-import com.fluxtion.server.lib.pnl.refdata.Instrument;
-import com.fluxtion.server.lib.pnl.events.MidPrice;
-import com.fluxtion.server.lib.pnl.events.Trade;
+import com.fluxtion.example.cookbook.pnl.calculator.DerivedRateNode;
+import com.fluxtion.example.cookbook.pnl.calculator.InstrumentPosMtm;
+import com.fluxtion.example.cookbook.pnl.calculator.TradeToPosition;
+import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
+import com.fluxtion.example.cookbook.pnl.events.MidPrice;
+import com.fluxtion.example.cookbook.pnl.events.Trade;
 
-import static com.fluxtion.server.lib.pnl.refdata.RefData.*;
+import static com.fluxtion.example.cookbook.pnl.refdata.RefData.*;
 
 
 public class PnlExampleMain {

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.server.lib.pnl.refdata;
+package com.fluxtion.example.cookbook.pnl.refdata;
 
 public record Symbol(String symbolName, Instrument dealtInstrument, Instrument contraInstrument) {
 }

@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.server.lib.pnl.events;
+package com.fluxtion.example.cookbook.pnl.events;
 
-import com.fluxtion.server.lib.pnl.refdata.Instrument;
+import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
 
 public record MtmInstrument(Instrument instrument) {
 }

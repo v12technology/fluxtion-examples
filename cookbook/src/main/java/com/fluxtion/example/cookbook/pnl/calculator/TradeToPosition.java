@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.server.lib.pnl.calculator;
+package com.fluxtion.example.cookbook.pnl.calculator;
 
 import com.fluxtion.runtime.dataflow.aggregate.AggregateFlowFunction;
-import com.fluxtion.server.lib.pnl.events.Trade;
+import com.fluxtion.example.cookbook.pnl.events.Trade;
 
 public class TradeToPosition implements AggregateFlowFunction<Trade, InstrumentPosMtm, TradeToPosition> {
     private InstrumentPosMtm instrumentPosMtm = new InstrumentPosMtm();

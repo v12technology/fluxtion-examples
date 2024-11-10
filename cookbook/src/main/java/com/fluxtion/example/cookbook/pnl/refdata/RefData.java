@@ -1,4 +1,4 @@
-package com.fluxtion.server.lib.pnl.refdata;
+package com.fluxtion.example.cookbook.pnl.refdata;
 
 public interface RefData {
 

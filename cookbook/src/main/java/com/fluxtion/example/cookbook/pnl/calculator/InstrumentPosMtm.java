@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.server.lib.pnl.calculator;
+package com.fluxtion.example.cookbook.pnl.calculator;
 
-import com.fluxtion.server.lib.pnl.refdata.Instrument;
+import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
 import lombok.Data;
 
 import java.util.HashMap;

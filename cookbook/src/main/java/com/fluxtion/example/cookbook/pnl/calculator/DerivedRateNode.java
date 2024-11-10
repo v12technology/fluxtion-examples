@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.server.lib.pnl.calculator;
+package com.fluxtion.example.cookbook.pnl.calculator;
 
 import com.fluxtion.runtime.annotations.OnEventHandler;
-import com.fluxtion.server.lib.pnl.events.MidPrice;
-import com.fluxtion.server.lib.pnl.events.MtmInstrument;
-import com.fluxtion.server.lib.pnl.refdata.Instrument;
-import com.fluxtion.server.lib.pnl.refdata.RefData;
+import com.fluxtion.example.cookbook.pnl.events.MidPrice;
+import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
+import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
+import com.fluxtion.example.cookbook.pnl.refdata.RefData;
 import lombok.Data;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.BellmanFordShortestPath;
