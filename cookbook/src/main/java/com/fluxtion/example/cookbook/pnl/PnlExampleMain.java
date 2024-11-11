@@ -10,6 +10,7 @@ import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.compiler.builder.dataflow.JoinFlowBuilder;
 import com.fluxtion.example.cookbook.pnl.calculator.DerivedRateNode;
 import com.fluxtion.example.cookbook.pnl.calculator.InstrumentPosMtm;
+import com.fluxtion.example.cookbook.pnl.calculator.PnlSummaryCalc;
 import com.fluxtion.example.cookbook.pnl.calculator.TradeToPosition;
 import com.fluxtion.example.cookbook.pnl.events.MidPrice;
 import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
@@ -32,7 +33,8 @@ public class PnlExampleMain {
                     JoinFlowBuilder.outerJoin(dealtPosition, contraPosition, InstrumentPosMtm::merge)
                             .publishTrigger(derivedRate)
                             .mapValues(derivedRate::calculateInstrumentPosMtm)
-                            .map(PnlExampleMain::calculateTotalPnl);
+                            .map(new PnlSummaryCalc()::updateSummary)
+                            .console();
                 }
         );
 
