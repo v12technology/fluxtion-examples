@@ -12,6 +12,7 @@ import com.fluxtion.example.cookbook.pnl.calculator.DerivedRateNode;
 import com.fluxtion.example.cookbook.pnl.calculator.InstrumentPosMtm;
 import com.fluxtion.example.cookbook.pnl.calculator.TradeToPosition;
 import com.fluxtion.example.cookbook.pnl.events.MidPrice;
+import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
 import com.fluxtion.example.cookbook.pnl.events.Trade;
 import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
 import com.fluxtion.runtime.dataflow.groupby.GroupBy;
@@ -52,6 +53,9 @@ public class PnlExampleMain {
 
         System.out.println("---------- final trade -----------");
         pnlCalculator.onEvent(new Trade(symbolGBPUSD, 20, -25));
+
+        System.out.println("---------- change mtm EUR -----------");
+        pnlCalculator.onEvent(new MtmInstrument(EUR));
     }
 
     private static PnlSummary calculateTotalPnl(GroupBy<Instrument, InstrumentPosMtm> instrumentInstrumentPosMtmGroupBy) {
