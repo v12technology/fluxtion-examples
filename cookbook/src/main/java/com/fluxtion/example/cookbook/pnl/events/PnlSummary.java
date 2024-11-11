@@ -2,6 +2,7 @@ package com.fluxtion.example.cookbook.pnl.events;
 
 import com.fluxtion.example.cookbook.pnl.calculator.InstrumentPosMtm;
 import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
+import com.fluxtion.example.cookbook.pnl.refdata.RefData;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Data
 public class PnlSummary {
+    private Instrument mtmInstrument = RefData.USD;
     private double pnl;
     private Map<Instrument, InstrumentPosMtm> mtmAssetMap = new HashMap<>();
 
@@ -22,6 +24,7 @@ public class PnlSummary {
     @Override
     public String toString() {
         return "PnlSummary{" +
+               "\n\tmtmInstrument=" + mtmInstrument.instrumentName() +
                "\n\tpnl=" + pnl +
                "\n\t" + mtmAssetMap.values().stream()
                        .map(i -> i.getInstrument().instrumentName() + " pos:" + i.getPosition() + " mtmPos:" + i.getMtmPosition())

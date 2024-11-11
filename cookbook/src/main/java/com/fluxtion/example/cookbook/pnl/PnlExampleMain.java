@@ -59,16 +59,4 @@ public class PnlExampleMain {
         System.out.println("---------- change mtm EUR -----------");
         pnlCalculator.onEvent(new MtmInstrument(EUR));
     }
-
-    private static PnlSummary calculateTotalPnl(GroupBy<Instrument, InstrumentPosMtm> instrumentInstrumentPosMtmGroupBy) {
-        System.out.println("---------- summary -----------");
-        System.out.println(instrumentInstrumentPosMtmGroupBy.toMap());
-        return null;
-    }
-
-    private static class PnlSummary {
-
-    }
-
-
 }
