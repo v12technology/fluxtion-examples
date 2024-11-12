@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.example.cookbook.pnl.events;
+package com.fluxtion.example.cookbook.pnl_flatmap.events;
 
-import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
-import com.fluxtion.example.cookbook.pnl.refdata.Symbol;
+import com.fluxtion.example.cookbook.pnl_flatmap.refdata.Instrument;
+import com.fluxtion.example.cookbook.pnl_flatmap.refdata.Symbol;
 
 public record Trade(Symbol symbol, double dealtVolume, double contraVolume) {
 

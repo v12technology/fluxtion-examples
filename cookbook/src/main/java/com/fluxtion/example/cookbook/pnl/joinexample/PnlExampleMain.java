@@ -3,20 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.example.cookbook.pnl;
+package com.fluxtion.example.cookbook.pnl.joinexample;
 
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.compiler.builder.dataflow.JoinFlowBuilder;
-import com.fluxtion.example.cookbook.pnl.calculator.DerivedRateNode;
-import com.fluxtion.example.cookbook.pnl.calculator.InstrumentPosMtm;
-import com.fluxtion.example.cookbook.pnl.calculator.PnlSummaryCalc;
-import com.fluxtion.example.cookbook.pnl.calculator.TradeToPosition;
+import com.fluxtion.example.cookbook.pnl.calculator.*;
 import com.fluxtion.example.cookbook.pnl.events.MidPrice;
 import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
 import com.fluxtion.example.cookbook.pnl.events.Trade;
-import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
-import com.fluxtion.runtime.dataflow.groupby.GroupBy;
+import com.fluxtion.runtime.EventProcessor;
 
 import static com.fluxtion.example.cookbook.pnl.refdata.RefData.*;
 
@@ -37,10 +33,11 @@ public class PnlExampleMain {
                             .console();
                 }
         );
-
         pnlCalculator.init();
+        sendEvents(pnlCalculator);
+    }
 
-
+    private static void sendEvents(EventProcessor pnlCalculator) {
         pnlCalculator.onEvent(new Trade(symbolEURJPY, -400, 80000));
         pnlCalculator.onEvent(new Trade(symbolEURUSD, 500, -1100));
         pnlCalculator.onEvent(new Trade(symbolUSDCHF, 500, -1100));
@@ -59,4 +56,6 @@ public class PnlExampleMain {
         System.out.println("---------- change mtm EUR -----------");
         pnlCalculator.onEvent(new MtmInstrument(EUR));
     }
+
+
 }
