@@ -55,8 +55,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.29
- * api version                     : 9.3.29
+ * eventProcessorGenerator version : 9.3.45
+ * api version                     : 9.3.45
  * </pre>
  *
  * Event classes supported:
@@ -163,6 +163,19 @@ public class GlobalPnlProcessor
     processing = true;
     auditEvent(Lifecycle.LifecycleEvent.Start);
     globalPnl_0.start();
+    afterEvent();
+    callbackDispatcher.dispatchQueuedCallbacks();
+    processing = false;
+  }
+
+  @Override
+  public void startComplete() {
+    if (!initCalled) {
+      throw new RuntimeException("init() must be called before startComplete()");
+    }
+    processing = true;
+    auditEvent(Lifecycle.LifecycleEvent.StartComplete);
+
     afterEvent();
     callbackDispatcher.dispatchQueuedCallbacks();
     processing = false;

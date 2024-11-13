@@ -8,20 +8,20 @@ package com.fluxtion.example.cookbook.pnl.calculator;
 import com.fluxtion.example.cookbook.pnl.events.Trade;
 import com.fluxtion.runtime.dataflow.aggregate.AggregateFlowFunction;
 
-public class TradeToPosition implements AggregateFlowFunction<Trade, InstrumentPosMtm, TradeToPosition> {
+public class TradeToPositionAggregate implements AggregateFlowFunction<Trade, InstrumentPosMtm, TradeToPositionAggregate> {
     private InstrumentPosMtm instrumentPosMtm = new InstrumentPosMtm();
     private final boolean dealtSide;
 
-    public TradeToPosition(boolean dealtSide) {
+    public TradeToPositionAggregate(boolean dealtSide) {
         this.dealtSide = dealtSide;
     }
 
-    public static TradeToPosition aggregateDealt() {
-        return new TradeToPosition(true);
+    public static TradeToPositionAggregate aggregateDealt() {
+        return new TradeToPositionAggregate(true);
     }
 
-    public static TradeToPosition aggregateContra() {
-        return new TradeToPosition(false);
+    public static TradeToPositionAggregate aggregateContra() {
+        return new TradeToPositionAggregate(false);
     }
 
     @Override

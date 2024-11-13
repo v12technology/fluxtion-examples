@@ -3,40 +3,43 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-package com.fluxtion.example.cookbook.pnl.joinexample;
+package com.fluxtion.example.cookbook.pnl.flatmapexample;
 
 import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
 import com.fluxtion.compiler.builder.dataflow.DataFlow;
-import com.fluxtion.compiler.builder.dataflow.JoinFlowBuilder;
-import com.fluxtion.example.cookbook.pnl.calculator.*;
-import com.fluxtion.example.cookbook.pnl.events.MidPrice;
-import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
-import com.fluxtion.example.cookbook.pnl.events.Trade;
+import com.fluxtion.example.cookbook.pnl.calculator.PnlSummaryCalc;
+import com.fluxtion.example.cookbook.pnl.calculator.TradeLegToPositionAggregate;
+import com.fluxtion.example.cookbook.pnl.events.*;
+
 import com.fluxtion.runtime.EventProcessor;
 
 import static com.fluxtion.example.cookbook.pnl.refdata.RefData.*;
 
-
+/**
+ * Pnl calculator example that uses flatmap operations, no joins and single groupBy methods to achieve the same result as
+ * {@link com.fluxtion.example.cookbook.pnl.joinexample.PnlExampleMain}
+ *
+ * This results in less memory allocations and an additional event cycle for the flatmap. Fluxtion is very efficient in
+ * processing an event cycle, down in the nanosecond range in current hardware, so this is probably a good trade off.
+ */
 public class PnlExampleMain {
 
+    public static final String EOB_TRADE_KEY = "eob";
+
     public static void main(String[] args) {
-        var pnlCalculator = Fluxtion.interpret(PnlExampleMain::buildPnlFromJoins);
+        var pnlCalculator = Fluxtion.interpret(PnlExampleMain::buildPnlFlatMap);
         pnlCalculator.init();
         sendEvents(pnlCalculator);
     }
 
-    public static void buildPnlFromJoins(EventProcessorConfig c) {
-        var tradeStream = DataFlow.subscribe(Trade.class);
-        var dealtPosition = tradeStream.groupBy(Trade::dealtInstrument, TradeToPositionAggregate::aggregateDealt);
-        var contraPosition = tradeStream.groupBy(Trade::contraInstrument, TradeToPositionAggregate::aggregateContra);
-
+    public static void buildPnlFlatMap(EventProcessorConfig c) {
         PnlSummaryCalc pnlSummaryCalc = new PnlSummaryCalc();
-        MtMRateCalculator derivedRate = pnlSummaryCalc.getMtMRateCalculator();
-        JoinFlowBuilder.outerJoin(dealtPosition, contraPosition, InstrumentPosMtm::merge)
-                .publishTrigger(derivedRate)
-                .mapValues(derivedRate::calculateInstrumentPosMtm)
-                .map(pnlSummaryCalc::updateSummary)
+        DataFlow.subscribe(Trade.class)
+                .flatMapFromArray(Trade::tradeLegs)
+                .groupBy(TradeLeg::instrument, TradeLegToPositionAggregate::new)
+                .publishTriggerOverride(pnlSummaryCalc)
+                .map(pnlSummaryCalc::calcMtmAndUpdateSummary)
                 .console();
 
         c.setSupportBufferAndTrigger(false);
@@ -44,10 +47,19 @@ public class PnlExampleMain {
 
     private static void sendEvents(EventProcessor pnlCalculator) {
         pnlCalculator.onEvent(new Trade(symbolEURJPY, -400, 80000));
+        pnlCalculator.publishSignal(EOB_TRADE_KEY);
+
         pnlCalculator.onEvent(new Trade(symbolEURUSD, 500, -1100));
+        pnlCalculator.publishSignal(EOB_TRADE_KEY);
+
         pnlCalculator.onEvent(new Trade(symbolUSDCHF, 500, -1100));
+        pnlCalculator.publishSignal(EOB_TRADE_KEY);
+
         pnlCalculator.onEvent(new Trade(symbolEURGBP, 1200, -1000));
+        pnlCalculator.publishSignal(EOB_TRADE_KEY);
+
         pnlCalculator.onEvent(new Trade(symbolGBPUSD, 1500, -700));
+        pnlCalculator.publishSignal(EOB_TRADE_KEY);
 
         pnlCalculator.onEvent(new MidPrice(symbolEURGBP, 0.9));
         pnlCalculator.onEvent(new MidPrice(symbolEURUSD, 1.1));
@@ -57,6 +69,7 @@ public class PnlExampleMain {
 
         System.out.println("---------- final trade -----------");
         pnlCalculator.onEvent(new Trade(symbolGBPUSD, 20, -25));
+        pnlCalculator.publishSignal(EOB_TRADE_KEY);
 
         System.out.println("---------- change mtm EUR -----------");
         pnlCalculator.onEvent(new MtmInstrument(EUR));

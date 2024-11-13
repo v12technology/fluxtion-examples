@@ -5,6 +5,7 @@
 
 package com.fluxtion.example.cookbook.pnl.calculator;
 
+import com.fluxtion.example.cookbook.pnl.events.TradeLeg;
 import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
 import lombok.Data;
 
@@ -19,6 +20,14 @@ public class InstrumentPosMtm {
     }
 
     public InstrumentPosMtm() {
+    }
+
+    public InstrumentPosMtm add(TradeLeg from) {
+        if (from != null) {
+            this.instrument = from.instrument();
+            this.position += from.volume();
+        }
+        return this;
     }
 
     public InstrumentPosMtm(InstrumentPosMtm from) {

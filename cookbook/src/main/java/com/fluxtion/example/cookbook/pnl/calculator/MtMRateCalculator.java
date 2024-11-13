@@ -10,7 +10,7 @@ import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
 import com.fluxtion.example.cookbook.pnl.refdata.Instrument;
 import com.fluxtion.example.cookbook.pnl.refdata.RefData;
 import com.fluxtion.runtime.annotations.OnEventHandler;
-import lombok.Data;
+import lombok.Getter;
 import org.jgrapht.alg.shortestpath.BellmanFordShortestPath;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -18,13 +18,13 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
-public class DerivedRateNode {
+public class MtMRateCalculator {
 
+    @Getter
     private Instrument mtmInstrument = RefData.USD;
-    private Map<Instrument, Double> directMtmRatesByInstrument = new HashMap<>();
-    private Map<Instrument, Double> derivedMtmRatesByInstrument = new HashMap<>();
-    private final DefaultDirectedWeightedGraph<Instrument, DefaultWeightedEdge> graph = new DefaultDirectedWeightedGraph<>(DefaultWeightedEdge.class);
+    private transient final Map<Instrument, Double> directMtmRatesByInstrument = new HashMap<>();
+    private transient final Map<Instrument, Double> derivedMtmRatesByInstrument = new HashMap<>();
+    private transient final DefaultDirectedWeightedGraph<Instrument, DefaultWeightedEdge> graph = new DefaultDirectedWeightedGraph<>(DefaultWeightedEdge.class);
     private BellmanFordShortestPath<Instrument, DefaultWeightedEdge> shortestPath;
 
     @OnEventHandler
