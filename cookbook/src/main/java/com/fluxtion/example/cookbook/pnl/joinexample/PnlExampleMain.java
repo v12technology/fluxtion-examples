@@ -18,6 +18,12 @@ import com.fluxtion.runtime.EventProcessor;
 import static com.fluxtion.example.cookbook.pnl.refdata.RefData.*;
 
 
+/**
+ * Pnl calculator example that uses joins and  groupBy methods to achieve the same result as
+ * {@link com.fluxtion.example.cookbook.pnl.flatmapexample.PnlExampleMain}
+ *
+ * This results in more memory allocations and but less event cycle compared to the flatmap approach.
+ */
 public class PnlExampleMain {
 
     public static void main(String[] args) {
