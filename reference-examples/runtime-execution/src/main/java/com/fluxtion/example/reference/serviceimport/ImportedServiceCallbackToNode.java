@@ -116,7 +116,7 @@ public class ImportedServiceCallbackToNode {
                 System.out.println("MarketDataSubscriberNode - ignore marketUpdate: " + symbol + " " + mid);
             } else {
                 System.out.println("MarketDataSubscriberNode - triggerGraphCycle mid changed " + symbol + " " + mid);
-                triggerGraphCycle();
+                fireCallback();
             }
             return true;//ignored value as this method is not called via the parent eventprocessor
         }

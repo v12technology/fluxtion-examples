@@ -54,8 +54,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.45
- * api version                     : 9.3.45
+ * eventProcessorGenerator version : 9.3.46
+ * api version                     : 9.3.46
  * </pre>
  *
  * Event classes supported:

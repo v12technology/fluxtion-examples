@@ -32,10 +32,10 @@ import com.fluxtion.runtime.EventProcessorContext;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
+import com.fluxtion.runtime.callback.CallBackNode;
 import com.fluxtion.runtime.callback.CallbackDispatcherImpl;
-import com.fluxtion.runtime.callback.CallbackEvent;
-import com.fluxtion.runtime.callback.CallbackImpl;
 import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
+import com.fluxtion.runtime.callback.InstanceCallbackEvent.InstanceCallbackEvent_0;
 import com.fluxtion.runtime.dataflow.function.FlatMapArrayFlowFunction;
 import com.fluxtion.runtime.dataflow.function.MapFlowFunction.MapRef2RefFlowFunction;
 import com.fluxtion.runtime.dataflow.function.PeekFlowFunction;
@@ -66,8 +66,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.45
- * api version                     : 9.3.45
+ * eventProcessorGenerator version : 9.3.46
+ * api version                     : 9.3.46
  * </pre>
  *
  * Event classes supported:
@@ -77,7 +77,7 @@ import java.util.function.Consumer;
  *   <li>com.fluxtion.example.cookbook.pnl.events.MidPrice
  *   <li>com.fluxtion.example.cookbook.pnl.events.MtmInstrument
  *   <li>com.fluxtion.example.cookbook.pnl.events.Trade
- *   <li>com.fluxtion.runtime.callback.CallbackEvent
+ *   <li>com.fluxtion.runtime.callback.InstanceCallbackEvent.InstanceCallbackEvent_0
  *   <li>com.fluxtion.runtime.event.Signal
  *   <li>com.fluxtion.runtime.time.ClockStrategy.ClockStrategyEvent
  * </ul>
@@ -96,8 +96,9 @@ public class PnlFromFlatMapCalculator
         Lifecycle {
 
   // Node declarations
+  private final InstanceCallbackEvent_0 callBackTriggerEvent_0 = new InstanceCallbackEvent_0();
+  private final CallBackNode callBackNode_7 = new CallBackNode<>(callBackTriggerEvent_0);
   private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  private final CallbackImpl callbackImpl_7 = new CallbackImpl<>(1, callbackDispatcher);
   public final Clock clock = new Clock();
   private final GroupByFlowFunctionWrapper groupByFlowFunctionWrapper_1 =
       new GroupByFlowFunctionWrapper<>(
@@ -138,7 +139,7 @@ public class PnlFromFlatMapCalculator
   private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(8);
 
-  private boolean isDirty_callbackImpl_7 = false;
+  private boolean isDirty_callBackNode_7 = false;
   private boolean isDirty_clock = false;
   private boolean isDirty_flatMapArrayFlowFunction_0 = false;
   private boolean isDirty_handlerTrade = false;
@@ -158,9 +159,8 @@ public class PnlFromFlatMapCalculator
     if (context != null) {
       context.replaceMappings(contextMap);
     }
-    callbackImpl_7.dirtyStateMonitor = callbackDispatcher;
     flatMapArrayFlowFunction_0.dirtyStateMonitor = callbackDispatcher;
-    flatMapArrayFlowFunction_0.callback = callbackImpl_7;
+    flatMapArrayFlowFunction_0.callback = callBackNode_7;
     mapRef2RefFlowFunction_2.setEventProcessorContext(context);
     mapRef2RefFlowFunction_2.setPublishTriggerOverrideNode(pnlSummaryCalc_3);
     mapRef2RefFlowFunction_4.setEventProcessorContext(context);
@@ -190,7 +190,6 @@ public class PnlFromFlatMapCalculator
     auditEvent(Lifecycle.LifecycleEvent.Init);
     // initialise dirty lookup map
     isDirty("test");
-    callbackImpl_7.init();
     clock.init();
     handlerTrade.init();
     mapRef2RefFlowFunction_2.initialiseEventStream();
@@ -288,8 +287,9 @@ public class PnlFromFlatMapCalculator
     } else if (event instanceof com.fluxtion.example.cookbook.pnl.events.Trade) {
       Trade typedEvent = (Trade) event;
       handleEvent(typedEvent);
-    } else if (event instanceof com.fluxtion.runtime.callback.CallbackEvent) {
-      CallbackEvent typedEvent = (CallbackEvent) event;
+    } else if (event
+        instanceof com.fluxtion.runtime.callback.InstanceCallbackEvent.InstanceCallbackEvent_0) {
+      InstanceCallbackEvent_0 typedEvent = (InstanceCallbackEvent_0) event;
       handleEvent(typedEvent);
     } else if (event instanceof com.fluxtion.runtime.event.Signal) {
       Signal typedEvent = (Signal) event;
@@ -368,36 +368,31 @@ public class PnlFromFlatMapCalculator
     afterEvent();
   }
 
-  public void handleEvent(CallbackEvent typedEvent) {
+  public void handleEvent(InstanceCallbackEvent_0 typedEvent) {
     auditEvent(typedEvent);
-    switch (typedEvent.filterId()) {
-        // Event Class:[com.fluxtion.runtime.callback.CallbackEvent] filterId:[1]
-      case (1):
-        isDirty_callbackImpl_7 = callbackImpl_7.onEvent(typedEvent);
-        if (guardCheck_flatMapArrayFlowFunction_0()) {
-          isDirty_flatMapArrayFlowFunction_0 = true;
-          flatMapArrayFlowFunction_0.callbackReceived();
-          if (isDirty_flatMapArrayFlowFunction_0) {
-            mapRef2RefFlowFunction_2.inputUpdated(flatMapArrayFlowFunction_0);
-          }
-        }
-        if (guardCheck_mapRef2RefFlowFunction_2()) {
-          isDirty_mapRef2RefFlowFunction_2 = mapRef2RefFlowFunction_2.map();
-          if (isDirty_mapRef2RefFlowFunction_2) {
-            mapRef2RefFlowFunction_4.inputUpdated(mapRef2RefFlowFunction_2);
-          }
-        }
-        if (guardCheck_mapRef2RefFlowFunction_4()) {
-          isDirty_mapRef2RefFlowFunction_4 = mapRef2RefFlowFunction_4.map();
-          if (isDirty_mapRef2RefFlowFunction_4) {
-            peekFlowFunction_6.inputUpdated(mapRef2RefFlowFunction_4);
-          }
-        }
-        if (guardCheck_peekFlowFunction_6()) {
-          peekFlowFunction_6.peek();
-        }
-        afterEvent();
-        return;
+    // Default, no filter methods
+    isDirty_callBackNode_7 = callBackNode_7.onEvent(typedEvent);
+    if (guardCheck_flatMapArrayFlowFunction_0()) {
+      isDirty_flatMapArrayFlowFunction_0 = true;
+      flatMapArrayFlowFunction_0.callbackReceived();
+      if (isDirty_flatMapArrayFlowFunction_0) {
+        mapRef2RefFlowFunction_2.inputUpdated(flatMapArrayFlowFunction_0);
+      }
+    }
+    if (guardCheck_mapRef2RefFlowFunction_2()) {
+      isDirty_mapRef2RefFlowFunction_2 = mapRef2RefFlowFunction_2.map();
+      if (isDirty_mapRef2RefFlowFunction_2) {
+        mapRef2RefFlowFunction_4.inputUpdated(mapRef2RefFlowFunction_2);
+      }
+    }
+    if (guardCheck_mapRef2RefFlowFunction_4()) {
+      isDirty_mapRef2RefFlowFunction_4 = mapRef2RefFlowFunction_4.map();
+      if (isDirty_mapRef2RefFlowFunction_4) {
+        peekFlowFunction_6.inputUpdated(mapRef2RefFlowFunction_4);
+      }
+    }
+    if (guardCheck_peekFlowFunction_6()) {
+      peekFlowFunction_6.peek();
     }
     afterEvent();
   }
@@ -485,8 +480,9 @@ public class PnlFromFlatMapCalculator
     auditor.init();
     auditor.nodeRegistered(mtMRateCalculator_9, "mtMRateCalculator_9");
     auditor.nodeRegistered(pnlSummaryCalc_3, "pnlSummaryCalc_3");
+    auditor.nodeRegistered(callBackNode_7, "callBackNode_7");
     auditor.nodeRegistered(callbackDispatcher, "callbackDispatcher");
-    auditor.nodeRegistered(callbackImpl_7, "callbackImpl_7");
+    auditor.nodeRegistered(callBackTriggerEvent_0, "callBackTriggerEvent_0");
     auditor.nodeRegistered(flatMapArrayFlowFunction_0, "flatMapArrayFlowFunction_0");
     auditor.nodeRegistered(mapRef2RefFlowFunction_2, "mapRef2RefFlowFunction_2");
     auditor.nodeRegistered(mapRef2RefFlowFunction_4, "mapRef2RefFlowFunction_4");
@@ -518,7 +514,7 @@ public class PnlFromFlatMapCalculator
     clock.processingComplete();
     nodeNameLookup.processingComplete();
     serviceRegistry.processingComplete();
-    isDirty_callbackImpl_7 = false;
+    isDirty_callBackNode_7 = false;
     isDirty_clock = false;
     isDirty_flatMapArrayFlowFunction_0 = false;
     isDirty_handlerTrade = false;
@@ -556,7 +552,7 @@ public class PnlFromFlatMapCalculator
   @Override
   public BooleanSupplier dirtySupplier(Object node) {
     if (dirtyFlagSupplierMap.isEmpty()) {
-      dirtyFlagSupplierMap.put(callbackImpl_7, () -> isDirty_callbackImpl_7);
+      dirtyFlagSupplierMap.put(callBackNode_7, () -> isDirty_callBackNode_7);
       dirtyFlagSupplierMap.put(clock, () -> isDirty_clock);
       dirtyFlagSupplierMap.put(
           flatMapArrayFlowFunction_0, () -> isDirty_flatMapArrayFlowFunction_0);
@@ -572,7 +568,7 @@ public class PnlFromFlatMapCalculator
   @Override
   public void setDirty(Object node, boolean dirtyFlag) {
     if (dirtyFlagUpdateMap.isEmpty()) {
-      dirtyFlagUpdateMap.put(callbackImpl_7, (b) -> isDirty_callbackImpl_7 = b);
+      dirtyFlagUpdateMap.put(callBackNode_7, (b) -> isDirty_callBackNode_7 = b);
       dirtyFlagUpdateMap.put(clock, (b) -> isDirty_clock = b);
       dirtyFlagUpdateMap.put(
           flatMapArrayFlowFunction_0, (b) -> isDirty_flatMapArrayFlowFunction_0 = b);
@@ -590,7 +586,7 @@ public class PnlFromFlatMapCalculator
   }
 
   private boolean guardCheck_flatMapArrayFlowFunction_0() {
-    return isDirty_callbackImpl_7;
+    return isDirty_callBackNode_7;
   }
 
   private boolean guardCheck_mapRef2RefFlowFunction_2() {
