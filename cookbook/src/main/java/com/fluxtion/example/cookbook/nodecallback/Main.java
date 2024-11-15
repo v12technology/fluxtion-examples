@@ -1,6 +1,7 @@
 package com.fluxtion.example.cookbook.nodecallback;
 
 import com.fluxtion.compiler.Fluxtion;
+import com.fluxtion.runtime.callback.CallBackNode;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ import java.util.List;
  * Each {@link CandidateVoteHandler} handles the same type of generic arguments, if these were passed to the containing
  * event processor to handle all the CandidateVoteHandlers would be triggered. Using the {@link com.fluxtion.runtime.callback.CallBackNode}
  * as a base class allows the CandidateVoteHandler's to receive normal function calls and then trigger a processing cycle,
- * by calling {@link com.fluxtion.runtime.callback.CallBackNode#triggerGraphCycle()}
+ * by calling {@link CallBackNode#fireCallback()} ()}
  */
 public class Main {
 

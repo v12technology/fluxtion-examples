@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>
  * The MarketDataSubscriberNode implements listener interface, MarketDataSubscriber, and receives the market
  * data update callbacks directly and not via the parent event processor. The node decides whether to trigger dependent
- * nodes by calling triggerGraphCycle from the super class {@link CallBackNode}, in this case MidLoggerNode
+ * nodes by calling CallBackNode#fireCallback from the super class {@link CallBackNode}, in this case MidLoggerNode
  *
  *
  * <pre>
@@ -90,7 +90,7 @@ public class ImportedServiceCallbackToNode {
     //The node in the graph that is a MarketDataSubscriber.
     //DOES NOT EXPORT SERVICE MarketDataSubscriber.
     //Receives updates from MarketDataPublisher directly into this instance bypassing the event processor dispatch
-    //Extend the CallBackNode and call triggerGraphCycle to trigger the event processor with this node as the root dirty node
+    //Extend the CallBackNode and call CallBackNode#fireCallback to trigger the event processor with this node as the root dirty node
     public static class MarketDataSubscriberNode
             extends CallBackNode
             implements
@@ -106,7 +106,7 @@ public class ImportedServiceCallbackToNode {
             marketDataPublisher.subscribe("AAA", this);
         }
 
-        //MarketDataPublisher service directly invokes callback method, this node can call triggerGraphCycle
+        //MarketDataPublisher service directly invokes callback method, this node can call CallBackNode#fireCallback
         //to start a graph cycle and trigger any dependent nodes such as the MidLoggerNode
         @Override
         public boolean marketUpdate(String symbol, double mid) {
