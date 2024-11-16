@@ -54,8 +54,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.46
- * api version                     : 9.3.46
+ * eventProcessorGenerator version : 9.3.47
+ * api version                     : 9.3.47
  * </pre>
  *
  * Event classes supported:
@@ -295,6 +295,7 @@ public class BreachNotifierProcessor
   }
   //EXPORTED SERVICE FUNCTIONS - END
 
+  //EVENT BUFFERING - START
   public void bufferEvent(Object event) {
     buffering = true;
     if (event instanceof com.fluxtion.example.imperative.helloworld.Event_A) {
@@ -324,6 +325,7 @@ public class BreachNotifierProcessor
     }
     afterEvent();
   }
+  //EVENT BUFFERING - END
 
   private void auditEvent(Object typedEvent) {
     clock.eventReceived(typedEvent);

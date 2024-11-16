@@ -67,8 +67,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.46
- * api version                     : 9.3.46
+ * eventProcessorGenerator version : 9.3.47
+ * api version                     : 9.3.47
  * </pre>
  *
  * Event classes supported:
@@ -443,16 +443,7 @@ public class PnlFromJoinCalculator
     switch (typedEvent.filterString()) {
         // Event Class:[com.fluxtion.runtime.event.Signal] filterString:[eob]
       case ("eob"):
-        isDirty_pnlSummaryCalc_10 = pnlSummaryCalc_10.eobTrigger(typedEvent);
-        if (guardCheck_mapRef2RefFlowFunction_11()) {
-          isDirty_mapRef2RefFlowFunction_11 = mapRef2RefFlowFunction_11.map();
-          if (isDirty_mapRef2RefFlowFunction_11) {
-            peekFlowFunction_13.inputUpdated(mapRef2RefFlowFunction_11);
-          }
-        }
-        if (guardCheck_peekFlowFunction_13()) {
-          peekFlowFunction_13.peek();
-        }
+        handle_Signal_eob(typedEvent);
         afterEvent();
         return;
     }
@@ -467,6 +458,21 @@ public class PnlFromJoinCalculator
     afterEvent();
   }
   // EVENT DISPATCH - END
+
+  // FILTERED DISPATCH - START
+  private void handle_Signal_eob(Signal typedEvent) {
+    isDirty_pnlSummaryCalc_10 = pnlSummaryCalc_10.eobTrigger(typedEvent);
+    if (guardCheck_mapRef2RefFlowFunction_11()) {
+      isDirty_mapRef2RefFlowFunction_11 = mapRef2RefFlowFunction_11.map();
+      if (isDirty_mapRef2RefFlowFunction_11) {
+        peekFlowFunction_13.inputUpdated(mapRef2RefFlowFunction_11);
+      }
+    }
+    if (guardCheck_peekFlowFunction_13()) {
+      peekFlowFunction_13.peek();
+    }
+  }
+  // FILTERED DISPATCH - END
 
   // EXPORTED SERVICE FUNCTIONS - START
   @Override
@@ -488,6 +494,7 @@ public class PnlFromJoinCalculator
   }
   // EXPORTED SERVICE FUNCTIONS - END
 
+  // EVENT BUFFERING - START
   public void bufferEvent(Object event) {
     throw new UnsupportedOperationException("bufferEvent not supported");
   }

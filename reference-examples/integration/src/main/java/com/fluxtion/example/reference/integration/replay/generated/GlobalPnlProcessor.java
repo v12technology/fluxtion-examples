@@ -55,8 +55,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.46
- * api version                     : 9.3.46
+ * eventProcessorGenerator version : 9.3.47
+ * api version                     : 9.3.47
  * </pre>
  *
  * Event classes supported:
@@ -250,26 +250,17 @@ public class GlobalPnlProcessor
     switch (typedEvent.filterString()) {
         //Event Class:[com.fluxtion.example.reference.integration.replay.PnlUpdate] filterString:[book1]
       case ("book1"):
-        isDirty_bookPnl_1 = bookPnl_1.pnlUpdate(typedEvent);
-        if (guardCheck_globalPnl_0()) {
-          globalPnl_0.calculate();
-        }
+        handle_PnlUpdate_book1(typedEvent);
         afterEvent();
         return;
         //Event Class:[com.fluxtion.example.reference.integration.replay.PnlUpdate] filterString:[bookAAA]
       case ("bookAAA"):
-        isDirty_bookPnl_2 = bookPnl_2.pnlUpdate(typedEvent);
-        if (guardCheck_globalPnl_0()) {
-          globalPnl_0.calculate();
-        }
+        handle_PnlUpdate_bookAAA(typedEvent);
         afterEvent();
         return;
         //Event Class:[com.fluxtion.example.reference.integration.replay.PnlUpdate] filterString:[book_XYZ]
       case ("book_XYZ"):
-        isDirty_bookPnl_3 = bookPnl_3.pnlUpdate(typedEvent);
-        if (guardCheck_globalPnl_0()) {
-          globalPnl_0.calculate();
-        }
+        handle_PnlUpdate_book_XYZ(typedEvent);
         afterEvent();
         return;
     }
@@ -284,6 +275,29 @@ public class GlobalPnlProcessor
     afterEvent();
   }
   //EVENT DISPATCH - END
+
+  //FILTERED DISPATCH - START
+  private void handle_PnlUpdate_book1(PnlUpdate typedEvent) {
+    isDirty_bookPnl_1 = bookPnl_1.pnlUpdate(typedEvent);
+    if (guardCheck_globalPnl_0()) {
+      globalPnl_0.calculate();
+    }
+  }
+
+  private void handle_PnlUpdate_bookAAA(PnlUpdate typedEvent) {
+    isDirty_bookPnl_2 = bookPnl_2.pnlUpdate(typedEvent);
+    if (guardCheck_globalPnl_0()) {
+      globalPnl_0.calculate();
+    }
+  }
+
+  private void handle_PnlUpdate_book_XYZ(PnlUpdate typedEvent) {
+    isDirty_bookPnl_3 = bookPnl_3.pnlUpdate(typedEvent);
+    if (guardCheck_globalPnl_0()) {
+      globalPnl_0.calculate();
+    }
+  }
+  //FILTERED DISPATCH - END
 
   //EXPORTED SERVICE FUNCTIONS - START
   @Override
@@ -305,6 +319,7 @@ public class GlobalPnlProcessor
   }
   //EXPORTED SERVICE FUNCTIONS - END
 
+  //EVENT BUFFERING - START
   public void bufferEvent(Object event) {
     buffering = true;
     if (event instanceof com.fluxtion.example.reference.integration.replay.PnlUpdate) {
@@ -313,17 +328,17 @@ public class GlobalPnlProcessor
       switch (typedEvent.filterString()) {
           //Event Class:[com.fluxtion.example.reference.integration.replay.PnlUpdate] filterString:[book1]
         case ("book1"):
-          isDirty_bookPnl_1 = bookPnl_1.pnlUpdate(typedEvent);
+          handle_PnlUpdate_book1_bufferDispatch(typedEvent);
           afterEvent();
           return;
           //Event Class:[com.fluxtion.example.reference.integration.replay.PnlUpdate] filterString:[bookAAA]
         case ("bookAAA"):
-          isDirty_bookPnl_2 = bookPnl_2.pnlUpdate(typedEvent);
+          handle_PnlUpdate_bookAAA_bufferDispatch(typedEvent);
           afterEvent();
           return;
           //Event Class:[com.fluxtion.example.reference.integration.replay.PnlUpdate] filterString:[book_XYZ]
         case ("book_XYZ"):
-          isDirty_bookPnl_3 = bookPnl_3.pnlUpdate(typedEvent);
+          handle_PnlUpdate_book_XYZ_bufferDispatch(typedEvent);
           afterEvent();
           return;
       }
@@ -335,6 +350,18 @@ public class GlobalPnlProcessor
     }
   }
 
+  private void handle_PnlUpdate_book1_bufferDispatch(PnlUpdate typedEvent) {
+    isDirty_bookPnl_1 = bookPnl_1.pnlUpdate(typedEvent);
+  }
+
+  private void handle_PnlUpdate_bookAAA_bufferDispatch(PnlUpdate typedEvent) {
+    isDirty_bookPnl_2 = bookPnl_2.pnlUpdate(typedEvent);
+  }
+
+  private void handle_PnlUpdate_book_XYZ_bufferDispatch(PnlUpdate typedEvent) {
+    isDirty_bookPnl_3 = bookPnl_3.pnlUpdate(typedEvent);
+  }
+
   public void triggerCalculation() {
     buffering = false;
     String typedEvent = "No event information - buffered dispatch";
@@ -343,6 +370,7 @@ public class GlobalPnlProcessor
     }
     afterEvent();
   }
+  //EVENT BUFFERING - END
 
   private void auditEvent(Object typedEvent) {
     clock.eventReceived(typedEvent);

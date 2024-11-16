@@ -60,8 +60,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.46
- * api version                     : 9.3.46
+ * eventProcessorGenerator version : 9.3.47
+ * api version                     : 9.3.47
  * </pre>
  *
  * Event classes supported:
@@ -406,350 +406,27 @@ public class FVGraphPricer
     switch (typedEvent.filterString()) {
         //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[daysToExpiry]
       case ("daysToExpiry"):
-        isDirty_handlerDoubleSignal_daysToExpiry =
-            handlerDoubleSignal_daysToExpiry.onEvent(typedEvent);
-        if (isDirty_handlerDoubleSignal_daysToExpiry) {
-          mapRef2ToDoubleFlowFunction_3.inputUpdated(handlerDoubleSignal_daysToExpiry);
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_3()) {
-          isDirty_mapRef2ToDoubleFlowFunction_3 = mapRef2ToDoubleFlowFunction_3.map();
-        }
-        if (guardCheck_fairValueAbsolute_21()) {
-          isDirty_fairValueAbsolute_21 = fairValueAbsolute_21.calculate();
-        }
-        if (guardCheck_nodeToFlowFunction_4()) {
-          isDirty_nodeToFlowFunction_4 = true;
-          nodeToFlowFunction_4.sourceUpdated();
-          if (isDirty_nodeToFlowFunction_4) {
-            mapRef2ToDoubleFlowFunction_5.inputUpdated(nodeToFlowFunction_4);
-          }
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_5()) {
-          isDirty_mapRef2ToDoubleFlowFunction_5 = mapRef2ToDoubleFlowFunction_5.map();
-          if (isDirty_mapRef2ToDoubleFlowFunction_5) {
-            mapDouble2ToDoubleFlowFunction_6.inputUpdated(mapRef2ToDoubleFlowFunction_5);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_6()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_6 = mapDouble2ToDoubleFlowFunction_6.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_6) {
-            binaryMapToDoubleFlowFunction_9.input2Updated(mapDouble2ToDoubleFlowFunction_6);
-            binaryMapToDoubleFlowFunction_17.input2Updated(mapDouble2ToDoubleFlowFunction_6);
-            doublePeekFlowFunction_8.inputUpdated(mapDouble2ToDoubleFlowFunction_6);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_9()) {
-          isDirty_binaryMapToDoubleFlowFunction_9 = binaryMapToDoubleFlowFunction_9.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_9) {
-            mapDouble2ToDoubleFlowFunction_10.inputUpdated(binaryMapToDoubleFlowFunction_9);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
-          isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_17) {
-            mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_10()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_10 = mapDouble2ToDoubleFlowFunction_10.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_10) {
-            binaryMapToDoubleFlowFunction_13.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
-            doublePeekFlowFunction_12.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_13()) {
-          isDirty_binaryMapToDoubleFlowFunction_13 = binaryMapToDoubleFlowFunction_13.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_13) {
-            doublePeekFlowFunction_15.inputUpdated(binaryMapToDoubleFlowFunction_13);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
-            doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
-          }
-        }
-        if (guardCheck_doublePeekFlowFunction_8()) {
-          doublePeekFlowFunction_8.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_12()) {
-          doublePeekFlowFunction_12.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_15()) {
-          doublePeekFlowFunction_15.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_20()) {
-          doublePeekFlowFunction_20.peek();
-        }
+        handle_DoubleSignal_daysToExpiry(typedEvent);
         afterEvent();
         return;
         //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[dividends]
       case ("dividends"):
-        isDirty_handlerDoubleSignal_dividends = handlerDoubleSignal_dividends.onEvent(typedEvent);
-        if (isDirty_handlerDoubleSignal_dividends) {
-          mapRef2ToDoubleFlowFunction_1.inputUpdated(handlerDoubleSignal_dividends);
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_1()) {
-          isDirty_mapRef2ToDoubleFlowFunction_1 = mapRef2ToDoubleFlowFunction_1.map();
-        }
-        if (guardCheck_fairValueAbsolute_21()) {
-          isDirty_fairValueAbsolute_21 = fairValueAbsolute_21.calculate();
-        }
-        if (guardCheck_nodeToFlowFunction_4()) {
-          isDirty_nodeToFlowFunction_4 = true;
-          nodeToFlowFunction_4.sourceUpdated();
-          if (isDirty_nodeToFlowFunction_4) {
-            mapRef2ToDoubleFlowFunction_5.inputUpdated(nodeToFlowFunction_4);
-          }
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_5()) {
-          isDirty_mapRef2ToDoubleFlowFunction_5 = mapRef2ToDoubleFlowFunction_5.map();
-          if (isDirty_mapRef2ToDoubleFlowFunction_5) {
-            mapDouble2ToDoubleFlowFunction_6.inputUpdated(mapRef2ToDoubleFlowFunction_5);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_6()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_6 = mapDouble2ToDoubleFlowFunction_6.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_6) {
-            binaryMapToDoubleFlowFunction_9.input2Updated(mapDouble2ToDoubleFlowFunction_6);
-            binaryMapToDoubleFlowFunction_17.input2Updated(mapDouble2ToDoubleFlowFunction_6);
-            doublePeekFlowFunction_8.inputUpdated(mapDouble2ToDoubleFlowFunction_6);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_9()) {
-          isDirty_binaryMapToDoubleFlowFunction_9 = binaryMapToDoubleFlowFunction_9.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_9) {
-            mapDouble2ToDoubleFlowFunction_10.inputUpdated(binaryMapToDoubleFlowFunction_9);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
-          isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_17) {
-            mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_10()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_10 = mapDouble2ToDoubleFlowFunction_10.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_10) {
-            binaryMapToDoubleFlowFunction_13.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
-            doublePeekFlowFunction_12.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_13()) {
-          isDirty_binaryMapToDoubleFlowFunction_13 = binaryMapToDoubleFlowFunction_13.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_13) {
-            doublePeekFlowFunction_15.inputUpdated(binaryMapToDoubleFlowFunction_13);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
-            doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
-          }
-        }
-        if (guardCheck_doublePeekFlowFunction_8()) {
-          doublePeekFlowFunction_8.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_12()) {
-          doublePeekFlowFunction_12.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_15()) {
-          doublePeekFlowFunction_15.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_20()) {
-          doublePeekFlowFunction_20.peek();
-        }
+        handle_DoubleSignal_dividends(typedEvent);
         afterEvent();
         return;
         //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[futuresPrice]
       case ("futuresPrice"):
-        isDirty_handlerDoubleSignal_futuresPrice =
-            handlerDoubleSignal_futuresPrice.onEvent(typedEvent);
-        if (isDirty_handlerDoubleSignal_futuresPrice) {
-          mapRef2ToDoubleFlowFunction_16.inputUpdated(handlerDoubleSignal_futuresPrice);
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_16()) {
-          isDirty_mapRef2ToDoubleFlowFunction_16 = mapRef2ToDoubleFlowFunction_16.map();
-          if (isDirty_mapRef2ToDoubleFlowFunction_16) {
-            binaryMapToDoubleFlowFunction_17.inputUpdated(mapRef2ToDoubleFlowFunction_16);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
-          isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_17) {
-            mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
-            doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
-          }
-        }
-        if (guardCheck_doublePeekFlowFunction_20()) {
-          doublePeekFlowFunction_20.peek();
-        }
+        handle_DoubleSignal_futuresPrice(typedEvent);
         afterEvent();
         return;
         //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[interestRate]
       case ("interestRate"):
-        isDirty_handlerDoubleSignal_interestRate =
-            handlerDoubleSignal_interestRate.onEvent(typedEvent);
-        if (isDirty_handlerDoubleSignal_interestRate) {
-          mapRef2ToDoubleFlowFunction_2.inputUpdated(handlerDoubleSignal_interestRate);
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_2()) {
-          isDirty_mapRef2ToDoubleFlowFunction_2 = mapRef2ToDoubleFlowFunction_2.map();
-        }
-        if (guardCheck_fairValueAbsolute_21()) {
-          isDirty_fairValueAbsolute_21 = fairValueAbsolute_21.calculate();
-        }
-        if (guardCheck_nodeToFlowFunction_4()) {
-          isDirty_nodeToFlowFunction_4 = true;
-          nodeToFlowFunction_4.sourceUpdated();
-          if (isDirty_nodeToFlowFunction_4) {
-            mapRef2ToDoubleFlowFunction_5.inputUpdated(nodeToFlowFunction_4);
-          }
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_5()) {
-          isDirty_mapRef2ToDoubleFlowFunction_5 = mapRef2ToDoubleFlowFunction_5.map();
-          if (isDirty_mapRef2ToDoubleFlowFunction_5) {
-            mapDouble2ToDoubleFlowFunction_6.inputUpdated(mapRef2ToDoubleFlowFunction_5);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_6()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_6 = mapDouble2ToDoubleFlowFunction_6.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_6) {
-            binaryMapToDoubleFlowFunction_9.input2Updated(mapDouble2ToDoubleFlowFunction_6);
-            binaryMapToDoubleFlowFunction_17.input2Updated(mapDouble2ToDoubleFlowFunction_6);
-            doublePeekFlowFunction_8.inputUpdated(mapDouble2ToDoubleFlowFunction_6);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_9()) {
-          isDirty_binaryMapToDoubleFlowFunction_9 = binaryMapToDoubleFlowFunction_9.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_9) {
-            mapDouble2ToDoubleFlowFunction_10.inputUpdated(binaryMapToDoubleFlowFunction_9);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
-          isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_17) {
-            mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_10()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_10 = mapDouble2ToDoubleFlowFunction_10.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_10) {
-            binaryMapToDoubleFlowFunction_13.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
-            doublePeekFlowFunction_12.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_13()) {
-          isDirty_binaryMapToDoubleFlowFunction_13 = binaryMapToDoubleFlowFunction_13.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_13) {
-            doublePeekFlowFunction_15.inputUpdated(binaryMapToDoubleFlowFunction_13);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
-            doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
-          }
-        }
-        if (guardCheck_doublePeekFlowFunction_8()) {
-          doublePeekFlowFunction_8.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_12()) {
-          doublePeekFlowFunction_12.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_15()) {
-          doublePeekFlowFunction_15.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_20()) {
-          doublePeekFlowFunction_20.peek();
-        }
+        handle_DoubleSignal_interestRate(typedEvent);
         afterEvent();
         return;
         //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[spot]
       case ("spot"):
-        isDirty_handlerDoubleSignal_spot = handlerDoubleSignal_spot.onEvent(typedEvent);
-        if (isDirty_handlerDoubleSignal_spot) {
-          mapRef2ToDoubleFlowFunction_0.inputUpdated(handlerDoubleSignal_spot);
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_0()) {
-          isDirty_mapRef2ToDoubleFlowFunction_0 = mapRef2ToDoubleFlowFunction_0.map();
-          if (isDirty_mapRef2ToDoubleFlowFunction_0) {
-            binaryMapToDoubleFlowFunction_9.inputUpdated(mapRef2ToDoubleFlowFunction_0);
-            binaryMapToDoubleFlowFunction_13.input2Updated(mapRef2ToDoubleFlowFunction_0);
-          }
-        }
-        if (guardCheck_fairValueAbsolute_21()) {
-          isDirty_fairValueAbsolute_21 = fairValueAbsolute_21.calculate();
-        }
-        if (guardCheck_nodeToFlowFunction_4()) {
-          isDirty_nodeToFlowFunction_4 = true;
-          nodeToFlowFunction_4.sourceUpdated();
-          if (isDirty_nodeToFlowFunction_4) {
-            mapRef2ToDoubleFlowFunction_5.inputUpdated(nodeToFlowFunction_4);
-          }
-        }
-        if (guardCheck_mapRef2ToDoubleFlowFunction_5()) {
-          isDirty_mapRef2ToDoubleFlowFunction_5 = mapRef2ToDoubleFlowFunction_5.map();
-          if (isDirty_mapRef2ToDoubleFlowFunction_5) {
-            mapDouble2ToDoubleFlowFunction_6.inputUpdated(mapRef2ToDoubleFlowFunction_5);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_6()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_6 = mapDouble2ToDoubleFlowFunction_6.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_6) {
-            binaryMapToDoubleFlowFunction_9.input2Updated(mapDouble2ToDoubleFlowFunction_6);
-            binaryMapToDoubleFlowFunction_17.input2Updated(mapDouble2ToDoubleFlowFunction_6);
-            doublePeekFlowFunction_8.inputUpdated(mapDouble2ToDoubleFlowFunction_6);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_9()) {
-          isDirty_binaryMapToDoubleFlowFunction_9 = binaryMapToDoubleFlowFunction_9.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_9) {
-            mapDouble2ToDoubleFlowFunction_10.inputUpdated(binaryMapToDoubleFlowFunction_9);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
-          isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_17) {
-            mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_10()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_10 = mapDouble2ToDoubleFlowFunction_10.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_10) {
-            binaryMapToDoubleFlowFunction_13.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
-            doublePeekFlowFunction_12.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
-          }
-        }
-        if (guardCheck_binaryMapToDoubleFlowFunction_13()) {
-          isDirty_binaryMapToDoubleFlowFunction_13 = binaryMapToDoubleFlowFunction_13.map();
-          if (isDirty_binaryMapToDoubleFlowFunction_13) {
-            doublePeekFlowFunction_15.inputUpdated(binaryMapToDoubleFlowFunction_13);
-          }
-        }
-        if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
-          isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
-          if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
-            doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
-          }
-        }
-        if (guardCheck_doublePeekFlowFunction_8()) {
-          doublePeekFlowFunction_8.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_12()) {
-          doublePeekFlowFunction_12.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_15()) {
-          doublePeekFlowFunction_15.peek();
-        }
-        if (guardCheck_doublePeekFlowFunction_20()) {
-          doublePeekFlowFunction_20.peek();
-        }
+        handle_DoubleSignal_spot(typedEvent);
         afterEvent();
         return;
     }
@@ -764,6 +441,348 @@ public class FVGraphPricer
     afterEvent();
   }
   //EVENT DISPATCH - END
+
+  //FILTERED DISPATCH - START
+  private void handle_DoubleSignal_daysToExpiry(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_daysToExpiry = handlerDoubleSignal_daysToExpiry.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_daysToExpiry) {
+      mapRef2ToDoubleFlowFunction_3.inputUpdated(handlerDoubleSignal_daysToExpiry);
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_3()) {
+      isDirty_mapRef2ToDoubleFlowFunction_3 = mapRef2ToDoubleFlowFunction_3.map();
+    }
+    if (guardCheck_fairValueAbsolute_21()) {
+      isDirty_fairValueAbsolute_21 = fairValueAbsolute_21.calculate();
+    }
+    if (guardCheck_nodeToFlowFunction_4()) {
+      isDirty_nodeToFlowFunction_4 = true;
+      nodeToFlowFunction_4.sourceUpdated();
+      if (isDirty_nodeToFlowFunction_4) {
+        mapRef2ToDoubleFlowFunction_5.inputUpdated(nodeToFlowFunction_4);
+      }
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_5()) {
+      isDirty_mapRef2ToDoubleFlowFunction_5 = mapRef2ToDoubleFlowFunction_5.map();
+      if (isDirty_mapRef2ToDoubleFlowFunction_5) {
+        mapDouble2ToDoubleFlowFunction_6.inputUpdated(mapRef2ToDoubleFlowFunction_5);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_6()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_6 = mapDouble2ToDoubleFlowFunction_6.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_6) {
+        binaryMapToDoubleFlowFunction_9.input2Updated(mapDouble2ToDoubleFlowFunction_6);
+        binaryMapToDoubleFlowFunction_17.input2Updated(mapDouble2ToDoubleFlowFunction_6);
+        doublePeekFlowFunction_8.inputUpdated(mapDouble2ToDoubleFlowFunction_6);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_9()) {
+      isDirty_binaryMapToDoubleFlowFunction_9 = binaryMapToDoubleFlowFunction_9.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_9) {
+        mapDouble2ToDoubleFlowFunction_10.inputUpdated(binaryMapToDoubleFlowFunction_9);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
+      isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_17) {
+        mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_10()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_10 = mapDouble2ToDoubleFlowFunction_10.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_10) {
+        binaryMapToDoubleFlowFunction_13.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
+        doublePeekFlowFunction_12.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_13()) {
+      isDirty_binaryMapToDoubleFlowFunction_13 = binaryMapToDoubleFlowFunction_13.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_13) {
+        doublePeekFlowFunction_15.inputUpdated(binaryMapToDoubleFlowFunction_13);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
+        doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
+      }
+    }
+    if (guardCheck_doublePeekFlowFunction_8()) {
+      doublePeekFlowFunction_8.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_12()) {
+      doublePeekFlowFunction_12.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_15()) {
+      doublePeekFlowFunction_15.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_20()) {
+      doublePeekFlowFunction_20.peek();
+    }
+  }
+
+  private void handle_DoubleSignal_dividends(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_dividends = handlerDoubleSignal_dividends.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_dividends) {
+      mapRef2ToDoubleFlowFunction_1.inputUpdated(handlerDoubleSignal_dividends);
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_1()) {
+      isDirty_mapRef2ToDoubleFlowFunction_1 = mapRef2ToDoubleFlowFunction_1.map();
+    }
+    if (guardCheck_fairValueAbsolute_21()) {
+      isDirty_fairValueAbsolute_21 = fairValueAbsolute_21.calculate();
+    }
+    if (guardCheck_nodeToFlowFunction_4()) {
+      isDirty_nodeToFlowFunction_4 = true;
+      nodeToFlowFunction_4.sourceUpdated();
+      if (isDirty_nodeToFlowFunction_4) {
+        mapRef2ToDoubleFlowFunction_5.inputUpdated(nodeToFlowFunction_4);
+      }
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_5()) {
+      isDirty_mapRef2ToDoubleFlowFunction_5 = mapRef2ToDoubleFlowFunction_5.map();
+      if (isDirty_mapRef2ToDoubleFlowFunction_5) {
+        mapDouble2ToDoubleFlowFunction_6.inputUpdated(mapRef2ToDoubleFlowFunction_5);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_6()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_6 = mapDouble2ToDoubleFlowFunction_6.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_6) {
+        binaryMapToDoubleFlowFunction_9.input2Updated(mapDouble2ToDoubleFlowFunction_6);
+        binaryMapToDoubleFlowFunction_17.input2Updated(mapDouble2ToDoubleFlowFunction_6);
+        doublePeekFlowFunction_8.inputUpdated(mapDouble2ToDoubleFlowFunction_6);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_9()) {
+      isDirty_binaryMapToDoubleFlowFunction_9 = binaryMapToDoubleFlowFunction_9.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_9) {
+        mapDouble2ToDoubleFlowFunction_10.inputUpdated(binaryMapToDoubleFlowFunction_9);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
+      isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_17) {
+        mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_10()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_10 = mapDouble2ToDoubleFlowFunction_10.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_10) {
+        binaryMapToDoubleFlowFunction_13.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
+        doublePeekFlowFunction_12.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_13()) {
+      isDirty_binaryMapToDoubleFlowFunction_13 = binaryMapToDoubleFlowFunction_13.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_13) {
+        doublePeekFlowFunction_15.inputUpdated(binaryMapToDoubleFlowFunction_13);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
+        doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
+      }
+    }
+    if (guardCheck_doublePeekFlowFunction_8()) {
+      doublePeekFlowFunction_8.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_12()) {
+      doublePeekFlowFunction_12.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_15()) {
+      doublePeekFlowFunction_15.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_20()) {
+      doublePeekFlowFunction_20.peek();
+    }
+  }
+
+  private void handle_DoubleSignal_futuresPrice(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_futuresPrice = handlerDoubleSignal_futuresPrice.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_futuresPrice) {
+      mapRef2ToDoubleFlowFunction_16.inputUpdated(handlerDoubleSignal_futuresPrice);
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_16()) {
+      isDirty_mapRef2ToDoubleFlowFunction_16 = mapRef2ToDoubleFlowFunction_16.map();
+      if (isDirty_mapRef2ToDoubleFlowFunction_16) {
+        binaryMapToDoubleFlowFunction_17.inputUpdated(mapRef2ToDoubleFlowFunction_16);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
+      isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_17) {
+        mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
+        doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
+      }
+    }
+    if (guardCheck_doublePeekFlowFunction_20()) {
+      doublePeekFlowFunction_20.peek();
+    }
+  }
+
+  private void handle_DoubleSignal_interestRate(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_interestRate = handlerDoubleSignal_interestRate.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_interestRate) {
+      mapRef2ToDoubleFlowFunction_2.inputUpdated(handlerDoubleSignal_interestRate);
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_2()) {
+      isDirty_mapRef2ToDoubleFlowFunction_2 = mapRef2ToDoubleFlowFunction_2.map();
+    }
+    if (guardCheck_fairValueAbsolute_21()) {
+      isDirty_fairValueAbsolute_21 = fairValueAbsolute_21.calculate();
+    }
+    if (guardCheck_nodeToFlowFunction_4()) {
+      isDirty_nodeToFlowFunction_4 = true;
+      nodeToFlowFunction_4.sourceUpdated();
+      if (isDirty_nodeToFlowFunction_4) {
+        mapRef2ToDoubleFlowFunction_5.inputUpdated(nodeToFlowFunction_4);
+      }
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_5()) {
+      isDirty_mapRef2ToDoubleFlowFunction_5 = mapRef2ToDoubleFlowFunction_5.map();
+      if (isDirty_mapRef2ToDoubleFlowFunction_5) {
+        mapDouble2ToDoubleFlowFunction_6.inputUpdated(mapRef2ToDoubleFlowFunction_5);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_6()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_6 = mapDouble2ToDoubleFlowFunction_6.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_6) {
+        binaryMapToDoubleFlowFunction_9.input2Updated(mapDouble2ToDoubleFlowFunction_6);
+        binaryMapToDoubleFlowFunction_17.input2Updated(mapDouble2ToDoubleFlowFunction_6);
+        doublePeekFlowFunction_8.inputUpdated(mapDouble2ToDoubleFlowFunction_6);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_9()) {
+      isDirty_binaryMapToDoubleFlowFunction_9 = binaryMapToDoubleFlowFunction_9.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_9) {
+        mapDouble2ToDoubleFlowFunction_10.inputUpdated(binaryMapToDoubleFlowFunction_9);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
+      isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_17) {
+        mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_10()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_10 = mapDouble2ToDoubleFlowFunction_10.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_10) {
+        binaryMapToDoubleFlowFunction_13.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
+        doublePeekFlowFunction_12.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_13()) {
+      isDirty_binaryMapToDoubleFlowFunction_13 = binaryMapToDoubleFlowFunction_13.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_13) {
+        doublePeekFlowFunction_15.inputUpdated(binaryMapToDoubleFlowFunction_13);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
+        doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
+      }
+    }
+    if (guardCheck_doublePeekFlowFunction_8()) {
+      doublePeekFlowFunction_8.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_12()) {
+      doublePeekFlowFunction_12.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_15()) {
+      doublePeekFlowFunction_15.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_20()) {
+      doublePeekFlowFunction_20.peek();
+    }
+  }
+
+  private void handle_DoubleSignal_spot(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_spot = handlerDoubleSignal_spot.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_spot) {
+      mapRef2ToDoubleFlowFunction_0.inputUpdated(handlerDoubleSignal_spot);
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_0()) {
+      isDirty_mapRef2ToDoubleFlowFunction_0 = mapRef2ToDoubleFlowFunction_0.map();
+      if (isDirty_mapRef2ToDoubleFlowFunction_0) {
+        binaryMapToDoubleFlowFunction_9.inputUpdated(mapRef2ToDoubleFlowFunction_0);
+        binaryMapToDoubleFlowFunction_13.input2Updated(mapRef2ToDoubleFlowFunction_0);
+      }
+    }
+    if (guardCheck_fairValueAbsolute_21()) {
+      isDirty_fairValueAbsolute_21 = fairValueAbsolute_21.calculate();
+    }
+    if (guardCheck_nodeToFlowFunction_4()) {
+      isDirty_nodeToFlowFunction_4 = true;
+      nodeToFlowFunction_4.sourceUpdated();
+      if (isDirty_nodeToFlowFunction_4) {
+        mapRef2ToDoubleFlowFunction_5.inputUpdated(nodeToFlowFunction_4);
+      }
+    }
+    if (guardCheck_mapRef2ToDoubleFlowFunction_5()) {
+      isDirty_mapRef2ToDoubleFlowFunction_5 = mapRef2ToDoubleFlowFunction_5.map();
+      if (isDirty_mapRef2ToDoubleFlowFunction_5) {
+        mapDouble2ToDoubleFlowFunction_6.inputUpdated(mapRef2ToDoubleFlowFunction_5);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_6()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_6 = mapDouble2ToDoubleFlowFunction_6.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_6) {
+        binaryMapToDoubleFlowFunction_9.input2Updated(mapDouble2ToDoubleFlowFunction_6);
+        binaryMapToDoubleFlowFunction_17.input2Updated(mapDouble2ToDoubleFlowFunction_6);
+        doublePeekFlowFunction_8.inputUpdated(mapDouble2ToDoubleFlowFunction_6);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_9()) {
+      isDirty_binaryMapToDoubleFlowFunction_9 = binaryMapToDoubleFlowFunction_9.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_9) {
+        mapDouble2ToDoubleFlowFunction_10.inputUpdated(binaryMapToDoubleFlowFunction_9);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_17()) {
+      isDirty_binaryMapToDoubleFlowFunction_17 = binaryMapToDoubleFlowFunction_17.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_17) {
+        mapDouble2ToDoubleFlowFunction_18.inputUpdated(binaryMapToDoubleFlowFunction_17);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_10()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_10 = mapDouble2ToDoubleFlowFunction_10.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_10) {
+        binaryMapToDoubleFlowFunction_13.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
+        doublePeekFlowFunction_12.inputUpdated(mapDouble2ToDoubleFlowFunction_10);
+      }
+    }
+    if (guardCheck_binaryMapToDoubleFlowFunction_13()) {
+      isDirty_binaryMapToDoubleFlowFunction_13 = binaryMapToDoubleFlowFunction_13.map();
+      if (isDirty_binaryMapToDoubleFlowFunction_13) {
+        doublePeekFlowFunction_15.inputUpdated(binaryMapToDoubleFlowFunction_13);
+      }
+    }
+    if (guardCheck_mapDouble2ToDoubleFlowFunction_18()) {
+      isDirty_mapDouble2ToDoubleFlowFunction_18 = mapDouble2ToDoubleFlowFunction_18.map();
+      if (isDirty_mapDouble2ToDoubleFlowFunction_18) {
+        doublePeekFlowFunction_20.inputUpdated(mapDouble2ToDoubleFlowFunction_18);
+      }
+    }
+    if (guardCheck_doublePeekFlowFunction_8()) {
+      doublePeekFlowFunction_8.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_12()) {
+      doublePeekFlowFunction_12.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_15()) {
+      doublePeekFlowFunction_15.peek();
+    }
+    if (guardCheck_doublePeekFlowFunction_20()) {
+      doublePeekFlowFunction_20.peek();
+    }
+  }
+  //FILTERED DISPATCH - END
 
   //EXPORTED SERVICE FUNCTIONS - START
   @Override
@@ -785,6 +804,7 @@ public class FVGraphPricer
   }
   //EXPORTED SERVICE FUNCTIONS - END
 
+  //EVENT BUFFERING - START
   public void bufferEvent(Object event) {
     buffering = true;
     if (event instanceof com.fluxtion.runtime.event.Signal.DoubleSignal) {
@@ -793,45 +813,27 @@ public class FVGraphPricer
       switch (typedEvent.filterString()) {
           //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[daysToExpiry]
         case ("daysToExpiry"):
-          isDirty_handlerDoubleSignal_daysToExpiry =
-              handlerDoubleSignal_daysToExpiry.onEvent(typedEvent);
-          if (isDirty_handlerDoubleSignal_daysToExpiry) {
-            mapRef2ToDoubleFlowFunction_3.inputUpdated(handlerDoubleSignal_daysToExpiry);
-          }
+          handle_DoubleSignal_daysToExpiry_bufferDispatch(typedEvent);
           afterEvent();
           return;
           //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[dividends]
         case ("dividends"):
-          isDirty_handlerDoubleSignal_dividends = handlerDoubleSignal_dividends.onEvent(typedEvent);
-          if (isDirty_handlerDoubleSignal_dividends) {
-            mapRef2ToDoubleFlowFunction_1.inputUpdated(handlerDoubleSignal_dividends);
-          }
+          handle_DoubleSignal_dividends_bufferDispatch(typedEvent);
           afterEvent();
           return;
           //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[futuresPrice]
         case ("futuresPrice"):
-          isDirty_handlerDoubleSignal_futuresPrice =
-              handlerDoubleSignal_futuresPrice.onEvent(typedEvent);
-          if (isDirty_handlerDoubleSignal_futuresPrice) {
-            mapRef2ToDoubleFlowFunction_16.inputUpdated(handlerDoubleSignal_futuresPrice);
-          }
+          handle_DoubleSignal_futuresPrice_bufferDispatch(typedEvent);
           afterEvent();
           return;
           //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[interestRate]
         case ("interestRate"):
-          isDirty_handlerDoubleSignal_interestRate =
-              handlerDoubleSignal_interestRate.onEvent(typedEvent);
-          if (isDirty_handlerDoubleSignal_interestRate) {
-            mapRef2ToDoubleFlowFunction_2.inputUpdated(handlerDoubleSignal_interestRate);
-          }
+          handle_DoubleSignal_interestRate_bufferDispatch(typedEvent);
           afterEvent();
           return;
           //Event Class:[com.fluxtion.runtime.event.Signal.DoubleSignal] filterString:[spot]
         case ("spot"):
-          isDirty_handlerDoubleSignal_spot = handlerDoubleSignal_spot.onEvent(typedEvent);
-          if (isDirty_handlerDoubleSignal_spot) {
-            mapRef2ToDoubleFlowFunction_0.inputUpdated(handlerDoubleSignal_spot);
-          }
+          handle_DoubleSignal_spot_bufferDispatch(typedEvent);
           afterEvent();
           return;
       }
@@ -840,6 +842,41 @@ public class FVGraphPricer
       auditEvent(typedEvent);
       isDirty_clock = true;
       clock.setClockStrategy(typedEvent);
+    }
+  }
+
+  private void handle_DoubleSignal_daysToExpiry_bufferDispatch(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_daysToExpiry = handlerDoubleSignal_daysToExpiry.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_daysToExpiry) {
+      mapRef2ToDoubleFlowFunction_3.inputUpdated(handlerDoubleSignal_daysToExpiry);
+    }
+  }
+
+  private void handle_DoubleSignal_dividends_bufferDispatch(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_dividends = handlerDoubleSignal_dividends.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_dividends) {
+      mapRef2ToDoubleFlowFunction_1.inputUpdated(handlerDoubleSignal_dividends);
+    }
+  }
+
+  private void handle_DoubleSignal_futuresPrice_bufferDispatch(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_futuresPrice = handlerDoubleSignal_futuresPrice.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_futuresPrice) {
+      mapRef2ToDoubleFlowFunction_16.inputUpdated(handlerDoubleSignal_futuresPrice);
+    }
+  }
+
+  private void handle_DoubleSignal_interestRate_bufferDispatch(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_interestRate = handlerDoubleSignal_interestRate.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_interestRate) {
+      mapRef2ToDoubleFlowFunction_2.inputUpdated(handlerDoubleSignal_interestRate);
+    }
+  }
+
+  private void handle_DoubleSignal_spot_bufferDispatch(DoubleSignal typedEvent) {
+    isDirty_handlerDoubleSignal_spot = handlerDoubleSignal_spot.onEvent(typedEvent);
+    if (isDirty_handlerDoubleSignal_spot) {
+      mapRef2ToDoubleFlowFunction_0.inputUpdated(handlerDoubleSignal_spot);
     }
   }
 
@@ -937,6 +974,7 @@ public class FVGraphPricer
     }
     afterEvent();
   }
+  //EVENT BUFFERING - END
 
   private void auditEvent(Object typedEvent) {
     clock.eventReceived(typedEvent);

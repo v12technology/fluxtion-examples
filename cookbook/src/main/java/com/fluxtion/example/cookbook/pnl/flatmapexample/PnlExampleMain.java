@@ -12,6 +12,7 @@ import com.fluxtion.example.cookbook.pnl.calculator.PnlSummaryCalc;
 import com.fluxtion.example.cookbook.pnl.calculator.TradeLegToPositionAggregate;
 import com.fluxtion.example.cookbook.pnl.events.*;
 
+import com.fluxtion.example.cookbook.pnl.flatmapexample.generated.PnlFromFlatMapCalculator;
 import com.fluxtion.runtime.EventProcessor;
 
 import static com.fluxtion.example.cookbook.pnl.refdata.RefData.*;

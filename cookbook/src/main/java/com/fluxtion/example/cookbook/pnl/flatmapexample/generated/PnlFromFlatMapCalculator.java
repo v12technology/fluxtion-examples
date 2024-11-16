@@ -66,8 +66,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.46
- * api version                     : 9.3.46
+ * eventProcessorGenerator version : 9.3.47
+ * api version                     : 9.3.47
  * </pre>
  *
  * Event classes supported:
@@ -402,25 +402,7 @@ public class PnlFromFlatMapCalculator
     switch (typedEvent.filterString()) {
         // Event Class:[com.fluxtion.runtime.event.Signal] filterString:[eob]
       case ("eob"):
-        isDirty_pnlSummaryCalc_3 = pnlSummaryCalc_3.eobTrigger(typedEvent);
-        if (isDirty_pnlSummaryCalc_3) {
-          mapRef2RefFlowFunction_2.publishTriggerOverrideNodeUpdated(pnlSummaryCalc_3);
-        }
-        if (guardCheck_mapRef2RefFlowFunction_2()) {
-          isDirty_mapRef2RefFlowFunction_2 = mapRef2RefFlowFunction_2.map();
-          if (isDirty_mapRef2RefFlowFunction_2) {
-            mapRef2RefFlowFunction_4.inputUpdated(mapRef2RefFlowFunction_2);
-          }
-        }
-        if (guardCheck_mapRef2RefFlowFunction_4()) {
-          isDirty_mapRef2RefFlowFunction_4 = mapRef2RefFlowFunction_4.map();
-          if (isDirty_mapRef2RefFlowFunction_4) {
-            peekFlowFunction_6.inputUpdated(mapRef2RefFlowFunction_4);
-          }
-        }
-        if (guardCheck_peekFlowFunction_6()) {
-          peekFlowFunction_6.peek();
-        }
+        handle_Signal_eob(typedEvent);
         afterEvent();
         return;
     }
@@ -435,6 +417,30 @@ public class PnlFromFlatMapCalculator
     afterEvent();
   }
   // EVENT DISPATCH - END
+
+  // FILTERED DISPATCH - START
+  private void handle_Signal_eob(Signal typedEvent) {
+    isDirty_pnlSummaryCalc_3 = pnlSummaryCalc_3.eobTrigger(typedEvent);
+    if (isDirty_pnlSummaryCalc_3) {
+      mapRef2RefFlowFunction_2.publishTriggerOverrideNodeUpdated(pnlSummaryCalc_3);
+    }
+    if (guardCheck_mapRef2RefFlowFunction_2()) {
+      isDirty_mapRef2RefFlowFunction_2 = mapRef2RefFlowFunction_2.map();
+      if (isDirty_mapRef2RefFlowFunction_2) {
+        mapRef2RefFlowFunction_4.inputUpdated(mapRef2RefFlowFunction_2);
+      }
+    }
+    if (guardCheck_mapRef2RefFlowFunction_4()) {
+      isDirty_mapRef2RefFlowFunction_4 = mapRef2RefFlowFunction_4.map();
+      if (isDirty_mapRef2RefFlowFunction_4) {
+        peekFlowFunction_6.inputUpdated(mapRef2RefFlowFunction_4);
+      }
+    }
+    if (guardCheck_peekFlowFunction_6()) {
+      peekFlowFunction_6.peek();
+    }
+  }
+  // FILTERED DISPATCH - END
 
   // EXPORTED SERVICE FUNCTIONS - START
   @Override
@@ -456,6 +462,7 @@ public class PnlFromFlatMapCalculator
   }
   // EXPORTED SERVICE FUNCTIONS - END
 
+  // EVENT BUFFERING - START
   public void bufferEvent(Object event) {
     throw new UnsupportedOperationException("bufferEvent not supported");
   }
