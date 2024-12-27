@@ -66,8 +66,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.49
- * api version                     : 9.3.49
+ * eventProcessorGenerator version : 9.4.5
+ * api version                     : 9.4.5
  * </pre>
  *
  * Event classes supported:
@@ -192,6 +192,7 @@ public class PnlFromFlatMapCalculator
     isDirty("test");
     clock.init();
     handlerTrade.init();
+    flatMapArrayFlowFunction_0.init();
     mapRef2RefFlowFunction_2.initialiseEventStream();
     mapRef2RefFlowFunction_4.initialiseEventStream();
     templateMessage_5.initialise();
@@ -267,7 +268,7 @@ public class PnlFromFlatMapCalculator
       triggerCalculation();
     }
     if (processing) {
-      callbackDispatcher.processReentrantEvent(event);
+      callbackDispatcher.queueReentrantEvent(event);
     } else {
       processing = true;
       onEventInternal(event);

@@ -54,8 +54,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.49
- * api version                     : 9.3.49
+ * eventProcessorGenerator version : 9.4.5
+ * api version                     : 9.4.5
  * </pre>
  *
  * Event classes supported:
@@ -210,7 +210,7 @@ public class PriceLadderProcessorNoBranching
       triggerCalculation();
     }
     if (processing) {
-      callbackDispatcher.processReentrantEvent(event);
+      callbackDispatcher.queueReentrantEvent(event);
     } else {
       processing = true;
       onEventInternal(event);
