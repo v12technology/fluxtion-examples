@@ -55,7 +55,7 @@ public class Main {
         var maxStream = dataSumStream.slidingAggregateByCount(DoubleMaxFlowFunction::new, ROLLING_WINDOW_SIZE);
 
         BreachMonitor breachMonitor = new BreachMonitor();
-        DataFlow.push(breachMonitor::update, avgStream, minStream, maxStream)
+        DataFlow.push(breachMonitor::update, dataSumStream, avgStream, minStream, maxStream)
                 .filter(breachMonitor::exceedsDynamicThreshold)
                 .console("ALERT: Rolling average exceeds dynamic threshold! Adjust cooling system!");
 
@@ -76,8 +76,8 @@ public class Main {
         private double min;
         private double max;
 
-        public void update(double average, double min, double max){
-            System.out.println(String.format("Avg: %.2f | Max: %.2f | Min: %.2f", average, max, min));
+        public void update(double sum, double average, double min, double max){
+            System.out.println(String.format("Sum: %.2f | Avg: %.2f | Max: %.2f | Min: %.2f", sum, average, max, min));
             this.average = average;
             this.min = min;
             this.max = max;
