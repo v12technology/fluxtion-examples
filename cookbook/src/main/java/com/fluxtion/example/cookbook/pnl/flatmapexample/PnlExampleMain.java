@@ -37,7 +37,7 @@ public class PnlExampleMain {
     public static void buildPnlFlatMap(EventProcessorConfig c) {
         PnlSummaryCalc pnlSummaryCalc = new PnlSummaryCalc();
         DataFlow.subscribe(Trade.class)
-                .flatMapFromArray(Trade::tradeLegs)
+                .flatMapFromArray(Trade::tradeLegs, EOB_TRADE_KEY)
                 .groupBy(TradeLeg::instrument, TradeLegToPositionAggregate::new)
                 .publishTriggerOverride(pnlSummaryCalc)
                 .map(pnlSummaryCalc::calcMtmAndUpdateSummary)
@@ -48,19 +48,14 @@ public class PnlExampleMain {
 
     private static void sendEvents(EventProcessor pnlCalculator) {
         pnlCalculator.onEvent(new Trade(symbolEURJPY, -400, 80000));
-        pnlCalculator.publishSignal(EOB_TRADE_KEY);
 
         pnlCalculator.onEvent(new Trade(symbolEURUSD, 500, -1100));
-        pnlCalculator.publishSignal(EOB_TRADE_KEY);
 
         pnlCalculator.onEvent(new Trade(symbolUSDCHF, 500, -1100));
-        pnlCalculator.publishSignal(EOB_TRADE_KEY);
 
         pnlCalculator.onEvent(new Trade(symbolEURGBP, 1200, -1000));
-        pnlCalculator.publishSignal(EOB_TRADE_KEY);
 
         pnlCalculator.onEvent(new Trade(symbolGBPUSD, 1500, -700));
-        pnlCalculator.publishSignal(EOB_TRADE_KEY);
 
         pnlCalculator.onEvent(new MidPrice(symbolEURGBP, 0.9));
         pnlCalculator.onEvent(new MidPrice(symbolEURUSD, 1.1));
@@ -70,7 +65,7 @@ public class PnlExampleMain {
 
         System.out.println("---------- final trade -----------");
         pnlCalculator.onEvent(new Trade(symbolGBPUSD, 20, -25));
-        pnlCalculator.publishSignal(EOB_TRADE_KEY);
+//        pnlCalculator.publishSignal(EOB_TRADE_KEY);
 
         System.out.println("---------- change mtm EUR -----------");
         pnlCalculator.onEvent(new MtmInstrument(EUR));

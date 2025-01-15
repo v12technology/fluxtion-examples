@@ -164,6 +164,7 @@ public class PnlFromFlatMapCalculator
     if (context != null) {
       context.replaceMappings(contextMap);
     }
+    flatMapArrayFlowFunction_0.setFlatMapCompleteSignal("eob");
     flatMapArrayFlowFunction_0.dirtyStateMonitor = callbackDispatcher;
     flatMapArrayFlowFunction_0.callback = callBackNode_7;
     mapRef2RefFlowFunction_2.setDefaultValue(new EmptyGroupBy());
