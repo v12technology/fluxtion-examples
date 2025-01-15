@@ -17,6 +17,7 @@
 package com.fluxtion.example.reference.racing.generated;
 
 import com.fluxtion.runtime.StaticEventProcessor;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
@@ -27,6 +28,7 @@ import com.fluxtion.example.reference.racing.RaceCalculator.ResultsPublisherImpl
 import com.fluxtion.example.reference.racing.RaceCalculator.RunnerFinished;
 import com.fluxtion.example.reference.racing.RaceCalculator.RunnerStarted;
 import com.fluxtion.runtime.EventProcessorContext;
+import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -53,8 +55,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.49
- * api version                     : 9.3.49
+ * eventProcessorGenerator version : 9.7.2
+ * api version                     : 9.7.2
  * </pre>
  *
  * Event classes supported:
@@ -72,8 +74,8 @@ import java.util.function.Consumer;
 public class RaceCalculatorProcessor
     implements EventProcessor<RaceCalculatorProcessor>,
         /*--- @ExportService start ---*/
-        ResultsPublisher,
-        ServiceListener,
+        @ExportService ResultsPublisher,
+        @ExportService ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -81,24 +83,26 @@ public class RaceCalculatorProcessor
         Lifecycle {
 
   //Node declarations
-  private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  public final Clock clock = new Clock();
-  public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  public final RaceTimeTracker raceCalculator = new RaceTimeTracker();
-  public final ResultsPublisherImpl resultsPublisher = new ResultsPublisherImpl(raceCalculator);
-  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
-  private final MutableEventProcessorContext context =
+  private final transient CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final transient Clock clock = new Clock();
+  public final transient NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
+  public final transient RaceTimeTracker raceCalculator = new RaceTimeTracker();
+  public final transient ResultsPublisherImpl resultsPublisher =
+      new ResultsPublisherImpl(raceCalculator);
+  private final transient SubscriptionManagerNode subscriptionManager =
+      new SubscriptionManagerNode();
+  private final transient MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
-  private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
+  public final transient ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
+  private final transient ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
-  private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
+  private final transient IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
       new IdentityHashMap<>(2);
-  private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
+  private final transient IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(2);
 
   private boolean isDirty_clock = false;
@@ -206,12 +210,13 @@ public class RaceCalculatorProcessor
 
   //EVENT DISPATCH - START
   @Override
+  @OnEventHandler(failBuildIfMissingBooleanReturn = false)
   public void onEvent(Object event) {
     if (buffering) {
       triggerCalculation();
     }
     if (processing) {
-      callbackDispatcher.processReentrantEvent(event);
+      callbackDispatcher.queueReentrantEvent(event);
     } else {
       processing = true;
       onEventInternal(event);

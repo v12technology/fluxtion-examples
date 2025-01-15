@@ -17,6 +17,7 @@
 package com.fluxtion.example.cookbook.ml.linearregression.generated;
 
 import com.fluxtion.runtime.StaticEventProcessor;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
@@ -30,6 +31,7 @@ import com.fluxtion.example.cookbook.ml.linearregression.node.ReCalibrationCompl
 import com.fluxtion.example.cookbook.ml.linearregression.pipeline.HousePipelineFunctions;
 import com.fluxtion.example.cookbook.ml.linearregression.pipeline.LocationCategoryFeature;
 import com.fluxtion.runtime.EventProcessorContext;
+import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -64,8 +66,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.49
- * api version                     : 9.3.49
+ * eventProcessorGenerator version : 9.7.2
+ * api version                     : 9.7.2
  * </pre>
  *
  * Event classes supported:
@@ -83,10 +85,10 @@ import java.util.function.Consumer;
 public class OpportunityMlProcessor
     implements EventProcessor<OpportunityMlProcessor>,
         /*--- @ExportService start ---*/
-        CalibrationProcessor,
-        HouseSalesMonitor,
-        OpportunityNotifier,
-        ServiceListener,
+        @ExportService CalibrationProcessor,
+        @ExportService HouseSalesMonitor,
+        @ExportService OpportunityNotifier,
+        @ExportService ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -94,54 +96,55 @@ public class OpportunityMlProcessor
         Lifecycle {
 
   // Node declarations
-  private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  public final Clock clock = new Clock();
-  private final LiveHouseSalesCache liveHouseSalesCache_4 = new LiveHouseSalesCache();
-  public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
-  private final MutableEventProcessorContext context =
+  private final transient CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final transient Clock clock = new Clock();
+  private final transient LiveHouseSalesCache liveHouseSalesCache_4 = new LiveHouseSalesCache();
+  public final transient NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
+  private final transient SubscriptionManagerNode subscriptionManager =
+      new SubscriptionManagerNode();
+  private final transient MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  private final DefaultEventHandlerNode handlerHouseSaleDetails =
+  private final transient DefaultEventHandlerNode handlerHouseSaleDetails =
       new DefaultEventHandlerNode<>(
           2147483647,
           "",
           com.fluxtion.example.cookbook.ml.linearregression.api.HouseSaleDetails.class,
           "handlerHouseSaleDetails",
           context);
-  private final FilterFlowFunction filterFlowFunction_1 =
+  private final transient FilterFlowFunction filterFlowFunction_1 =
       new FilterFlowFunction<>(
           handlerHouseSaleDetails, HousePipelineFunctions::bedroomWithinRangeFilter);
-  private final FilterFlowFunction filterFlowFunction_2 =
+  private final transient FilterFlowFunction filterFlowFunction_2 =
       new FilterFlowFunction<>(filterFlowFunction_1, HousePipelineFunctions::correctLocationFilter);
-  private final PropertyToFeature area =
+  private final transient PropertyToFeature area =
       new PropertyToFeature<>("area", filterFlowFunction_2, HouseSaleDetails::getArea);
-  private final MapPropertyToFeature areaSquared =
+  private final transient MapPropertyToFeature areaSquared =
       new MapPropertyToFeature<>(
           "areaSquared",
           filterFlowFunction_2,
           HouseSaleDetails::getArea,
           HousePipelineFunctions::squared);
-  private final PropertyToFeature bedroom =
+  private final transient PropertyToFeature bedroom =
       new PropertyToFeature<>("bedroom", filterFlowFunction_2, HouseSaleDetails::getBedrooms);
-  private final LocationCategoryFeature locationCategoryFeature =
+  private final transient LocationCategoryFeature locationCategoryFeature =
       new LocationCategoryFeature(filterFlowFunction_2);
-  private final PropertyToFeature offerPrice =
+  private final transient PropertyToFeature offerPrice =
       new PropertyToFeature<>("offerPrice", filterFlowFunction_2, HouseSaleDetails::getOfferPrice);
-  private final PredictiveLinearRegressionModel predictiveLinearRegressionModel_3 =
+  private final transient PredictiveLinearRegressionModel predictiveLinearRegressionModel_3 =
       new PredictiveLinearRegressionModel(
           new Feature[] {offerPrice, area, areaSquared, locationCategoryFeature, bedroom});
-  private final OpportunityNotifierNode opportunityNotifierNode_0 =
+  private final transient OpportunityNotifierNode opportunityNotifierNode_0 =
       new OpportunityNotifierNode(predictiveLinearRegressionModel_3, liveHouseSalesCache_4);
-  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
-  private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
+  public final transient ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
+  private final transient ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
-  private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
+  private final transient IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
       new IdentityHashMap<>(10);
-  private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
+  private final transient IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(10);
 
   private boolean isDirty_area = false;
@@ -269,12 +272,13 @@ public class OpportunityMlProcessor
 
   // EVENT DISPATCH - START
   @Override
+  @OnEventHandler(failBuildIfMissingBooleanReturn = false)
   public void onEvent(Object event) {
     if (buffering) {
       triggerCalculation();
     }
     if (processing) {
-      callbackDispatcher.processReentrantEvent(event);
+      callbackDispatcher.queueReentrantEvent(event);
     } else {
       processing = true;
       onEventInternal(event);

@@ -17,6 +17,7 @@
 package com.fluxtion.example.cookbook.pnl.flatmapexample.generated;
 
 import com.fluxtion.runtime.StaticEventProcessor;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
@@ -29,6 +30,7 @@ import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
 import com.fluxtion.example.cookbook.pnl.events.Trade;
 import com.fluxtion.example.cookbook.pnl.events.TradeLeg;
 import com.fluxtion.runtime.EventProcessorContext;
+import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -39,6 +41,7 @@ import com.fluxtion.runtime.callback.InstanceCallbackEvent.InstanceCallbackEvent
 import com.fluxtion.runtime.dataflow.function.FlatMapArrayFlowFunction;
 import com.fluxtion.runtime.dataflow.function.MapFlowFunction.MapRef2RefFlowFunction;
 import com.fluxtion.runtime.dataflow.function.PeekFlowFunction;
+import com.fluxtion.runtime.dataflow.groupby.GroupBy.EmptyGroupBy;
 import com.fluxtion.runtime.dataflow.groupby.GroupByFlowFunctionWrapper;
 import com.fluxtion.runtime.dataflow.helpers.Mappers;
 import com.fluxtion.runtime.dataflow.helpers.Peekers.TemplateMessage;
@@ -66,8 +69,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.49
- * api version                     : 9.3.49
+ * eventProcessorGenerator version : 9.7.2
+ * api version                     : 9.7.2
  * </pre>
  *
  * Event classes supported:
@@ -88,7 +91,7 @@ import java.util.function.Consumer;
 public class PnlFromFlatMapCalculator
     implements EventProcessor<PnlFromFlatMapCalculator>,
         /*--- @ExportService start ---*/
-        ServiceListener,
+        @ExportService ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -96,47 +99,49 @@ public class PnlFromFlatMapCalculator
         Lifecycle {
 
   // Node declarations
-  private final InstanceCallbackEvent_0 callBackTriggerEvent_0 = new InstanceCallbackEvent_0();
-  private final CallBackNode callBackNode_7 = new CallBackNode<>(callBackTriggerEvent_0);
-  private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  public final Clock clock = new Clock();
-  private final GroupByFlowFunctionWrapper groupByFlowFunctionWrapper_1 =
+  private final transient InstanceCallbackEvent_0 callBackTriggerEvent_0 =
+      new InstanceCallbackEvent_0();
+  private final transient CallBackNode callBackNode_7 = new CallBackNode<>(callBackTriggerEvent_0);
+  private final transient CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final transient Clock clock = new Clock();
+  private final transient GroupByFlowFunctionWrapper groupByFlowFunctionWrapper_1 =
       new GroupByFlowFunctionWrapper<>(
           TradeLeg::instrument, Mappers::identity, TradeLegToPositionAggregate::new);
-  private final MtMRateCalculator mtMRateCalculator_9 = new MtMRateCalculator();
-  public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final PnlSummaryCalc pnlSummaryCalc_3 = new PnlSummaryCalc(mtMRateCalculator_9);
-  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
-  private final MutableEventProcessorContext context =
+  private final transient MtMRateCalculator mtMRateCalculator_9 = new MtMRateCalculator();
+  public final transient NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
+  private final transient PnlSummaryCalc pnlSummaryCalc_3 = new PnlSummaryCalc(mtMRateCalculator_9);
+  private final transient SubscriptionManagerNode subscriptionManager =
+      new SubscriptionManagerNode();
+  private final transient MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  private final DefaultEventHandlerNode handlerTrade =
+  private final transient DefaultEventHandlerNode handlerTrade =
       new DefaultEventHandlerNode<>(
           2147483647,
           "",
           com.fluxtion.example.cookbook.pnl.events.Trade.class,
           "handlerTrade",
           context);
-  private final FlatMapArrayFlowFunction flatMapArrayFlowFunction_0 =
+  private final transient FlatMapArrayFlowFunction flatMapArrayFlowFunction_0 =
       new FlatMapArrayFlowFunction<>(handlerTrade, Trade::tradeLegs);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_2 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_2 =
       new MapRef2RefFlowFunction<>(
           flatMapArrayFlowFunction_0, groupByFlowFunctionWrapper_1::aggregate);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_4 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_4 =
       new MapRef2RefFlowFunction<>(
           mapRef2RefFlowFunction_2, pnlSummaryCalc_3::calcMtmAndUpdateSummary);
-  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
-  private final TemplateMessage templateMessage_5 = new TemplateMessage<>("{}");
-  private final PeekFlowFunction peekFlowFunction_6 =
+  public final transient ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
+  private final transient TemplateMessage templateMessage_5 = new TemplateMessage<>("{}");
+  private final transient PeekFlowFunction peekFlowFunction_6 =
       new PeekFlowFunction<>(mapRef2RefFlowFunction_4, templateMessage_5::templateAndLogToConsole);
-  private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
+  private final transient ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
-  private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
+  private final transient IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
       new IdentityHashMap<>(8);
-  private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
+  private final transient IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(8);
 
   private boolean isDirty_callBackNode_7 = false;
@@ -161,6 +166,7 @@ public class PnlFromFlatMapCalculator
     }
     flatMapArrayFlowFunction_0.dirtyStateMonitor = callbackDispatcher;
     flatMapArrayFlowFunction_0.callback = callBackNode_7;
+    mapRef2RefFlowFunction_2.setDefaultValue(new EmptyGroupBy());
     mapRef2RefFlowFunction_2.setEventProcessorContext(context);
     mapRef2RefFlowFunction_2.setPublishTriggerOverrideNode(pnlSummaryCalc_3);
     mapRef2RefFlowFunction_4.setEventProcessorContext(context);
@@ -192,6 +198,7 @@ public class PnlFromFlatMapCalculator
     isDirty("test");
     clock.init();
     handlerTrade.init();
+    flatMapArrayFlowFunction_0.init();
     mapRef2RefFlowFunction_2.initialiseEventStream();
     mapRef2RefFlowFunction_4.initialiseEventStream();
     templateMessage_5.initialise();
@@ -262,12 +269,13 @@ public class PnlFromFlatMapCalculator
 
   // EVENT DISPATCH - START
   @Override
+  @OnEventHandler(failBuildIfMissingBooleanReturn = false)
   public void onEvent(Object event) {
     if (buffering) {
       triggerCalculation();
     }
     if (processing) {
-      callbackDispatcher.processReentrantEvent(event);
+      callbackDispatcher.queueReentrantEvent(event);
     } else {
       processing = true;
       onEventInternal(event);

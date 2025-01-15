@@ -17,6 +17,7 @@
 package com.fluxtion.example.reference.dsl.generated;
 
 import com.fluxtion.runtime.StaticEventProcessor;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
@@ -24,6 +25,7 @@ import com.fluxtion.runtime.callback.InternalEventProcessor;
 import com.fluxtion.example.reference.dsl.frontpage_examples.GraphPricer;
 import com.fluxtion.example.reference.dsl.frontpage_examples.GraphPricer.FairValueAbsolute;
 import com.fluxtion.runtime.EventProcessorContext;
+import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -60,8 +62,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.49
- * api version                     : 9.3.49
+ * eventProcessorGenerator version : 9.7.2
+ * api version                     : 9.7.2
  * </pre>
  *
  * Event classes supported:
@@ -78,7 +80,7 @@ import java.util.function.Consumer;
 public class FVGraphPricer
     implements EventProcessor<FVGraphPricer>,
         /*--- @ExportService start ---*/
-        ServiceListener,
+        @ExportService ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -86,109 +88,111 @@ public class FVGraphPricer
         Lifecycle {
 
   //Node declarations
-  private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  public final Clock clock = new Clock();
-  public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
-  private final MutableEventProcessorContext context =
+  private final transient CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final transient Clock clock = new Clock();
+  public final transient NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
+  private final transient SubscriptionManagerNode subscriptionManager =
+      new SubscriptionManagerNode();
+  private final transient MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  private final DefaultEventHandlerNode handlerDoubleSignal_daysToExpiry =
+  private final transient DefaultEventHandlerNode handlerDoubleSignal_daysToExpiry =
       new DefaultEventHandlerNode<>(
           2147483647,
           "daysToExpiry",
           com.fluxtion.runtime.event.Signal.DoubleSignal.class,
           "handlerDoubleSignal_daysToExpiry",
           context);
-  private final DefaultEventHandlerNode handlerDoubleSignal_dividends =
+  private final transient DefaultEventHandlerNode handlerDoubleSignal_dividends =
       new DefaultEventHandlerNode<>(
           2147483647,
           "dividends",
           com.fluxtion.runtime.event.Signal.DoubleSignal.class,
           "handlerDoubleSignal_dividends",
           context);
-  private final DefaultEventHandlerNode handlerDoubleSignal_futuresPrice =
+  private final transient DefaultEventHandlerNode handlerDoubleSignal_futuresPrice =
       new DefaultEventHandlerNode<>(
           2147483647,
           "futuresPrice",
           com.fluxtion.runtime.event.Signal.DoubleSignal.class,
           "handlerDoubleSignal_futuresPrice",
           context);
-  private final DefaultEventHandlerNode handlerDoubleSignal_interestRate =
+  private final transient DefaultEventHandlerNode handlerDoubleSignal_interestRate =
       new DefaultEventHandlerNode<>(
           2147483647,
           "interestRate",
           com.fluxtion.runtime.event.Signal.DoubleSignal.class,
           "handlerDoubleSignal_interestRate",
           context);
-  private final DefaultEventHandlerNode handlerDoubleSignal_spot =
+  private final transient DefaultEventHandlerNode handlerDoubleSignal_spot =
       new DefaultEventHandlerNode<>(
           2147483647,
           "spot",
           com.fluxtion.runtime.event.Signal.DoubleSignal.class,
           "handlerDoubleSignal_spot",
           context);
-  private final MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_0 =
+  private final transient MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_0 =
       new MapRef2ToDoubleFlowFunction<>(handlerDoubleSignal_spot, DoubleSignal::getValue);
-  private final MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_1 =
+  private final transient MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_1 =
       new MapRef2ToDoubleFlowFunction<>(handlerDoubleSignal_dividends, DoubleSignal::getValue);
-  private final MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_2 =
+  private final transient MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_2 =
       new MapRef2ToDoubleFlowFunction<>(handlerDoubleSignal_interestRate, DoubleSignal::getValue);
-  private final MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_3 =
+  private final transient MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_3 =
       new MapRef2ToDoubleFlowFunction<>(handlerDoubleSignal_daysToExpiry, DoubleSignal::getValue);
-  private final FairValueAbsolute fairValueAbsolute_21 = new FairValueAbsolute();
-  private final MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_16 =
+  private final transient FairValueAbsolute fairValueAbsolute_21 = new FairValueAbsolute();
+  private final transient MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_16 =
       new MapRef2ToDoubleFlowFunction<>(handlerDoubleSignal_futuresPrice, DoubleSignal::getValue);
-  private final NodeToFlowFunction nodeToFlowFunction_4 =
+  private final transient NodeToFlowFunction nodeToFlowFunction_4 =
       new NodeToFlowFunction<>(fairValueAbsolute_21);
-  private final MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_5 =
+  private final transient MapRef2ToDoubleFlowFunction mapRef2ToDoubleFlowFunction_5 =
       new MapRef2ToDoubleFlowFunction<>(nodeToFlowFunction_4, FairValueAbsolute::getDerivedValue);
-  private final MapDouble2ToDoubleFlowFunction mapDouble2ToDoubleFlowFunction_6 =
+  private final transient MapDouble2ToDoubleFlowFunction mapDouble2ToDoubleFlowFunction_6 =
       new MapDouble2ToDoubleFlowFunction(mapRef2ToDoubleFlowFunction_5, GraphPricer::round2Dps);
-  private final BinaryMapToDoubleFlowFunction binaryMapToDoubleFlowFunction_9 =
+  private final transient BinaryMapToDoubleFlowFunction binaryMapToDoubleFlowFunction_9 =
       new BinaryMapToDoubleFlowFunction<>(
           mapRef2ToDoubleFlowFunction_0,
           mapDouble2ToDoubleFlowFunction_6,
           Mappers::subtractDoubles);
-  private final BinaryMapToDoubleFlowFunction binaryMapToDoubleFlowFunction_17 =
+  private final transient BinaryMapToDoubleFlowFunction binaryMapToDoubleFlowFunction_17 =
       new BinaryMapToDoubleFlowFunction<>(
           mapRef2ToDoubleFlowFunction_16,
           mapDouble2ToDoubleFlowFunction_6,
           Mappers::subtractDoubles);
-  private final MapDouble2ToDoubleFlowFunction mapDouble2ToDoubleFlowFunction_10 =
+  private final transient MapDouble2ToDoubleFlowFunction mapDouble2ToDoubleFlowFunction_10 =
       new MapDouble2ToDoubleFlowFunction(binaryMapToDoubleFlowFunction_9, GraphPricer::round2Dps);
-  private final BinaryMapToDoubleFlowFunction binaryMapToDoubleFlowFunction_13 =
+  private final transient BinaryMapToDoubleFlowFunction binaryMapToDoubleFlowFunction_13 =
       new BinaryMapToDoubleFlowFunction<>(
           mapDouble2ToDoubleFlowFunction_10, mapRef2ToDoubleFlowFunction_0, Double::sum);
-  private final MapDouble2ToDoubleFlowFunction mapDouble2ToDoubleFlowFunction_18 =
+  private final transient MapDouble2ToDoubleFlowFunction mapDouble2ToDoubleFlowFunction_18 =
       new MapDouble2ToDoubleFlowFunction(binaryMapToDoubleFlowFunction_17, GraphPricer::round2Dps);
-  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
-  private final TemplateMessage templateMessage_7 = new TemplateMessage<>("fvAbs = {}");
-  private final DoublePeekFlowFunction doublePeekFlowFunction_8 =
+  public final transient ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
+  private final transient TemplateMessage templateMessage_7 = new TemplateMessage<>("fvAbs = {}");
+  private final transient DoublePeekFlowFunction doublePeekFlowFunction_8 =
       new DoublePeekFlowFunction(
           mapDouble2ToDoubleFlowFunction_6, templateMessage_7::templateAndLogToConsole);
-  private final TemplateMessage templateMessage_11 =
+  private final transient TemplateMessage templateMessage_11 =
       new TemplateMessage<>("spotPriceAdjustment:{}");
-  private final DoublePeekFlowFunction doublePeekFlowFunction_12 =
+  private final transient DoublePeekFlowFunction doublePeekFlowFunction_12 =
       new DoublePeekFlowFunction(
           mapDouble2ToDoubleFlowFunction_10, templateMessage_11::templateAndLogToConsole);
-  private final TemplateMessage templateMessage_14 = new TemplateMessage<>("spotPriceFV:{}");
-  private final DoublePeekFlowFunction doublePeekFlowFunction_15 =
+  private final transient TemplateMessage templateMessage_14 =
+      new TemplateMessage<>("spotPriceFV:{}");
+  private final transient DoublePeekFlowFunction doublePeekFlowFunction_15 =
       new DoublePeekFlowFunction(
           binaryMapToDoubleFlowFunction_13, templateMessage_14::templateAndLogToConsole);
-  private final TemplateMessage templateMessage_19 =
+  private final transient TemplateMessage templateMessage_19 =
       new TemplateMessage<>("futurePriceAdjustment:{}");
-  private final DoublePeekFlowFunction doublePeekFlowFunction_20 =
+  private final transient DoublePeekFlowFunction doublePeekFlowFunction_20 =
       new DoublePeekFlowFunction(
           mapDouble2ToDoubleFlowFunction_18, templateMessage_19::templateAndLogToConsole);
-  private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
+  private final transient ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   //Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
-  private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
+  private final transient IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
       new IdentityHashMap<>(20);
-  private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
+  private final transient IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(20);
 
   private boolean isDirty_binaryMapToDoubleFlowFunction_9 = false;
@@ -374,12 +378,13 @@ public class FVGraphPricer
 
   //EVENT DISPATCH - START
   @Override
+  @OnEventHandler(failBuildIfMissingBooleanReturn = false)
   public void onEvent(Object event) {
     if (buffering) {
       triggerCalculation();
     }
     if (processing) {
-      callbackDispatcher.processReentrantEvent(event);
+      callbackDispatcher.queueReentrantEvent(event);
     } else {
       processing = true;
       onEventInternal(event);

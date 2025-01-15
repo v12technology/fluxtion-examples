@@ -17,6 +17,7 @@
 package com.fluxtion.example.cookbook.pnl.joinexample.generated;
 
 import com.fluxtion.runtime.StaticEventProcessor;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
@@ -29,6 +30,7 @@ import com.fluxtion.example.cookbook.pnl.events.MidPrice;
 import com.fluxtion.example.cookbook.pnl.events.MtmInstrument;
 import com.fluxtion.example.cookbook.pnl.events.Trade;
 import com.fluxtion.runtime.EventProcessorContext;
+import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -37,6 +39,7 @@ import com.fluxtion.runtime.callback.ExportFunctionAuditEvent;
 import com.fluxtion.runtime.dataflow.function.BinaryMapFlowFunction.BinaryMapToRefFlowFunction;
 import com.fluxtion.runtime.dataflow.function.MapFlowFunction.MapRef2RefFlowFunction;
 import com.fluxtion.runtime.dataflow.function.PeekFlowFunction;
+import com.fluxtion.runtime.dataflow.groupby.GroupBy.EmptyGroupBy;
 import com.fluxtion.runtime.dataflow.groupby.GroupByFlowFunctionWrapper;
 import com.fluxtion.runtime.dataflow.groupby.GroupByMapFlowFunction;
 import com.fluxtion.runtime.dataflow.groupby.OuterJoin;
@@ -67,8 +70,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.49
- * api version                     : 9.3.49
+ * eventProcessorGenerator version : 9.7.2
+ * api version                     : 9.7.2
  * </pre>
  *
  * Event classes supported:
@@ -88,7 +91,7 @@ import java.util.function.Consumer;
 public class PnlFromJoinCalculator
     implements EventProcessor<PnlFromJoinCalculator>,
         /*--- @ExportService start ---*/
-        ServiceListener,
+        @ExportService ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -96,61 +99,63 @@ public class PnlFromJoinCalculator
         Lifecycle {
 
   // Node declarations
-  private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  public final Clock clock = new Clock();
-  private final GroupByFlowFunctionWrapper groupByFlowFunctionWrapper_0 =
+  private final transient CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final transient Clock clock = new Clock();
+  private final transient GroupByFlowFunctionWrapper groupByFlowFunctionWrapper_0 =
       new GroupByFlowFunctionWrapper<>(
           Trade::dealtInstrument, Mappers::identity, TradeToPositionAggregate::aggregateDealt);
-  private final GroupByFlowFunctionWrapper groupByFlowFunctionWrapper_2 =
+  private final transient GroupByFlowFunctionWrapper groupByFlowFunctionWrapper_2 =
       new GroupByFlowFunctionWrapper<>(
           Trade::contraInstrument, Mappers::identity, TradeToPositionAggregate::aggregateContra);
-  private final MapTuple mapTuple_47 = new MapTuple<>(InstrumentPosMtm::merge);
-  private final GroupByMapFlowFunction groupByMapFlowFunction_6 =
+  private final transient MapTuple mapTuple_47 = new MapTuple<>(InstrumentPosMtm::merge);
+  private final transient GroupByMapFlowFunction groupByMapFlowFunction_6 =
       new GroupByMapFlowFunction(mapTuple_47::mapTuple);
-  private final MtMRateCalculator mtMRateCalculator_45 = new MtMRateCalculator();
-  private final GroupByMapFlowFunction groupByMapFlowFunction_8 =
+  private final transient MtMRateCalculator mtMRateCalculator_45 = new MtMRateCalculator();
+  private final transient GroupByMapFlowFunction groupByMapFlowFunction_8 =
       new GroupByMapFlowFunction(mtMRateCalculator_45::calculateInstrumentPosMtm);
-  public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final OuterJoin outerJoin_4 = new OuterJoin();
-  private final PnlSummaryCalc pnlSummaryCalc_10 = new PnlSummaryCalc(mtMRateCalculator_45);
-  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
-  private final MutableEventProcessorContext context =
+  public final transient NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
+  private final transient OuterJoin outerJoin_4 = new OuterJoin();
+  private final transient PnlSummaryCalc pnlSummaryCalc_10 =
+      new PnlSummaryCalc(mtMRateCalculator_45);
+  private final transient SubscriptionManagerNode subscriptionManager =
+      new SubscriptionManagerNode();
+  private final transient MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  private final DefaultEventHandlerNode handlerTrade =
+  private final transient DefaultEventHandlerNode handlerTrade =
       new DefaultEventHandlerNode<>(
           2147483647,
           "",
           com.fluxtion.example.cookbook.pnl.events.Trade.class,
           "handlerTrade",
           context);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_1 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_1 =
       new MapRef2RefFlowFunction<>(handlerTrade, groupByFlowFunctionWrapper_0::aggregate);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_3 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_3 =
       new MapRef2RefFlowFunction<>(handlerTrade, groupByFlowFunctionWrapper_2::aggregate);
-  private final BinaryMapToRefFlowFunction binaryMapToRefFlowFunction_5 =
+  private final transient BinaryMapToRefFlowFunction binaryMapToRefFlowFunction_5 =
       new BinaryMapToRefFlowFunction<>(
           mapRef2RefFlowFunction_1, mapRef2RefFlowFunction_3, outerJoin_4::join);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_7 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_7 =
       new MapRef2RefFlowFunction<>(
           binaryMapToRefFlowFunction_5, groupByMapFlowFunction_6::mapValues);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_9 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_9 =
       new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_7, groupByMapFlowFunction_8::mapValues);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_11 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_11 =
       new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_9, pnlSummaryCalc_10::updateSummary);
-  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
-  private final TemplateMessage templateMessage_12 = new TemplateMessage<>("{}");
-  private final PeekFlowFunction peekFlowFunction_13 =
+  public final transient ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
+  private final transient TemplateMessage templateMessage_12 = new TemplateMessage<>("{}");
+  private final transient PeekFlowFunction peekFlowFunction_13 =
       new PeekFlowFunction<>(
           mapRef2RefFlowFunction_11, templateMessage_12::templateAndLogToConsole);
-  private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
+  private final transient ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
-  private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
+  private final transient IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
       new IdentityHashMap<>(10);
-  private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
+  private final transient IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(10);
 
   private boolean isDirty_binaryMapToRefFlowFunction_5 = false;
@@ -175,8 +180,11 @@ public class PnlFromJoinCalculator
     if (context != null) {
       context.replaceMappings(contextMap);
     }
+    binaryMapToRefFlowFunction_5.setDefaultValue(new EmptyGroupBy());
     binaryMapToRefFlowFunction_5.setEventProcessorContext(context);
+    mapRef2RefFlowFunction_1.setDefaultValue(new EmptyGroupBy());
     mapRef2RefFlowFunction_1.setEventProcessorContext(context);
+    mapRef2RefFlowFunction_3.setDefaultValue(new EmptyGroupBy());
     mapRef2RefFlowFunction_3.setEventProcessorContext(context);
     mapRef2RefFlowFunction_7.setEventProcessorContext(context);
     mapRef2RefFlowFunction_7.setPublishTriggerNode(mtMRateCalculator_45);
@@ -284,12 +292,13 @@ public class PnlFromJoinCalculator
 
   // EVENT DISPATCH - START
   @Override
+  @OnEventHandler(failBuildIfMissingBooleanReturn = false)
   public void onEvent(Object event) {
     if (buffering) {
       triggerCalculation();
     }
     if (processing) {
-      callbackDispatcher.processReentrantEvent(event);
+      callbackDispatcher.queueReentrantEvent(event);
     } else {
       processing = true;
       onEventInternal(event);

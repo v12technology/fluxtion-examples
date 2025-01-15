@@ -17,6 +17,7 @@
 package com.fluxtion.example.cookbook.dataingestion.pipeline;
 
 import com.fluxtion.runtime.StaticEventProcessor;
+import com.fluxtion.runtime.annotations.OnEventHandler;
 import com.fluxtion.runtime.lifecycle.BatchHandler;
 import com.fluxtion.runtime.lifecycle.Lifecycle;
 import com.fluxtion.runtime.EventProcessor;
@@ -31,6 +32,7 @@ import com.fluxtion.example.cookbook.dataingestion.function.PostProcessBinaryWri
 import com.fluxtion.example.cookbook.dataingestion.function.PostProcessCsvWriter;
 import com.fluxtion.example.cookbook.dataingestion.function.ProcessingStats;
 import com.fluxtion.runtime.EventProcessorContext;
+import com.fluxtion.runtime.annotations.ExportService;
 import com.fluxtion.runtime.audit.Auditor;
 import com.fluxtion.runtime.audit.EventLogManager;
 import com.fluxtion.runtime.audit.NodeNameAuditor;
@@ -62,8 +64,8 @@ import java.util.function.Consumer;
  *
  * <pre>
  * generation time                 : Not available
- * eventProcessorGenerator version : 9.3.49
- * api version                     : 9.3.49
+ * eventProcessorGenerator version : 9.7.2
+ * api version                     : 9.7.2
  * </pre>
  *
  * Event classes supported:
@@ -80,9 +82,9 @@ import java.util.function.Consumer;
 public class DataIngestionPipeline
     implements EventProcessor<DataIngestionPipeline>,
         /*--- @ExportService start ---*/
-        DataIngestComponent,
-        DataIngestStats,
-        ServiceListener,
+        @ExportService DataIngestComponent,
+        @ExportService DataIngestStats,
+        @ExportService ServiceListener,
         /*--- @ExportService end ---*/
         StaticEventProcessor,
         InternalEventProcessor,
@@ -90,65 +92,68 @@ public class DataIngestionPipeline
         Lifecycle {
 
   // Node declarations
-  private final CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
-  public final Clock clock = new Clock();
-  private final CsvToHouseRecordSerializer csvToHouseRecordSerializer_0 =
+  private final transient CallbackDispatcherImpl callbackDispatcher = new CallbackDispatcherImpl();
+  public final transient Clock clock = new Clock();
+  private final transient CsvToHouseRecordSerializer csvToHouseRecordSerializer_0 =
       new CsvToHouseRecordSerializer();
-  private final HouseRecordTransformer houseRecordTransformer_3 = new HouseRecordTransformer();
-  private final HouseRecordValidator houseRecordValidator_5 = new HouseRecordValidator();
-  private final InvalidLogWriter invalidLogWriter_47 = new InvalidLogWriter();
-  public final NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
-  private final PostProcessBinaryWriter postProcessBinaryWriter_35 = new PostProcessBinaryWriter();
-  private final PostProcessCsvWriter postProcessCsvWriter_31 = new PostProcessCsvWriter();
-  private final ProcessingStats processingStats_51 = new ProcessingStats();
-  private final SubscriptionManagerNode subscriptionManager = new SubscriptionManagerNode();
-  private final MutableEventProcessorContext context =
+  private final transient HouseRecordTransformer houseRecordTransformer_3 =
+      new HouseRecordTransformer();
+  private final transient HouseRecordValidator houseRecordValidator_5 = new HouseRecordValidator();
+  private final transient InvalidLogWriter invalidLogWriter_47 = new InvalidLogWriter();
+  public final transient NodeNameAuditor nodeNameLookup = new NodeNameAuditor();
+  private final transient PostProcessBinaryWriter postProcessBinaryWriter_35 =
+      new PostProcessBinaryWriter();
+  private final transient PostProcessCsvWriter postProcessCsvWriter_31 = new PostProcessCsvWriter();
+  private final transient ProcessingStats processingStats_51 = new ProcessingStats();
+  private final transient SubscriptionManagerNode subscriptionManager =
+      new SubscriptionManagerNode();
+  private final transient MutableEventProcessorContext context =
       new MutableEventProcessorContext(
           nodeNameLookup, callbackDispatcher, subscriptionManager, callbackDispatcher);
-  private final DefaultEventHandlerNode handlerString =
+  private final transient DefaultEventHandlerNode handlerString =
       new DefaultEventHandlerNode<>(
           2147483647, "", java.lang.String.class, "handlerString", context);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_1 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_1 =
       new MapRef2RefFlowFunction<>(handlerString, csvToHouseRecordSerializer_0::marshall);
-  private final FilterFlowFunction filterFlowFunction_11 =
+  private final transient FilterFlowFunction filterFlowFunction_11 =
       new FilterFlowFunction<>(
           mapRef2RefFlowFunction_1, CsvToHouseRecordSerializer::isBadCsvMessage);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_2 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_2 =
       new MapRef2RefFlowFunction<>(
           mapRef2RefFlowFunction_1, CsvToHouseRecordSerializer::getHouseRecord);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_4 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_4 =
       new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_2, houseRecordTransformer_3::transform);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_6 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_6 =
       new MapRef2RefFlowFunction<>(mapRef2RefFlowFunction_4, houseRecordValidator_5::validate);
-  private final FilterFlowFunction filterFlowFunction_14 =
+  private final transient FilterFlowFunction filterFlowFunction_14 =
       new FilterFlowFunction<>(mapRef2RefFlowFunction_6, HouseRecordValidator::isInValidRecord);
-  private final MapRef2RefFlowFunction mapRef2RefFlowFunction_7 =
+  private final transient MapRef2RefFlowFunction mapRef2RefFlowFunction_7 =
       new MapRef2RefFlowFunction<>(
           mapRef2RefFlowFunction_6, HouseRecordValidator::getValidHouseRecord);
-  private final PushFlowFunction pushFlowFunction_8 =
+  private final transient PushFlowFunction pushFlowFunction_8 =
       new PushFlowFunction<>(mapRef2RefFlowFunction_7, processingStats_51::validHouseRecord);
-  private final PushFlowFunction pushFlowFunction_9 =
+  private final transient PushFlowFunction pushFlowFunction_9 =
       new PushFlowFunction<>(mapRef2RefFlowFunction_7, postProcessCsvWriter_31::validHouseRecord);
-  private final PushFlowFunction pushFlowFunction_10 =
+  private final transient PushFlowFunction pushFlowFunction_10 =
       new PushFlowFunction<>(
           mapRef2RefFlowFunction_7, postProcessBinaryWriter_35::validHouseRecord);
-  private final PushFlowFunction pushFlowFunction_12 =
+  private final transient PushFlowFunction pushFlowFunction_12 =
       new PushFlowFunction<>(filterFlowFunction_11, invalidLogWriter_47::badCsvRecord);
-  private final PushFlowFunction pushFlowFunction_13 =
+  private final transient PushFlowFunction pushFlowFunction_13 =
       new PushFlowFunction<>(filterFlowFunction_11, processingStats_51::badCsvRecord);
-  private final PushFlowFunction pushFlowFunction_15 =
+  private final transient PushFlowFunction pushFlowFunction_15 =
       new PushFlowFunction<>(filterFlowFunction_14, invalidLogWriter_47::invalidHouseRecord);
-  private final PushFlowFunction pushFlowFunction_16 =
+  private final transient PushFlowFunction pushFlowFunction_16 =
       new PushFlowFunction<>(filterFlowFunction_14, processingStats_51::invalidHouseRecord);
-  public final ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
-  private final ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
+  public final transient ServiceRegistryNode serviceRegistry = new ServiceRegistryNode();
+  private final transient ExportFunctionAuditEvent functionAudit = new ExportFunctionAuditEvent();
   // Dirty flags
   private boolean initCalled = false;
   private boolean processing = false;
   private boolean buffering = false;
-  private final IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
+  private final transient IdentityHashMap<Object, BooleanSupplier> dirtyFlagSupplierMap =
       new IdentityHashMap<>(16);
-  private final IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
+  private final transient IdentityHashMap<Object, Consumer<Boolean>> dirtyFlagUpdateMap =
       new IdentityHashMap<>(16);
 
   private boolean isDirty_clock = false;
@@ -311,12 +316,13 @@ public class DataIngestionPipeline
 
   // EVENT DISPATCH - START
   @Override
+  @OnEventHandler(failBuildIfMissingBooleanReturn = false)
   public void onEvent(Object event) {
     if (buffering) {
       triggerCalculation();
     }
     if (processing) {
-      callbackDispatcher.processReentrantEvent(event);
+      callbackDispatcher.queueReentrantEvent(event);
     } else {
       processing = true;
       onEventInternal(event);
