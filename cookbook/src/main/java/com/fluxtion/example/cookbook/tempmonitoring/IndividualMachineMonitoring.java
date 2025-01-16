@@ -36,10 +36,7 @@ import java.util.*;
 public class IndividualMachineMonitoring {
 
     private static final String[] MACHINE_IDS = new String[]{"machine_GOOG", "machine_AMZN", "machine_MSFT", "machine_TKM"};
-
     public enum Locations {USA_EAST_1, USA_EAST_2}
-
-    ;
 
     public static void buildGraph(EventProcessorConfig processorConfig) {
         var workScheduler = new WorkScheduler();
