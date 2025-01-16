@@ -111,13 +111,13 @@ public class IndividualMachineMonitoring {
         private Map<Locations, SupportContact> supportContactnMap = new HashMap<>();
         private final DateTimeFormatter timeColonFormatter = DateTimeFormatter.ofPattern("HH:mm:ss SSS");
 
-        public void investigateMachine(Map<String, Double> stringDoubleMap) {
+        public void investigateMachine(Map<String, Double> machineWarningTempMap) {
 
-            if (stringDoubleMap.isEmpty()) {
+            if (machineWarningTempMap.isEmpty()) {
                 return;
             }
             String now = timeColonFormatter.format(LocalTime.now());
-            stringDoubleMap.forEach((machineId, temp) -> {
+            machineWarningTempMap.forEach((machineId, temp) -> {
                 MachineLocation machineLocation = machineLocationMap.get(machineId);
                 String contactDetails = "No contact found";
                 String location = "unknown";
