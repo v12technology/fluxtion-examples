@@ -6,16 +6,24 @@ import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.runtime.dataflow.groupby.GroupBy;
 import com.fluxtion.runtime.dataflow.helpers.Aggregates;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Monitors each machine for an average temperature breach in a sliding window of 4 seconds with a bucket size of 1 second
  * readings are produced randomly every 10 millis the aggregation handles all combining values within a window and dropping
- * values that have expired <br>
+ * values that have expired.<br>
+ * <br>
+ * Notifies a support contact in the correct location where the breach has occurred. The contact lookup is built up
+ * through events:
+ * <ul>
+ *     <li>MachineLocation = Machine id -> location</li>
+ *     <li>SupportContact = location -> contact details</li>
+ * </ul>
  * <br>
  * Running the app should produce an output similar to below
  *
@@ -36,6 +44,7 @@ import java.util.*;
 public class IndividualMachineMonitoring {
 
     private static final String[] MACHINE_IDS = new String[]{"machine_GOOG", "machine_AMZN", "machine_MSFT", "machine_TKM"};
+
     public enum Locations {USA_EAST_1, USA_EAST_2}
 
     public static void buildGraph(EventProcessorConfig processorConfig) {
@@ -46,24 +55,28 @@ public class IndividualMachineMonitoring {
         DataFlow.subscribe(MachineReadings.class)
                 //4 sec window with 1000 milli bucket size
                 .groupBySliding(MachineReadings::id, MachineReadings::temp, Aggregates.doubleAverageFactory(), 1000, 4)
-                .filterValues(temp -> temp > 48)
+                .filterValues(IndividualMachineMonitoring::tempBreachCheck)//inline lambda cant be compiled - use method reference
                 .map(GroupBy::toMap)
                 .push(workScheduler::investigateMachine);
 
         //machine location map
         DataFlow.groupBy(MachineLocation::id)
                 .map(GroupBy::toMap)
-                .push(workScheduler::machineLocationMap);
+                .push(workScheduler::setMachineLocationMap);
 
         //support contact location map
         DataFlow.groupBy(SupportContact::locationCode)
                 .map(GroupBy::toMap)
-                .push(workScheduler::supportContactnMap);
+                .push(workScheduler::setSupportContactnMap);
+    }
 
+    public static Boolean tempBreachCheck(Double inputTemp) {
+        return inputTemp > 48;
     }
 
     public static void main(String[] args) {
-        var machineMonitoring = Fluxtion.interpret(IndividualMachineMonitoring::buildGraph);
+        //use a compiled version, Fluxtion.interpret will work and handles in-line lambdas
+        var machineMonitoring = Fluxtion.compile(IndividualMachineMonitoring::buildGraph);
         machineMonitoring.init();
 
         //set up machine locations
@@ -76,23 +89,16 @@ public class IndividualMachineMonitoring {
         machineMonitoring.onEvent(new SupportContact("Jean", Locations.USA_EAST_1, "jean@fluxtion.com"));
         machineMonitoring.onEvent(new SupportContact("Tandy", Locations.USA_EAST_2, "tandy@fluxtion.com"));
 
-        Timer timer = new Timer("readingsThread", false);
         Random random = new Random();
-
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                String machineId = MACHINE_IDS[random.nextInt(MACHINE_IDS.length)];
-                double temperatureReading = random.nextDouble() * 100;
-                machineMonitoring.onEvent(new MachineReadings(machineId, temperatureReading));
-
-            }
-        }, 100, 10);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+                    String machineId = MACHINE_IDS[random.nextInt(MACHINE_IDS.length)];
+                    double temperatureReading = random.nextDouble() * 100;
+                    machineMonitoring.onEvent(new MachineReadings(machineId, temperatureReading));
+                },
+                100, 10, TimeUnit.MILLISECONDS);
 
         System.out.println("Application started - wait four seconds for first machine readings\n");
-
     }
-
 
     public record MachineReadings(String id, double temp) { }
 
@@ -100,16 +106,13 @@ public class IndividualMachineMonitoring {
 
     public record SupportContact(String name, Locations locationCode, String contactDetails) { }
 
-
     @Data
-    @Accessors(fluent = true)
     public static class WorkScheduler {
-        private Map<String, MachineLocation> machineLocationMap = new HashMap<>();
-        private Map<Locations, SupportContact> supportContactnMap = new HashMap<>();
-        private final DateTimeFormatter timeColonFormatter = DateTimeFormatter.ofPattern("HH:mm:ss SSS");
+        private transient Map<String, MachineLocation> machineLocationMap = new HashMap<>();
+        private transient Map<Locations, SupportContact> supportContactnMap = new HashMap<>();
+        private final DateTimeFormatter timeColonFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
 
         public void investigateMachine(Map<String, Double> machineWarningTempMap) {
-
             if (machineWarningTempMap.isEmpty()) {
                 return;
             }
@@ -127,6 +130,5 @@ public class IndividualMachineMonitoring {
             });
             System.out.println("----------------------------------------------------------------------\n");
         }
-
     }
 }
