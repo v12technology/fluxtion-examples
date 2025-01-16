@@ -20,8 +20,10 @@ public class IndividualMachineMonitoring {
     public static void buildGraph(EventProcessorConfig processorConfig) {
         var workScheduler = new WorkScheduler();
 
-        //machine monitoring rolling window
+        //4 second sliding window with bucket size of 1 second, calculates average temp in window
+        //group by on machine id so each machine has its own average temp state
         DataFlow.subscribe(MachineReadings.class)
+                //4 sec window with 1000 milli bucket size
                 .groupBySliding(MachineReadings::id, MachineReadings::temp, Aggregates.doubleAverageFactory(), 1000, 4)
                 .filterValues(temp -> temp > 48)
                 .map(GroupBy::toMap)
