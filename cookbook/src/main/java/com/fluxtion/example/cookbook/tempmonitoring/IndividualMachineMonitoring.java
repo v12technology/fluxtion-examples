@@ -50,32 +50,11 @@ public class IndividualMachineMonitoring {
 
     public enum Locations {USA_EAST_1, USA_EAST_2}
 
-    public static void buildGraph(EventProcessorConfig processorConfig) {
-        var workScheduler = new WorkScheduler();
+    public record MachineReadings(String id, double temp) {}
 
-        //4 second sliding window with bucket size of 1 second, calculates average temp in window
-        //group by on machine id so each machine has its own average temp state
-        DataFlow.subscribe(MachineReadings.class)
-                //4 sec window with 1000 milli bucket size
-                .groupBySliding(MachineReadings::id, MachineReadings::temp, Aggregates.doubleAverageFactory(), 1000, 4)
-                .filterValues(IndividualMachineMonitoring::tempBreachCheck)//inline lambda cant be compiled - use method reference
-                .map(GroupBy::toMap)
-                .push(workScheduler::investigateMachine);
+    public record MachineLocation(String id, Locations locationCode) {}
 
-        //machine location map
-        DataFlow.groupBy(MachineLocation::id)
-                .map(GroupBy::toMap)
-                .push(workScheduler::setMachineLocationMap);
-
-        //support contact location map
-        DataFlow.groupBy(SupportContact::locationCode)
-                .map(GroupBy::toMap)
-                .push(workScheduler::setSupportContactnMap);
-    }
-
-    public static Boolean tempBreachCheck(Double inputTemp) {
-        return inputTemp > 48;
-    }
+    public record SupportContact(String name, Locations locationCode, String contactDetails) {}
 
     public static void main(String[] args) {
         //use a compiled version, Fluxtion.interpret will work and handles in-line lambdas
@@ -103,11 +82,32 @@ public class IndividualMachineMonitoring {
         System.out.println("Application started - wait four seconds for first machine readings\n");
     }
 
-    public record MachineReadings(String id, double temp) { }
+    public static void buildGraph(EventProcessorConfig processorConfig) {
+        var workScheduler = new WorkScheduler();
 
-    public record MachineLocation(String id, Locations locationCode) { }
+        //4 second sliding window with bucket size of 1 second, calculates average temp in window
+        //group by on machine id so each machine has its own average temp state
+        DataFlow.subscribe(MachineReadings.class)
+                //4 sec window with 1000 milli bucket size
+                .groupBySliding(MachineReadings::id, MachineReadings::temp, Aggregates.doubleAverageFactory(), 1000, 4)
+                .filterValues(IndividualMachineMonitoring::tempBreachCheck)//inline lambda cant be compiled - use method reference
+                .map(GroupBy::toMap)
+                .push(workScheduler::investigateMachine);
 
-    public record SupportContact(String name, Locations locationCode, String contactDetails) { }
+        //machine location map
+        DataFlow.groupBy(MachineLocation::id)
+                .map(GroupBy::toMap)
+                .push(workScheduler::setMachineLocationMap);
+
+        //support contact location map
+        DataFlow.groupBy(SupportContact::locationCode)
+                .map(GroupBy::toMap)
+                .push(workScheduler::setSupportContactnMap);
+    }
+
+    public static Boolean tempBreachCheck(Double inputTemp) {
+        return inputTemp > 48;
+    }
 
     @Data
     public static class WorkScheduler {
