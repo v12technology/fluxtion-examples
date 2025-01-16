@@ -36,7 +36,10 @@ import java.util.*;
 public class IndividualMachineMonitoring {
 
     private static final String[] MACHINE_IDS = new String[]{"machine_GOOG", "machine_AMZN", "machine_MSFT", "machine_TKM"};
-    public enum Locations{USA_EAST_1, USA_EAST_2};
+
+    public enum Locations {USA_EAST_1, USA_EAST_2}
+
+    ;
 
     public static void buildGraph(EventProcessorConfig processorConfig) {
         var workScheduler = new WorkScheduler();
@@ -110,21 +113,21 @@ public class IndividualMachineMonitoring {
 
         public void investigateMachine(Map<String, Double> stringDoubleMap) {
 
-            if(stringDoubleMap.isEmpty()){
+            if (stringDoubleMap.isEmpty()) {
                 return;
             }
             String now = timeColonFormatter.format(LocalTime.now());
-                stringDoubleMap.forEach((machineId, temp) -> {
-                    MachineLocation machineLocation = machineLocationMap.get(machineId);
-                    String contactDetails = "No contact found";
-                    String location = "unknown";
-                    if(machineLocation != null) {
-                        location = machineLocation.locationCode.name();
-                        SupportContact contact = supportContactnMap.get(machineLocation.locationCode());
-                        contactDetails = contact == null ? contactDetails : "contact: " + contact.contactDetails;
-                    }
-                    System.out.printf("%s machineId: %s, temp: %s location: %s %s%n", now, machineId, temp, location, contactDetails);
-                });
+            stringDoubleMap.forEach((machineId, temp) -> {
+                MachineLocation machineLocation = machineLocationMap.get(machineId);
+                String contactDetails = "No contact found";
+                String location = "unknown";
+                if (machineLocation != null) {
+                    location = machineLocation.locationCode.name();
+                    SupportContact contact = supportContactnMap.get(machineLocation.locationCode());
+                    contactDetails = contact == null ? contactDetails : "contact: " + contact.contactDetails;
+                }
+                System.out.printf("%s machineId: %s, temp: %s location: %s %s%n", now, machineId, temp, location, contactDetails);
+            });
             System.out.println("----------------------------------------------------------------------\n");
         }
 
