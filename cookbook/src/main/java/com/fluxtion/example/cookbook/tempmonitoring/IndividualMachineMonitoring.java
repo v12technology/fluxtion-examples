@@ -28,22 +28,25 @@ import java.util.concurrent.TimeUnit;
  * Running the app should produce an output similar to below
  *
  * <pre>
+ *  Application started - wait four seconds for first machine readings
  *
- *     08:24:58 711 machineId: machine_AMZN, temp: 52.23570663362154 location: USA_EAST_1 contact: jean@fluxtion.com
- *     08:24:58 711 machineId: machine_GOOG, temp: 48.46758458121178 location: USA_EAST_1 contact: jean@fluxtion.com
- *     ----------------------------------------------------------------------
+ *  11:37:20.115 'server_TKM@USA_EAST_2', temp:'48.88' contact:'tandy@fluxtion.com'
+ *  11:37:20.115 'server_MSFT@USA_EAST_2', temp:'52.88' contact:'tandy@fluxtion.com'
+ *  11:37:20.115 'server_AMZN@USA_EAST_1', temp:'49.60' contact:'jean@fluxtion.com'
+ *  ----------------------------------------------------------------------
  *
- *     08:24:59 721 machineId: machine_AMZN, temp: 55.728445586631835 location: USA_EAST_1 contact: jean@fluxtion.com
- *     ----------------------------------------------------------------------
+ *  11:37:21.114 'server_TKM@USA_EAST_2', temp:'49.92' contact:'tandy@fluxtion.com'
+ *  11:37:21.114 'server_MSFT@USA_EAST_2', temp:'53.67' contact:'tandy@fluxtion.com'
+ *  ----------------------------------------------------------------------
  *
- *     08:25:00 722 machineId: machine_AMZN, temp: 57.88833058099956 location: USA_EAST_1 contact: jean@fluxtion.com
- *     08:25:00 722 machineId: machine_MSFT, temp: 48.939382869208174 location: USA_EAST_2 contact: tandy@fluxtion.com
- *     ----------------------------------------------------------------------
+ *  11:37:22.115 'server_TKM@USA_EAST_2', temp:'48.61' contact:'tandy@fluxtion.com'
+ *  11:37:22.115 'server_MSFT@USA_EAST_2', temp:'53.98' contact:'tandy@fluxtion.com'
+ *  ----------------------------------------------------------------------
  * </pre>
  */
 public class IndividualMachineMonitoring {
 
-    private static final String[] MACHINE_IDS = new String[]{"machine_GOOG", "machine_AMZN", "machine_MSFT", "machine_TKM"};
+    private static final String[] MACHINE_IDS = new String[]{"server_GOOG", "server_AMZN", "server_MSFT", "server_TKM"};
 
     public enum Locations {USA_EAST_1, USA_EAST_2}
 
@@ -80,10 +83,10 @@ public class IndividualMachineMonitoring {
         machineMonitoring.init();
 
         //set up machine locations
-        machineMonitoring.onEvent(new MachineLocation("machine_GOOG", Locations.USA_EAST_1));
-        machineMonitoring.onEvent(new MachineLocation("machine_AMZN", Locations.USA_EAST_1));
-        machineMonitoring.onEvent(new MachineLocation("machine_MSFT", Locations.USA_EAST_2));
-        machineMonitoring.onEvent(new MachineLocation("machine_TKM", Locations.USA_EAST_2));
+        machineMonitoring.onEvent(new MachineLocation("server_GOOG", Locations.USA_EAST_1));
+        machineMonitoring.onEvent(new MachineLocation("server_AMZN", Locations.USA_EAST_1));
+        machineMonitoring.onEvent(new MachineLocation("server_MSFT", Locations.USA_EAST_2));
+        machineMonitoring.onEvent(new MachineLocation("server_TKM", Locations.USA_EAST_2));
 
         //set up support contacts
         machineMonitoring.onEvent(new SupportContact("Jean", Locations.USA_EAST_1, "jean@fluxtion.com"));
@@ -124,9 +127,9 @@ public class IndividualMachineMonitoring {
                 if (machineLocation != null) {
                     location = machineLocation.locationCode.name();
                     SupportContact contact = supportContactnMap.get(machineLocation.locationCode());
-                    contactDetails = contact == null ? contactDetails : "contact: " + contact.contactDetails;
+                    contactDetails = contact == null ? contactDetails : "contact:'" + contact.contactDetails + "'";
                 }
-                System.out.printf("%s machineId: %s, temp: %s location: %s %s%n", now, machineId, temp, location, contactDetails);
+                System.out.printf("%s '%s@%s', temp:'%.2f' %s%n", now, machineId, location, temp, contactDetails);
             });
             System.out.println("----------------------------------------------------------------------\n");
         }
