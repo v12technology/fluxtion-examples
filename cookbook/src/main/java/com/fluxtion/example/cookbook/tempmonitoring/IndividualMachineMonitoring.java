@@ -89,6 +89,8 @@ public class IndividualMachineMonitoring {
             }
         }, 100, 10);
 
+        System.out.println("Application started - wait four seconds for first machine readings\n");
+
     }
 
 
@@ -104,7 +106,6 @@ public class IndividualMachineMonitoring {
     public static class WorkScheduler {
         private Map<String, MachineLocation> machineLocationMap = new HashMap<>();
         private Map<Locations, SupportContact> supportContactnMap = new HashMap<>();
-        private static final SupportContact emptyContact = new SupportContact("none", Locations.USA_EAST_1, "no contact");
         private final DateTimeFormatter timeColonFormatter = DateTimeFormatter.ofPattern("HH:mm:ss SSS");
 
         public void investigateMachine(Map<String, Double> stringDoubleMap) {
