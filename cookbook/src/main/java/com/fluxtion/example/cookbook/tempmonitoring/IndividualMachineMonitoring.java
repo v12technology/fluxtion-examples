@@ -12,6 +12,27 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * Monitors each machine for an average temperature breach in a sliding window of 4 seconds with a bucket size of 1 second
+ * readings are produced randomly every 10 millis the aggregation handles all combining values within a window and dropping
+ * values that have expired <br>
+ * <br>
+ * Running the app should produce an output similar to below
+ *
+ * <pre>
+ *
+ *     08:24:58 711 machineId: machine_AMZN, temp: 52.23570663362154 location: USA_EAST_1 contact: jean@fluxtion.com
+ *     08:24:58 711 machineId: machine_GOOG, temp: 48.46758458121178 location: USA_EAST_1 contact: jean@fluxtion.com
+ *     ----------------------------------------------------------------------
+ *
+ *     08:24:59 721 machineId: machine_AMZN, temp: 55.728445586631835 location: USA_EAST_1 contact: jean@fluxtion.com
+ *     ----------------------------------------------------------------------
+ *
+ *     08:25:00 722 machineId: machine_AMZN, temp: 57.88833058099956 location: USA_EAST_1 contact: jean@fluxtion.com
+ *     08:25:00 722 machineId: machine_MSFT, temp: 48.939382869208174 location: USA_EAST_2 contact: tandy@fluxtion.com
+ *     ----------------------------------------------------------------------
+ * </pre>
+ */
 public class IndividualMachineMonitoring {
 
     private static final String[] MACHINE_IDS = new String[]{"machine_GOOG", "machine_AMZN", "machine_MSFT", "machine_TKM"};
