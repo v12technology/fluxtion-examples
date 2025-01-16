@@ -14,7 +14,7 @@ import java.util.List;
 public class GroupByWithFilter {
 
     public static void main(String[] args) {
-        var sep = Fluxtion.interpret(c ->{
+        var sep = Fluxtion.interpret(c -> {
             DataFlow.subscribe(MachineReadings.class)
                     .groupByFieldsGetAndAggregate(
                             MachineReadings::temp,
@@ -38,12 +38,7 @@ public class GroupByWithFilter {
                     .filterValues(tempReadings -> tempReadings.size() > 10)
                     .mapValues(GroupByWithFilter::listToAverage)
                     .filterValues(temp -> temp > 48)
-                    .push(workScheduler::investigateMachine)
-
-//                    .reduceValues(v -> v.)
-//                    .filter(Predicates.hasMapChanged())
-
-            ;
+                    .push(workScheduler::investigateMachine);
 
         });
         sep.init();
@@ -66,24 +61,22 @@ public class GroupByWithFilter {
     }
 
 
+    public record MachineReadings(String id, double temp) { }
 
-    public record MachineReadings(String id, double temp){}
-    public record MachineLocation(String id, String locationCode){}
-    public record SupportContact(String name, String locationCode, String contactDetails){}
+    public record MachineLocation(String id, String locationCode) { }
 
-    public static double listToAverage(List<Double> list){
+    public record SupportContact(String name, String locationCode, String contactDetails) { }
+
+    public static double listToAverage(List<Double> list) {
         return list.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
-    }
-    private static class Aggregate{
-
     }
 
     @Data
-    public static class WorkScheduler{
+    public static class WorkScheduler {
         private MachineLocation machineLocation;
         private SupportContact supportContact;
 
-        public void investigateMachine(Object o){
+        public void investigateMachine(Object o) {
 
         }
     }
