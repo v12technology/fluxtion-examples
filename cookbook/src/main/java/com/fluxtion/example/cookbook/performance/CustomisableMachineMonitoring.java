@@ -1,4 +1,4 @@
-package com.fluxtion.example.cookbook.tempmonitoring;
+package com.fluxtion.example.cookbook.performance;
 
 import com.fluxtion.compiler.EventProcessorConfig;
 import com.fluxtion.compiler.Fluxtion;
@@ -80,6 +80,11 @@ public class CustomisableMachineMonitoring {
     public record MachineProfile(String id, LocationCode locationCode, double maxTempAlarm, double maxAvgTempAlarm) { }
     public record SupportContact(String name, LocationCode locationCode, String contactDetails) { }
 
+    public static int counter = 0;
+    public static int fastCounter = 0;
+    public static long loopCounter = 0;
+    public static long sumDelay = 0;
+
     public static void main(String[] args) {
         //use a compiled version, Fluxtion.interpret will work and handles in-line lambdas
         var tempMonitor = Fluxtion.compile(CustomisableMachineMonitoring::buildGraph);
@@ -87,10 +92,10 @@ public class CustomisableMachineMonitoring {
         tempMonitor.addSink("alarmPublisher", CustomisableMachineMonitoring::prettyPrintAlarms);
 
         //set up machine locations
-        tempMonitor.onEvent(new MachineProfile("server_GOOG", LocationCode.USA_EAST_1, 70, 48));
-        tempMonitor.onEvent(new MachineProfile("server_AMZN", LocationCode.USA_EAST_1, 99.999, 65));
-        tempMonitor.onEvent(new MachineProfile("server_MSFT", LocationCode.USA_EAST_2,105, 49.99));
-        tempMonitor.onEvent(new MachineProfile("server_TKM", LocationCode.USA_EAST_2,102, 50.0001));
+        tempMonitor.onEvent(new MachineProfile("server_GOOG", LocationCode.USA_EAST_1, 105, 48));
+        tempMonitor.onEvent(new MachineProfile("server_AMZN", LocationCode.USA_EAST_1, 105, 50));
+        tempMonitor.onEvent(new MachineProfile("server_MSFT", LocationCode.USA_EAST_2,195, 50));
+        tempMonitor.onEvent(new MachineProfile("server_TKM", LocationCode.USA_EAST_2,195, 50));
 
         //set up support contacts
         tempMonitor.onEvent(new SupportContact("Jean", LocationCode.USA_EAST_1, "jean@fluxtion.com"));
@@ -101,9 +106,26 @@ public class CustomisableMachineMonitoring {
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
                     String machineId = MACHINE_IDS[random.nextInt(MACHINE_IDS.length)];
                     double temperatureReading = random.nextDouble() * 100;
+                    long now = System.nanoTime();
                     tempMonitor.onEvent(new MachineReading(machineId, temperatureReading));
+
+                    long delay = System.nanoTime() - now;
+                    if(loopCounter == 20_000){
+                        sumDelay = delay * 20_000;
+                    }
+                    loopCounter++;
+                    sumDelay += delay;
+                    if(delay < 2_000){
+                        fastCounter++;
+                    }
+                    if(delay > 55_000 & loopCounter > 20_000) {
+                        counter++;
+                        long avgLatency = sumDelay / loopCounter;
+                        System.out.println("DELAY COUNT:" + counter + " loopCounter:" + loopCounter
+                        + " fastCounter:" + fastCounter + " avgLatency:" + avgLatency);
+                    }
                 },
-                10_000, 10, TimeUnit.MICROSECONDS);
+                100, 400, TimeUnit.NANOSECONDS);
 
         System.out.println("Application started - wait four seconds for first machine readings\n");
     }
