@@ -23,7 +23,9 @@ import java.util.stream.Collectors;
  * readings are produced randomly every 10 millis the aggregation handles all combining values within a window and dropping
  * values that have expired.<br>
  * <br>
- * Each machine can have its own temperature alarm profile updated by events MachineProfile<br>
+ * Alarm status is published on any change to the alarm state, i.e. new alarms or cleared old alarms<br>
+ * <br>
+ * Each machine can have its own temperature alarm profile updated by event MachineProfile<br>
  * <br>
  * Notifies a support contact in the correct location where the breach has occurred. The contact lookup is built up
  * through events:
@@ -34,11 +36,10 @@ import java.util.stream.Collectors;
  * <br>
  * <br>
  *
- * A sink is available for the host application to consume the alarm output
- * <br>
+ * A sink is available for the host application to consume the alarm output, in this case a pretty print consumer<br>
  * <br>
  *
- * Running the app should produce an output similar to below
+ * Running the app should produce an output similar to below:
  *
  * <pre>
  *  Application started - wait four seconds for first machine readings
@@ -161,11 +162,11 @@ public class CustomisableMachineMonitoring {
     @ToString
     public static class AlarmMonitor {
 
-        public Set<String> alarmsToClear = new HashSet<>();
-
-        public Map<String, MachineState> activeAlarms = new HashMap<>();
-        public Map<String, MachineState> newAlarms = new HashMap<>();
+        private transient final Set<String> alarmsToClear = new HashSet<>();
+        private transient final Map<String, MachineState> activeAlarms = new HashMap<>();
+        private transient final Map<String, MachineState> newAlarms = new HashMap<>();
         private boolean changed;
+
         public AlarmMonitor activeAlarms(Map<String, MachineState> updatedActiveAlarms) {
             changed = !activeAlarms.keySet().equals(updatedActiveAlarms.keySet());
 
