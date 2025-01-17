@@ -6,6 +6,7 @@ import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.runtime.annotations.AfterEvent;
 import com.fluxtion.runtime.dataflow.aggregate.function.primitive.DoubleAverageFlowFunction;
 import com.fluxtion.runtime.dataflow.groupby.GroupBy;
+import com.fluxtion.runtime.time.FixedRateTrigger;
 import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
@@ -141,6 +142,7 @@ public class CustomisableMachineMonitoring {
                 .mapBiFlowFunction(CustomisableMachineMonitoring::addContact, DataFlow.groupBy(SupportContact::locationCode))
                 .innerJoin(currentMachineTemp, MachineState::setCurrentTemperature)
                 .innerJoin(avgMachineTemp, MachineState::setAvgTemperature)
+                .publishTriggerOverride(FixedRateTrigger.atMillis(1_000))
                 .filterValues(MachineState::outsideOperatingTemp)
                 .map(GroupBy::toMap)
                 .map(new AlarmMonitor()::activeAlarms)

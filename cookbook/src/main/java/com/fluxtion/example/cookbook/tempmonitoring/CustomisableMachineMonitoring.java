@@ -6,6 +6,7 @@ import com.fluxtion.compiler.builder.dataflow.DataFlow;
 import com.fluxtion.runtime.annotations.AfterEvent;
 import com.fluxtion.runtime.dataflow.aggregate.function.primitive.DoubleAverageFlowFunction;
 import com.fluxtion.runtime.dataflow.groupby.GroupBy;
+import com.fluxtion.runtime.time.FixedRateTrigger;
 import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
@@ -89,7 +90,7 @@ public class CustomisableMachineMonitoring {
         //set up machine locations
         tempMonitor.onEvent(new MachineProfile("server_GOOG", LocationCode.USA_EAST_1, 70, 48));
         tempMonitor.onEvent(new MachineProfile("server_AMZN", LocationCode.USA_EAST_1, 99.999, 65));
-        tempMonitor.onEvent(new MachineProfile("server_MSFT", LocationCode.USA_EAST_2,105, 49.99));
+        tempMonitor.onEvent(new MachineProfile("server_MSFT", LocationCode.USA_EAST_2,92, 49.99));
         tempMonitor.onEvent(new MachineProfile("server_TKM", LocationCode.USA_EAST_2,102, 50.0001));
 
         //set up support contacts
@@ -116,9 +117,10 @@ public class CustomisableMachineMonitoring {
 
         DataFlow.groupBy(MachineProfile::id)
                 .mapValues(MachineState::new)
-                .mapBiFlowFunction(CustomisableMachineMonitoring::addContact, DataFlow.groupBy(SupportContact::locationCode))
+                .mapBiFunction(CustomisableMachineMonitoring::addContact, DataFlow.groupBy(SupportContact::locationCode))
                 .innerJoin(currentMachineTemp, MachineState::setCurrentTemperature)
                 .innerJoin(avgMachineTemp, MachineState::setAvgTemperature)
+                .publishTriggerOverride(FixedRateTrigger.atMillis(1_000))
                 .filterValues(MachineState::outsideOperatingTemp)
                 .map(GroupBy::toMap)
                 .map(new AlarmMonitor()::activeAlarms)
